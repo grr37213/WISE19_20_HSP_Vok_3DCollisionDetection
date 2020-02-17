@@ -1,27 +1,35 @@
 \documentclass[11pt,twoside,a4paper]{article}
+
 \usepackage{german,a4wide,amsmath,amssymb}
 
-% Mann will direkt Umlaute eingeben k�nnen statt \"a, \"o, \"u usw.
+% Mann will direkt Umlaute eingeben können statt \"a, \"o, \"u usw.
 % Entweder:
-%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 % oder:
 %\usepackage{umlaut}
 
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\usepackage[german]{babel}
 
 % Trennvorschl"age (in {} einfuegen, wenn nicht automatisch getrennt wird:
 % z.B. Authen-ti-ka-tions-sys-tem)
 \hyphenation{}
 
 \hyphenation{min-des-tens}
+\hyphenation{Kol-li-sions-er-ken-nung}
 
 
 %-------------------------- Formatsachen --------------------------%
 
 % Bild-, Tabellenunterschriften veraendern:
 % Nummer fett, kleinerer Text fuer Bildunterschrift
-\usepackage[bf,small]{caption}
+%\usepackage[bf,small]{caption}
 
-\usepackage{mathpazo}  % -- Palatino als Zeichensatz -- einfach diese
+
+%\usepackage{mathpazo}  % -- Palatino als Zeichensatz -- einfach diese
 					   % Zeile auskommentieren, falls nicht installiert
 %\usepackage{mathptmx}  % -- Times als Zeichensatz
 
@@ -88,7 +96,7 @@
 \begin{document}
 
 \title{HSP-Projektarbeit im Master Informatik \\
-\small Kollisionsdetection in in echtzeit-gerenderten 3D Simulationen}
+\small Kollisionsdetektion in in Echtzeit gerenderten 3D-Simulationen mit Fokus auf die Verwendung in Videospielen}
 \author{Robert Graf, Lukas Hermann\\
 %  (\texttt{fridolw@in.tum.de})\\[5mm]
 %  Seminar "`Internetrouting"' , \\
@@ -102,27 +110,39 @@
 
 \maketitle
 
+\newpage
+\tableofcontents
+
 \input{abstract.tex}
 
 \section{Einleitung}
 \input{introduction.tex}
 
+\section{Terminologie}
+\input{terminology.tex}
 
-TODO REMOVE
+\section{Problemdefinition}
+\input{problem_definition.tex}
 
-\begin{defi}[Beispieldefinition]
-Gegeben ... wird ... definiert als ..
-\end{defi}
+\section{Verwendungszwecke}
+\input{usages.tex}
 
-TODO REMOVE
+\section{Physikalischer Realismus}
+\input{physical_realism.tex}
 
-\section{Kapitel}
 
-Grr f"uhrt in \cite{grr} das Konzept der Geheimniszerlegung ein 
-(Beispielzitat).
+\section{Überlegungen und Recherche zu Problemstufen der Kollisionserkennung}
+\subsection{L0 : Datenrepräsentation}
+\input{l0.tex}
+\subsection{L1 : Suchraumverkleinerung/Kollisionspaarermittlung}
+\input{l1.tex}
+\subsection{L2 : Akkurate paarweise Kollsionserkennung}
+\input{l2.tex}
+\subsection{L3: Kollisionsauflösung}
+\input{l3.tex}
 
-Tse f"uhrt in \cite{tse} das Konzept der Geheimniszerlegung ein 
-(Beispielzitat).
+\section{Projektverlaufsbericht}
+\section{Umsetzungen}
 
 \section{Zusammenfassung}
 \input{summary.tex}

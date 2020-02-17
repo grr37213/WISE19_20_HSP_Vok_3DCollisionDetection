@@ -1,0 +1,27 @@
+\label{sec:physical_realism}
+Anforderungen an physikalischen Realismus einer Simulation im Bereich der Videospiele müssen relativiert werden.\\
+Realismus bezieht sich an dieser Stelle auf die Einhaltung einer konsistenten Spezifikation von physikalischem Verhalten in einer Simulation. Das spezifizierte Verhalten kann dabei durchaus von den physikalischen Möglichkeiten der realen Welt abweichen.\\
+\\
+Bei Simulationsanwendungen außerhalb der Unterhaltungsindustrie können sich selten Ungenauigkeiten oder gar Fehler erlaubt werden.\\
+Ist die interne Simulation der Umgebung eines Industrieroboters fehlerhaft kann Sach- oder sogar Personenschaden entstehen.\\
+Die Härte dieser Anforderung besteht in Videospielen nicht.\\
+\\
+Physikalischer Realismus dient in Videospielen nur der Immersivität des Konsumenten,~d.h. der Konsument soll der Illusion von absolutem Realismus ausgesetzt sein, während absoluter Realismus aber nicht Umgesetzt werden kann (prinzipiell wäre absoluter Realismus die Simulation aller Teilchen im Universum unter den bekannten Grundkräften). Die Simulation soll sich dabei nach der Erwartung des Konsumenten verhalten.\\
+Der Konsument ist dabei fokusiert auf die Inhalte des Spiels. Ein Bruch der Illusion ist nicht kritisch, wenn dabei der Spielfluss nicht gestört wird.\\
+Solche Störungen sind beispielhaft:
+\begin{itemize}
+	\item inkonsistentes physikalisches Verhalten aus der Perspektive des Konsumenten
+	\item fälschliche Annahmen des Konsumenten von tatsächlich fehlendem physikalischem Verhalten
+\end{itemize}
+Der Effekt der Störung wird dazu noch verstärkt, wenn der Konsument sich aus deren Grund spielerisch negativen Konsequenzen ausgesetzt sieht.\\
+
+
+Ein Beispiel dafür ist das Konzept der Hitbox, wie es in Abschnitt~\ref{sec:hitbox} beschrieben wurde.\\
+In CSGO ist die Genauigkeit der Hitbox kritisch. Inkonsistenzen in Hitboxen würden hier schnell zu Störungen im Spielfluss führen.\\
+In Minecraft wird die Störung durch ungenaue Hitboxen durch die nicht-kritikalität erheblich verringert, es treten kaum negative Konsequenzen auf. Außerdem tritt die Störung bei weitem nicht so oft auf, da Minecraft nicht schnell und reaktionär gespielt werden muss, wie CSGO, kann sich Zeit genommen werden auf die Modelle zu zielen, was selbst bei ungenauen Hitboxen eine hohe Trefferquote erzielt.\\
+Die Störung ist aber immernoch da! Es könnte an dieser Stelle diskutiert werden, ob bei Minecraft der Effekt der Störung zu schwach eingeschätzt wurde oder nicht. Die Aufstellung dieser Überlegungen zählt zu den Aufgaben eines Spieleentwicklers.\\
+\\
+Es ist daher essenziell, dass spezifische Annahmen und Anforderungen zur Umsetzung von physikalischem Realismus aufgestellt werden.\\
+Weiter ist es vonnöten Erwartungen hinsichtlich physikalischem Realismus zu relativieren. Nur die Illusion von Immersivität muss in Videospielen gewahrt werden. Nicht alle physikalischen Prozesse müssen bis ins kleinste Detail, mathematisch perfekt abgebildet werden. Es bestehen Freiheitsgrade. Algorithmen können approximiert werden, physikalische Prozesse durch Abänderung vereinfacht werden.\\
+Dadurch können unter Umständen Echzeitanforderungen eingehalten werden.
+

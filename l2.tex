@@ -1,0 +1,96 @@
+
+Die paarweise Kollisionserkennung (L2) behandelt die Kollision von ausschließlich zwei Objekten miteinander. Von L2 gefordert ist nun eine Bestätigung oder Falsifizierung der in L1 aufgestellten Kollisionsvermutung zweier Objekte.\\
+Anzumerken ist, dass die Kollisionsvermutung nur für den Zeitraum eines Ticks gilt. Weiter ist ebenfalls von L2 nur die Kollisionserkennung innerhalb dieses Zeitraums gefordert!
+
+\subsubsection{Input}
+Unter der Annahme eines naiven Suchraumfilters (L1), müssten $k^2$ (mit $k$ Anzahl der simulierten Körper im Raum) Körperpaare überprüft werden.\\
+Durch die Bemühungen zur Filterung, wie in Kapitel \ref{sec:l1}
+%TODO insert label in HLs text
+ beschrieben, kann die Anzahl der genauer zu überprüfenden Körperpaare verringert werden.\\
+
+
+\subsubsection{Output}
+Der tatsächliche Output der L2-Schicht hängt stark von den tatsächlichen Anforderungen an das System ab. Die Anforderungen werden von der nächsten Schicht L3 gestellt. Die Evaluierung von L3 und eine darauf folgende Anforderungsanalyse müssen durchgeführt werden (siehe \ref{sec:l3}.\\
+
+\subsubsection{Methoden}
+Theoretisch können Objekte als eine Menge von Punkten dargstellt werden. Die Menge der Punkte ist dabei begrenzt durch die Form des Objektes und die Art der Darstellung ($\mathbb{S}$, bzw. im Relativen $\mathbb{F}$).
+Bei einer zeitlichen Bewegung nimmt das Objekt entlang einer Zeitdimension ebenfalls Positionen ein. Theoretisch ist das Kollisionsproblem also das Problem der Ermittlung des Schnittes zweier Objekte $O_0 \cap O_1$ in 4-dimensionaler Darstellung.\\
+Dieses Problem ist berechnungstechnisch zum Stand der Technik jedoch nicht realistisch echtzeitfähig zu lösen.\\
+\\
+Das Problem wird aus diesem Grund vereinfacht. Es werden nicht alle Punkte, die das Objekt beinhaltet betrachtet. Es genügt (bei stetigen Bewegungen der Objekte) ein Überschneiden der Hülle beider Objekte festzustellen.
+Weiter werden zur Darstellung der Hüllen mathematische Modelle verwendet(Vertices, Edges)(siehe \ref{sec:object}).\\
+Es hat sich etabliert, beliebige 3-dimensionale Modelle aus Dreicken aufzubauen. Es werden also mathematische Modelle von Dreiecken auf einen Kollisionskurs überprüft.\\
+
+\begin{itemize}
+	\item[Methode0:] Lineare Interpolation\\
+		Unter Annahme von Objektrepräsentation R0 (vgl. \ref{sec:object}) und Eigenschaften des Raums (vgl. \ref{sec:space}) gelten folgende Eigenschaften.
+		\begin{itemize}
+			\item Die Bewegungen von Objekt und Objektmerkmalen sind
+				\begin{itemize}
+					\item stetig
+					\item linear
+				\end{itemize}
+			\item Ecken behalten ihre Position relativ zu anderen Ecken des selben Objekts $\Rightarrow$ Bewegungsbahnen der Ecken verlaufen parallel.
+			\item Objekte werden zueinander in Position und Zeit relativiert, d.h. ein Objekt nimmt die starre Position am Ursprung ein, das andere führt die relative Bewegung aus.
+		\end{itemize}
+		Eine Methode, um unter diesen Umständen Kollisionen zu errechnen ist lineare Interpolation.\\
+\\
+		Durchführung:\\
+		Objekte sind aus Dreiecken aufgebaut. Es können also Dreiecke miteinander kollidiert werden.\\
+		Merkmale von Dreiecken sind:
+		\begin{itemize}
+			\item Ecke (eng. Vertex; Menge der Ecken von Objekt $i$ : $V_i$)
+			\item Kante (eng. Edge; Menge der Kanten von Objekt $i$ : $E_i$)
+			\item Fläche (eng. Face; Menge der Flächen von Objekt $i$ : $F_i$)
+		\end{itemize}
+		Es ist zu ermitteln, welche Merkmale miteinander mindestens kollidieren müssen, wenn eine Dreieckskollision stattfindet. Die Antwort hierzu ist:
+		\begin{itemize}
+			\item [(V$\times$F)] Eine Ecke durchschlägt eine Fläche.\\
+				$\Rightarrow$ Zu überpfüfende Paare: $(V_0\times F_1)\times (V_1\times F_0)$
+			\item [(E$\times$E)] Kanten durchschneiden sich gegenseitig.
+				$\Rightarrow$ Zu überprüfende Paare: $(E_0\times E_1)\times (E_1\times E_0) = (E_0\times E_1)$
+		\end{itemize}
+\ \\
+		Aufgrund der Relativierung muss nur eines der Merkmale muss eine zeitliche Bewegung durchführen
+		\begin{itemize}
+			\item [(V$\times$F)] 2 Möglichkeiten:
+				\begin{itemize}
+					\item[Option0:] Linie(Eckpunkt \& Zeitdimension) schneidet ein Dreieck
+					\item[Option1:] Punkt schneidet ein schiefes Prisma(Dreicksfläche \& Zeitdimension)
+				\end{itemize}
+				Gewählt wird Option0, da einfacher.
+			\item [(E$\times$E):]  Parallelogramm(Linie \& Zeitdimension) schneidet Linie
+		\end{itemize}
+\ \\
+		Geometrische Eigenschaften nun beteiligter Formen:
+		\begin{itemize}
+			\item [Linie] $L = \{l | x\in\mathbb{F} ; l_0, l_1 \in \mathbb{F}^3 ; l = l_0 + x * l_1; 0\le x\le 1 \}$ \\
+			mit Startpunkt $l_0$ und Endpunkt $l_0 + l_1$
+		\item [Dreieck] $T = \{t | x,y \in\mathbb{F}; t_0, t_1, t_2 \in \mathbb{F}; t = t_0 + x*t_1 + y*t_2; 0\le (x+y) \le 1\}$\\
+			mit Eckpunkten $a = t_0 ; b = t_0 + t_1 ; c = t_0 + t_2$ 
+			\item [Parallelogramm] $P = \{p | x,y \in\mathbb{F}; p_0, p_1, p_2 \in \mathbb{F}; p = p_0 + x*p_1 + y*p_2; 0\le x\le 1; 0\le y\le 1\}$\\
+			mit Eckpunkten $a = p_0 ; b = p_0 + 1.0*p_1 ; c = p_0 + 1.0*p_2; d = p_0 + 1.0*p_1 + 1.0*p_2$ 
+		\end{itemize}
+\ \\
+		Beide Szenarien können über Gleichungssysteme zur Ermittlung der Koeffizienten in konstanter Zeit überprüft werden:
+		\begin{itemize}
+			\item [(V$\times$F):] $l_0 + x * l_1 = t_0 + y*t_1 + z*t_2$\\
+				$x$ ist zudem hier der Koeffizient der Zeit, da die Linie in der Zeitdimension liegt.
+			\item [(E$\times$E):] $l_0 + x * l_1 = p = p_0 + y*p_1 + z*p_2$\\
+				Sei die ursprüngliche Linie, aus dem das Parallelogram generiert wurde $p_0+y*p_1$, so liegt die andere Linie $p_0 + z*p_2$ in der Zeitdimension und somit ist hier z der Zeitkoeffizient.
+		\end{itemize}
+\ \\
+		Komplexität:
+\begin{itemize}
+			\item [(V$\times$F):] $\#V_0*\#F_1 + \#V_1*\#F_0$
+			\item [(E$\times$E):] $\#E_0*\#E_1$
+		\end{itemize}
+\ \\
+		Eigenschaften der Kollisionserkennung von linearer Interpolation unter den getroffenen Annahmen:
+		\begin{itemize}
+			\item mathematisch exakte Ermittlung der Zeit einer Kollision
+			\item mathematisch exakte Ermittlung des Orts einer Kollision
+			\item Ermittlung der Beteiligen Objektmerkmale
+			\item Zuverlässige Ermittlung der ersten Kollision (durch zeitliche Sortierung der einzelnen Merkmalskollisionen)
+		\end{itemize}
+\end{itemize}

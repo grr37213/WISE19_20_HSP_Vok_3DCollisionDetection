@@ -1,0 +1,61 @@
+Das L0-Level (siehe \ref{l0}) beschäftigt sich mit der Datenrepräsentation von Modellen, Zeit und Raum.\\
+
+\subsubsection{Zeit}
+Es existieren die Realzeit der echten Welt und die Simulationszeit. Die Zeiten können prinzipiell asynchron ablaufen.\\
+In einer Echzeitsimulation müssen beide zeiten jedoch synchronisiert werden.\\
+Es genügt dabei, diese Synchronisation in kurzen Zeitabschnitten herzustellen.\\
+Diese zeitlichen Abstände werden oft Ticks genannt (siehe \ref{sec:tick}).\\
+Gefordert sind hierbei Tickraten von ca. $60 Ticks/s \Rightarrow 16.6ms /Tick$.\\
+Realzeit wird in Microsekunden-Genauigkeit vom ausführenden Betriebssystem zu Beginn jedes Ticks erhalten. Das Intervall der vergangenen Simulationszeit kann so durch den Abgleich mit der erhaltenen Zeit des vorherigen Ticks errechnet werden. Dieser Anzahl Microsekunden wird dann in einen Floating-Point-Wert in Sekunden umgewandelt, welche als Zeitfaktor in physikalischen Berechnungen verwendet werden kann.
+
+\subsubsection{Raum}
+Der geforderte Raum ist 3-dimensional. Die Darstellung der Positionen im Raum erfolgt über 3-dimensionale Vektoren in der Einheit von Metern.\\
+Es wird daher ein Datentyp für Dezimalbrüche verwendet um kleinere Raumanteile zu erfassen.
+Floating-Point-Dezimalbrüche würden sich anbieten, jedoch tritt für große Räume ein Genauigkeitsproblem auf Grund der Werteverteilung in Floating-Point Datentypen auf.\\
+Sei $\mathbb{F} \subset \mathbb{R}$ mit $\mathbb{F}$ als Floating-Point-Datentyp, so ist die Verteilung der verfügbaren Werte des Floats dichter je näher am Ursprung($0.0$) \cite{floatdistribution}.\\
+Für eine Darstellung im Raum $\mathbb{F}^3$ existiert dabei das selbe Problem in 3 Dimensionen. Physikalische Prozesse können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.
+Es wird allerdings an dieser stelle Konsistenz der simulierten Prozesse unabhängig vom Ort im Raum gefordert.\\
+Lösungen des Problems sind
+\begin{enumerate}
+	\item Relativierung interagierender Objekte zueinander.\\
+		Funktioniert unter der Annahme, dass Entfernungen zwischen interagierenden Objekten gegenüber der Gesamtgröße des Raums relativ klein sind.
+	\item Aufteilung des Raums und Positionswerte von Objekten relativiert zu einem nahen Raumanteilsursprung\\
+		Sorgt dafür das Objektpositionswerte nicht dem Ungenauigkeitsproblem verfallen, wenn Objekte sich weit vom Raumursprung befinden. Dafür muss ein Positionsdatentyp $\mathbb{S}$ definiert werden, welcher den betreffenden Raumanteil pro Positionswert mitführt $\mathbb{S}:\mathbb{Z}\times\mathbb{F}$.
+\end{enumerate}
+
+Der Raum wird demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt.
+
+\subsubsection{Objekte}
+Über die Grafikbibliothek OpenGL können Objekte graphisch dargestellt werden. Die Bibliothek ermöglicht die Darstellung folgendermaßen:\\
+Es wird eine Ansammlung an Ecken (eng. vertices) über 3D-Vectoren (32Bit-floating-point) gegeben. Weiter eine Ansammlung von 3er Gruppen an Integers zu der Eckenansammlung um Dreiecke zu spezifizieren. Die Dreiecke Bilden dann den Körper.\\
+Da diese Art der Repräsentation von OpenGL auf diese Weise im allgemeinen verwendet wird und von der Seite der Physiksimulation keine konkreten Anforderungen gestellt sind, wurde entschieden die Objektrepresentationen gleich zu halten, um dynamische Unformungen zwischen Repräsentationen zu vermeiden.\\
+Jedes Objekt hat einen eigenen Ursprung, auf den sich die Vertexdaten beziehen.\\
+\\
+Im Folgenden werden weitere Attribute von Objekten aufgezählt. Dabei werden verschiedene Arten der Objektrepräsentation dargestellt.
+\begin{itemize}
+	\item[R0]
+		\begin{itemize}i
+			\item Ein Positionswert $p \in \mathbb{S}^3$, der den Objektursprung zum Raumursprung absolut beschreibt
+			\item Geschwindigkeitswert $v \in \mathbb{S}^3$ in Form eines Vektors, der die lineare Bewegung im Raum darstellen kann.
+		\end{itemize}
+		Diese Repräsentation ist für uns die Basis. Es gibt auch Entitäten in der Spielesimulation, welche keine 3 Dimensionalen Objekte sind (zum Beispiel Geräusche, unter Umständen sogar Projektile, welche durch einen Punkt dargestellt werden). Diese besitzen daher nur Position und Geschwindigkeit.
+		Für 3-Dimensionale Physiksimulation mit 3D Modellen ist das jedoch ungenügend, da Objekte sich beispielsweise nicht drehen, sondern in einer Konkreten ausrichtung verharren.
+	\item[R1]
+		\begin{itemize}
+			\item Inklusive R0
+			\item Ausrichtung des Objektes im Raum (Rotation)
+			\item Rotationsgeschwindigkeit (Tickweise Rotation)
+			\item Skalierung
+			\item Sklaierungsgeschwindigkeit (Wachsen \& Schrumpfen ; Tickweise Skalierung)
+		\end{itemize}
+
+	\item[R2]
+		\begin{itemize}
+			\item Animation des Objektes
+			\item Inklusive R0, unter Umständen auch R1 als Fallback
+		\end{itemize}
+\end{itemize}
+
+Mit R1 und R2 lassen sich schon akzeptablere Simulationen erstellen.
+	
+

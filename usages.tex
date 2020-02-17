@@ -1,0 +1,18 @@
+
+Es gibt in Videospielen mehrere Verwendungszwecke für Kollisionserkennung in der Simulation.
+Einige Beispiele sind:
+\begin{enumerate}
+	\item physikalische Simulation\\
+		Objekte, die sich gegenseitig durch Kollision beeinflussen.
+	\item Ermittlung eines Fokusobjektes\\
+		In 3D-Spielen wird oft ein Fadenkreuz in die Mitte des Bildes gelegt, welches als Auswahlwerkzeug dient. Um dies zu realisieren muss ermittelt werden, auf welches Objekt das Fadenkreuz zeigt. Das ist beispielsweise durch die Kollision mit einem Strahl in Blickrichtung zu bewerkstelligen.
+	\item Relative Interaktion\\
+		Beispiel: In einem bestimmten Bereich um den Spieler werden Gegenstände ins Inventar des Spielers gebracht. Realisierbar durch Kollidierenden Körper um den Spieler. Wenn Kollision, dann Aufnahme ins inventar.
+	\item Objektplazierung
+		Unter Gravitation: Objekte sollen auf den Boden plaziert werden. Ermittlung der Höhe.
+\end{enumerate}
+
+Die verschiedenen Verwendungszwecke haben unterschiedliche Anwendungen an Kollisionlogik in Punkten Kollisionsgenauigkeit und welche Informationen zur Kollision benötigt werden.\\
+Beispielsweise: Für die Ermittlung des Fokusobjektes soll das Objekt der Kollision ermittelt werden. Der Konkrete treffpunkt oder die Auftrittszeit innerhalb des Ticks ist für diese Aufgabe irrelvant.\\
+\\
+Anforderungen an die Kollisionserkennung entstehen daher aus vielen Szenarien. Kollisionserkennung ist demnach nicht nur ein einziges Verfahren im System. Kollisionserkennung umfasst auch den Kontext und die Auswahl des passenden Verfahrens mit Blick auf Performanz und Genauigkeit.
