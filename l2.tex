@@ -1,42 +1,43 @@
 
+Die Kollisionserkennung involviert die Ermittlung des Auftritts einer Kollision, kann aber unter Umständen auch die Ermittlung von relvanter Zusatzinformation Beinhalten. Diese sind zum Beispiel Zeit, Ort oder an der Kollision beteiligte Objektmerkmale.(vgl. \cite[Abschn. 2]{cd2D})\\
+
 Die paarweise Kollisionserkennung (L2) behandelt die Kollision von ausschließlich zwei Objekten miteinander. Von L2 gefordert ist nun eine Bestätigung oder Falsifizierung der in L1 aufgestellten Kollisionsvermutung zweier Objekte.\\
 Anzumerken ist, dass die Kollisionsvermutung nur für den Zeitraum eines Ticks gilt. Weiter ist ebenfalls von L2 nur die Kollisionserkennung innerhalb dieses Zeitraums gefordert!
 
-\subsubsection{Input}
+\subsection{Input}
 Unter der Annahme eines naiven Suchraumfilters (L1), müssten $k^2$ (mit $k$ Anzahl der simulierten Körper im Raum) Körperpaare überprüft werden.\\
 Durch die Bemühungen zur Filterung, wie in Kapitel \ref{sec:l1}
 %TODO insert label in HLs text
  beschrieben, kann die Anzahl der genauer zu überprüfenden Körperpaare verringert werden.\\
 
 
-\subsubsection{Output}
-Der tatsächliche Output der L2-Schicht hängt stark von den tatsächlichen Anforderungen an das System ab. Die Anforderungen werden von der nächsten Schicht L3 gestellt. Die Evaluierung von L3 und eine darauf folgende Anforderungsanalyse müssen durchgeführt werden (siehe \ref{sec:l3}.\\
+\subsection{Output}
+Der tatsächliche Output der L2-Schicht hängt stark von den tatsächlichen Anforderungen an das System ab. Die Anforderungen werden von der nächsten Schicht L3 gestellt. Durch die Evaluierung von L3 (siehe Ende \ref{sec:l3} wurden die vom L2-Algorithmus zu ermittelnden Informationen festgelegt.\\
 
-\subsubsection{Methoden}
+\subsection{Methoden}
 Theoretisch können Objekte als eine Menge von Punkten dargstellt werden. Die Menge der Punkte ist dabei begrenzt durch die Form des Objektes und die Art der Darstellung ($\mathbb{S}$, bzw. im Relativen $\mathbb{F}$).
 Bei einer zeitlichen Bewegung nimmt das Objekt entlang einer Zeitdimension ebenfalls Positionen ein. Theoretisch ist das Kollisionsproblem also das Problem der Ermittlung des Schnittes zweier Objekte $O_0 \cap O_1$ in 4-dimensionaler Darstellung.\\
-Dieses Problem ist berechnungstechnisch zum Stand der Technik jedoch nicht realistisch echtzeitfähig zu lösen.\\
-\\
-Das Problem wird aus diesem Grund vereinfacht. Es werden nicht alle Punkte, die das Objekt beinhaltet betrachtet. Es genügt (bei stetigen Bewegungen der Objekte) ein Überschneiden der Hülle beider Objekte festzustellen.
-Weiter werden zur Darstellung der Hüllen mathematische Modelle verwendet(Vertices, Edges)(siehe \ref{sec:object}).\\
-Es hat sich etabliert, beliebige 3-dimensionale Modelle aus Dreicken aufzubauen. Es werden also mathematische Modelle von Dreiecken auf einen Kollisionskurs überprüft.\\
 
-\begin{itemize}
-	\item[Methode0:] Lineare Interpolation\\
-		Unter Annahme von Objektrepräsentation R0 (vgl. \ref{sec:object}) und Eigenschaften des Raums (vgl. \ref{sec:space}) gelten folgende Eigenschaften.
-		\begin{itemize}
-			\item Die Bewegungen von Objekt und Objektmerkmalen sind
-				\begin{itemize}
-					\item stetig
-					\item linear
-				\end{itemize}
-			\item Ecken behalten ihre Position relativ zu anderen Ecken des selben Objekts $\Rightarrow$ Bewegungsbahnen der Ecken verlaufen parallel.
-			\item Objekte werden zueinander in Position und Zeit relativiert, d.h. ein Objekt nimmt die starre Position am Ursprung ein, das andere führt die relative Bewegung aus.
-		\end{itemize}
-		Eine Methode, um unter diesen Umständen Kollisionen zu errechnen ist lineare Interpolation.\\
+Dieses Problem ist berechnungstechnisch auf Grund der Darstellung in Punktmengen viel zu komplex. Das Problem muss vereinfacht werden.\\
+Wie in Abschnitt \label{sec:l0_objects} beschrieben werden Objekte in Form von Polygon-Meshes dargestellt. Diese Darstellung ist simpler. Es wird dabei stattdessen auf mathematische Eigenschaften der Merkmale der Mesh (Ecken, Kanten und Dreiecksflächen) zurückgegriffen um die in der ehemaligen Punktemenge enthaltenen Punkte mit einzugrenzen.\\
+An dieser Stelle kann grundsätlich zwischen zwei Problemklassen unterschieden werden:
+\begin{enumerate}
+	\item Inklusionsproblem\\
+		Das Problem zweier sich schneidender Objekte $O_0 \cap O_1$. Beantwortet die Frage: Schneiden sich zu diesem bestimmten Zeitpunkt die beiden Objekte?
+	\item Intrusionsproblem\\
+		Das Problem des Eindringens eines Objektes in das andere. Beantwortet die Frage: Zu welchem Zeitpunkt durchdringt die Hülle eines Objektes die Hülle des anderen Objektes.
+\end{enumerate}
+Die Probleme sind ähnlich und Lösen beide in gewisser Art und Weise das Kollisionserkennungsproblem.\\
+Jedoch wird unter dieser Anschauung schnell klar: Die Antwort auf das Inklusionsproblem liefert wenig Information für die in \ref{sec:l3} gestellten Anforderungen.\\
+Es wird sich daher auf das Intrusionsproblem mit Hüllobjekten konzentriert.
+
+
+\subsubsection{Lineare Interpolation}
+Annahme: Beteiligte Objekte haben keine Rotation (Rotation wird ignoriert).\\
+Bei einer Relativierung zu einem der beteiligten Objekte sind die Flugbahnen aller Ecken immernoch linear und parallel zu anderen Ecken des selben Objektes.\\
+Eine Methode, um unter diesen Umständen Kollisionen zu errechnen ist lineare Interpolation.\\
 \\
-		Durchführung:\\
-		Objekte sind aus Dreiecken aufgebaut. Es können also Dreiecke miteinander kollidiert werden.\\
+Objekte sind aus Dreiecken aufgebaut. Es können also Dreiecke miteinander kollidiert werden.\\
 		Merkmale von Dreiecken sind:
 		\begin{itemize}
 			\item Ecke (eng. Vertex; Menge der Ecken von Objekt $i$ : $V_i$)
@@ -93,4 +94,128 @@ Es hat sich etabliert, beliebige 3-dimensionale Modelle aus Dreicken aufzubauen.
 			\item Ermittlung der Beteiligen Objektmerkmale
 			\item Zuverlässige Ermittlung der ersten Kollision (durch zeitliche Sortierung der einzelnen Merkmalskollisionen)
 		\end{itemize}
+Probleme:\\
+Der Ansatz der linearen Interpolation bei rotierenden Körpern ist implizit auf Grund der nichtlinearen Natur der Rotationstransformationen fehlerhaft.\\
+Bei der linearen Approximation einer Rotation werden Schwingungen/Kreisbahnen mit linien approximiert. Der Fehler ist dabei abhängig von der Rotationsgeschwindigkeit.\\
+Ansätze, welche das Problem mit der Rotation verbessern würden, zum Beispiel die Krümmung des Raums zur Begradigung von Kreisbahnen bei der Relativierung einzellner Merkmale erscheinen zu komplex.
+		Der Ansatz der linearen Interpolation wird and dieser Stelle nicht mehr weiterverfolgt. Es erscheint zu viel Aufwand, rechnerisch und entwicklungstechnisch, für ein ungenaues Verfahren zu sein.\\
+\\
+Für lineare Interpolation wird ein Fazit gezogen:
+\begin{itemize}
+	\item Um den Fehler durch Approximierung von Rotation zu midigieren muss die Roationsgeschwindigkeit beschränkt werden.
+	\item Ohne Rotation ist der Ansatz exakt und erfüllt alle gestellten Anforderungen.
+	\item Praktisch immernoch in vielen Fällen gut einsetzbar (Beispiel: Punktförmigen Projektil gegen Terrain)
 \end{itemize}
+
+\subsubsection{Gilbert-Johnson-Keerhi-Algorithmus (GJK)}
+GJK ist ein Algorithmus zur Berechnung der minimalen Distanz zwischen für konvexen Sets, publiziert 1988 \cite{gjk}, der in vielen Kollisionverfahren eingesetzt wird.\\
+		Der Algorithmus wird in vielen Videospielen verwendet, nachweislich in Blizzard Entertainments Diabolo 3 (\cite{gdc-physics}), und Valves Half-Life 2(\cite{gjk-blog}).\\
+		
+		Seien die Objekte $K_0, K_1$ als kompakte Mengen von Raumpositionen gegeben, welche ein Objekt einnimmt.\\
+		Die Menge $M = \{c | c = a - b; a\in K_0 ; b\in K_1\}$ denotiert dabei die so genannte Minkowski-Differenz, deren Eigenschaften in diesem Verfahren ausgenutzt werden.\\
+		\begin{enumerate}
+			\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex.
+			\item Kollidieren/Überschneiden sich die Objekte $K_0, K_1$ so ist die Menge $K_0 \cap K_1$ nicht leer und so gilt, dass der Ursprung $O := (0,0,0)$ in der Minkowski-Differenz enthalten ist, da $\exists a_o, b_o \in K_0 \cap K_1 : a_o = b_o \Rightarrow a_o - b_o = O \Rightarrow O \in M_{K_0, K_1}$.
+			\item Der Ursprung markiert im Bezug auf $M$ die Distanz zwischen zwei Objekten, wobei die Distanz hier nicht die zwischen den einzelnen Objektursprüngen ist, sondern die minimale euklidische Distanz zwischen zwei Punkten der Objekte $distance: \mathbb{R}^3 \times \mathbb{R}^3 \mapsto \mathbb{R}; distance(K_0, K_1) = min\{|a - b| : a \in K_0 , b\in K_1\}$. Der näherste Punkt zum Urspung $P\in M$ hat die selbe Distanz wie die Objekte zueinander, wenn keine Schnittmenge besteht $if K_0 \cap K_1 = \emptyset \Rightarrow distance(P, O) = distance(K_0, K_1)$
+			\item Für den Fall $O \in M$ kann durch den Abstand zur konvexen Hülle $\mathcal{H}(M)$ eine Penetrationsziefe ermittelt werden, welche allerdings richtungslos ist, d.h. minimale Penetrationstiefe, nicht Penetrationstiefe bei Penetration von einer bestimmten Richtung.
+		\end{enumerate}
+		Die Berechnung von unendlich großen Mengen von Punkten ist jedoch berechnungstechnisch nicht praktikabel. Als Objektrepräsentation werden hier, wie auch in anderen 3D-Anwendungen üblich, stattdessen Ecken und Kanten der Hülle eines Objektes angegeben. Die entstehende diskrete Minkowski-Differenz $M_d$ ist daher nicht mehr kompakt. Die Verwendung der relevanten Eigenschaften der Minkowski-Differenz weicht deshalb etwas von der theoretischen Mengensemantik ab.
+Eine Illustation unter diesen Umständen ist in den Abbildungen \ref{fig:minkov_col}, \ref{fig:minkov_col_solo} und \ref{fig:minkov_noncol}zu sehen. Zu sehen sind, in Rot und Blau, die 2 Objekte, welche sich in \ref{fig:minkov_col} überschneiden und in \ref{fig:minkov_noncol} nicht. Die Gebilde, deren Ecken grün sind und deren Kanten rot und blau sind sind die jeweiligen Minkowski-Differenzen.
+Die grünen Punkte sind alle Punkte, die durch die Anwendung der Minkowski-Different auf die Menge der Eckpunkte beider Körper ermittelbar sind.\\
+Die Kanten sind rot oder blau, je nachdem von welchem Ursprungskörper eine Kante Einfluss erhält. So ist die Beteiligung beider Körper an der Differenz besser zu erkennen. Theoretisch sind auch die Kanten zwischen jedem Punktepaar mit gemischten Einflüssen der beiden Ursprungsobjekte darstellbar, welche aus Darstellungsgründen nicht in der Grafik enthalten sind. Isoliert steht in Abbildung \ref{fig:minkov_col_solo} die Minkowski-Differenz aus Abbildung \ref{fig:minkov_col}.\\
+An dieser Stelle wird auch festgehalten, dass das erhaltene Gebilde kein Hüllenobjekt mehr ist, da nun auch Punkte und Kanten im Innenraum bekannt sind.\\
+\\
+Um die Überschneidung der Objekte festzustellen, wird ermittelt, ob $O\in M$.\\
+$K_0, K_1$ sind konvex, daher ist $M$ ebenfalls konvex. Zwischen allen Punkten in einem konvexen Set existiert eine gerade Linie, die sie verbindet und die ebenfalls komplett im selben konvexen Set enthalten ist $\forall (P_0, P_1)\in M^2 : 0 \le x \le 1 ; (P_0 + P_1*x) \in M$. Dies gilt auch für $O$, wenn $O\in M \Rightarrow \exists (P_{O0}, P_{O1}) \in M^2 : P_{O0} + P_{O1}*x = O$.\\
+Die Restriktion auf $M_d$ verhindert allerdings die Verwendung dieser Eigenschaft, da die benötigten Punkte $(P_{O0}, P_{O1})$ nicht zwingen in $M_d$ enthalten sind, um die Verbindung zum Ursprung direkt herzustellen.\\
+Da der Ursprung also nicht direkt gesucht werden kann, wird versucht ihn einzugrenzen. Ist es möglich den Ursprung mit einem Simplex(im 3D-Fall ein Tetrahedron) mit Eckpunkten $v_i \in M_d$ zu umschließen, so ist $O\in M$.\\
+Der Algorithmus lautet wie folgt:
+\begin{itemize}
+	\item[1.] Starte an beliebigem Punkt $P_0 \in M_d$
+	\item[2.] Simplex $S = {P_0}$
+	\item[3.] Setze Richtung $D = -P_0$
+	\item[4.] Finde $P_{\#S}$, einen neuen Punkt für $S$, den maximalen Punkt in der Richtung $D$\\
+		Da $M$ konvex, existiert dieses Maximum in jede Richtung. Ermittelt wird dieser Punkt über die Größe des Skalarproduktes $P_1 = max\{D \cdot P_i ; P_i \in M_d\}$
+	\item[5.] Befindet sich der Ursprung noch hinter $P_{\#S}$ in Suchrichtung ist er nicht in $M$ enthalten, was ebenfalls über das Skalarprodukt ermittelbar ist $-P_{\#S} \cdot D > 0 \Rightarrow$ Frühzeitiger Abbruch, bzw. Ermittlung des nähersten Merkmals und dem Abstand zum Ursprung zur Distanzbestimmung.
+	\item[6.] $S \cup {P_{\#S}}$ Ermittle das näheste bekannte Merkmal. Die Art des bekannten Simplex hängt von der Größe von $S$, $\#S$ ab.
+		Gesucht wird immer das näherste Merkmal zum Ursprung. Darauf folgt Änderung der Suchrichtung in Richtung des Ursprungs orthogonal zu diesem Merkmal.
+		Dabei wird $S$ mit den Punkten des Merkmals übeschrieben und $D$ mit der neuen Richtung.
+		Wird bei $\#S$ festgestellt, dass sich der Ursprung im inneren des Tetrahedrons befindet, wurde die Kollision festgestellt.
+		Beispiel:\\
+			$\#S=2$: Linie $L_{P_0,P_1} = {P_O + x * P_1; 0\le x\le 1}$\\
+				%TODO check theory
+				Da von $P_0$ aus gesucht wurde und $P_1$ maximal $\Rightarrow$ $Linie L_{P_0,P_1}$ ist am nähersten am Ursprung.\\
+				Setze $D$ in die Richtung des Ursprungs orthogonal zu der Linie zwischen $ P_0, P_1 $, welche berechnet werden kann durch $L_0 \times OP_1 \times L_0$.
+	\item[7.] gehe zu 4.
+\end{itemize}
+Mit diesem Algorithmus können zwei statische 3D-Objekte auf Überschneidung überprüft werden. Der Algorithmus ist demnach eine Lösung für das Inklusionsproblem.\\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{./res/why_criteria.png}
+	\caption{Szenario, in dem das gezeigte Abbruchskriterium nicht am nähesten Merkmal zum Ursprung stoppt.}
+	\label{fig:why_criteria}
+\end{figure}
+
+Der bisher dargestellte Algorithmus löst jedoch nicht das Problem der Distanzfindung. Nachdem der Algorithmus in 5.~ abbricht, muss weiter nach dem nähesten Merkmal am Ursprung gesucht werden. Die Grafik \ref{fig:why_criteria} zeigt dabei, dass das bisherige Abbruchkriterium aus 5. nicht ausreicht.
+Dort zu sehen ist das schwarze Dreieck $ABC$ und der grüne Ursprung $O$. Angenommen der Algorithmus beginnt an Punkt $B$ und sucht in Richtung des Ursprungs (grüner Pfeil) so wird als nächster Supportpunkt A gewählt und somit die rote Linie gefunden. Das Abbruchkriterium prüft nun, ob der Ursprung noch hinter diesem maximalen Punkt in der Suchrichtung läge, was durch das Skalarprodukt zwischen dem blauen und dem grünen Pfeil festgestellt wird (Schritt 5). In dem in der Grafik gezeigten Szenario führte dies zum Abbruch. Das gefundene Merkmal $AB$, die rote Linie, ist jedoch nicht das näherste am Ursprung. Das näheste Merkmal am Ursprung wäre stattdessen die Linie AC.\\
+Prinzipiell ist das weitere Vorgehen des Algorithmus wie folgt zu beschreiben:\\
+Suche neues Vertex in Richtung des Ursprungs bis keine weitere Annäherung mehr erfolgt.\\
+Es wurden verschiedene Versuche unternommen das Kriterium einfach umzusetzen:
+\begin{enumerate}
+	\item Das Simplex, welches durch die bekannten Punkte aus $S$ gebildet wird besitzt eine minimale Distanz zum Ursprung, der errechnet werden kann. Verringert sich dieser Abstand nicht durch Erweiterung um den neuen Support-Punkt $P_{\#S}$ in 4. wird abgebrochen. Die Lösung bedient sich dabei anderen mathematischen Routinen, wie z.B. Normalisierung (welche Division verwendet) und wird daher zwar als trivial, aber auch als relativ komplex angesehen.
+	\item Neue Support Punkte sind nach 4.~ maximal. Ist das näherste Merkmal erreicht, so wird nach 4.~in eine Richtung gesucht, deren maximale Punkte bereits bekannt sein müssen. Daher ist ein mögliches Abbruchkriterium: Abbruch beim finden eines Support-Punktes, der bereits bekannt ist. Dieses Kriterium kann in Konstantzeit abgeprüft werden, da die bekannten Supportpunkte eine maximale Anzahl von 3 Annehmen können.
+	\item Ein neuer Support Punkt soll eine Erweiterung in die Suchrichtung darstellen. Seien $S$ die bekannten Support-Punkte und $P_{\#S}$ der neu gewonnene. Nehmen wir die Suchrichtung als Ebenennormale an, liegt das von den in $S$ enthaltenen Punkten gebildete Simplex in der dieser Ebene. Alle neuen Punkte, welche eine Erweiterung in Richtung des Ursprungs darstellen sollen, müssen in Richtung der Ebenennormale liegen. Dies ist festzustellen, in dem Vektoren $V := P_{\#S}-s_i ; s_i\in S$ auf ein positives Skalarprodukt mit der Suchrichtung überprüft werden. Abbruchkriterium: $\exists V : D \cdot V <= 0$. Idee: Wird ein koplanarer oder gar schon bekannte Support-Punkt gefunden ist das Skalarprodukt $0$ und der Abbruch wird eingeleitet, da keine Erweiterung mehr schaffbar ist.
+\end{enumerate}
+Bei der Implementierung der Abbruchkriterien wurden jedoch Probleme erkennbar. Bei Abbruchkriterien 2 und 3 konvergierte der Algorithmus regelmäßig nicht. Es wurden folgende Fehler gefunden:
+\begin{enumerate}
+	\item Falsche Annahme: Das näherste Merkmal der Markovsumme ist eindeutig.\\
+	Generierbare Simplices in der Markovsumme können überlappen (z.B. aber nicht ausschließlich mit anteilig gleichen Eckpunkten bei Dreiecken). Es können demnach mehrere nächste Simplices zum Ursprung existieren.\\
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{./res/parallel_features.png}
+	\caption{Szenario, in dem das gezeigte Abbruchskriterium nicht am nähesten Merkmal zum Ursprung stoppt.}
+	\label{fig:parfeat}
+\end{figure}
+
+		Die Grafik \ref{fig:parfeat} zeigt ein solches Szenario. Oben im Bild, die rote und blaue Linie, geben die Ursprungsobjekte an. Der Ursprung ist in violett zu sehen. Die unten im Bild befindliche Linie ist die Markovsumme der roten und blauen Linie. An dieser zu sehen, in Grün, sind die generierten Eckpunkte. Die koplanarität erlaubt dem Algorithmus das Ignorieren des mittleren grünen Punktes. Demnach sind hier der mittlere Punkt und die Linie, welche die beiden äußeren Punkte verbindet exakt gleich weit vom Ursprung entfernt, genauso sind die Linien von jeweils einem Punkt von außen zur Mitte, und ein Dreieck aus allen grünen Punkten.
+
+	\item Falsche Annahme: Verwendete Funktionen sind ausreichend genau.\\
+		Theoretisch sollten (nahezu) koplanare Merkmale dieselbe neue Suchrichtung erzeugen. Daraufhin neu gefundene Support-Punkte sind deterministisch (Reihenfolge der Markovpunkte in der Maximumssuche ist immer gleich, Maximumssuche ebenfalls deterministisch). Ungenauigkeiten bei der Suchrichtungsermittlung arbeiten jedoch diesem Determinismus entgegen und erzeugte bei (unter floating Point präzision) nahezu gleichen Eingaben unterschiedliche Punkte, wenn eine auswahl von nahezu koplanaren Punkten existiert. Mehr noch: Alle neuen Punkte skalierten dabei regelmäßig auf Grund der Ungenauigkeit auch noch positiv mit der Suchrichtung was zur Folge hat das Abbruchkriterien 2 und 3 zu keiner konvergenz führten und den Worst Case einer Endlosschleife annehmen.\\
+	Die Ungenauigkeit wurde auf die Kondition des Kreuzproduktes zurückgeführt, welches hauptsächlich zur Ermittlung der orthogonalen Suchrichtung verwendet wird. Das ursprüglich als zu komplex angesehene Abbruchkriterium 1 arbeitet nicht mit der aus Kreuzprodukten erzeugten Suchrichtung, sonder direkt auf den bekannten Merkmalen, verwendet selbst keine Kreuzprodukte und wird daher die einzig verbleibende Option. Das Kriterium führte auch in allen Tests erfolgreich zur Konvergenz.
+\end{enumerate}
+~\\
+Weiter ist der Algorithmus bis jetzt nur ein statischer Intersektionstest. Um aus dem Inklusionsalgorithmus einen Intrusionsalgorithmus zu machen, wird eine Nullstellensuche auf die erhaltene Distanz angewandt.
+Das Wurzelsuchverfahren hat zudem den Vorteil, dass es unabhängig von der Bewegungsart der Objekte ist. Animation, Rotation oder beliebige Transformation ist prinzipiell denkbar, solange über eine stetige Distanzfunktion abstrahiert wird.\\
+Insbesondere im Falle der Rotation sind Überlegungen zu Startpunkten der Suche and der Distanzfunktionskurve anzustellen. Bei einer schnellen Rotation kollidieren Objekte unter Umständen mehrfach hintereinander, mit kollisionsfreien Episoden dazwischen. Bei Betrachtungen der Intrusion können Nullstellen sowohl beim Ein- als auch beim Austritt festgestellt werden.\\
+Die Distanzfunktion verhält sich bei rotierenden Körpern wie eine Schwingung. Es gilt das Nyquist-Shannon-Abtasttheorem. Um beispielsweise die erste Nullstelle/Kollision zu finden ist die Rotationsgeschwindigkeit eines Objektes von Bedeutung, um den Suchraum bedeutend einzugrenzen.\\
+Desweiteren ist an dieser Stelle festzustellen, dass das Verfahren wieder durch die Rotationsgeschwindigkeit beschränkt wird.
+\\
+Des weiteren bleibt ein Problem mit der Restriktion auf konvexe Objekte mit diesem Ansatz. 
+Nicht-konvexte Objekte können in konvexe Objekte aufgetrennt werden. Praktisch wird diese Trennung meist extra mit dem Modell angegeben. Dabei sind in der Industrie die Form des tatsächlichen Modells und den zur Kollision angebenen Formen oft nicht kongruent und stellen daher inakkurate Hitboxen dar.\\
+Automatisierte Methoden der Aufteilung sind komplex. Prinzipiell, für den Fall dass Objekte rigide sind, ist eine solche Aufteilung 1-mal Aufwand und daher Echtzeitfähig. Sind Objekte jedoch flexibel, z.B. durch Animation an Gelenken, müsste eine automatisierte Aufteilung bei jeder Änderung, u.U.~ mehrere male pro Tick auf ein Objekt angewendet werden. Das wäre Echtzeitfähig nicht tragbar. Deshalb werden in vielen Videospielen Gelenke ignoriert oder durch Kugeln approximiert.\\
+Eine Familie nicht-konvexer Objekte, welche aus konvexen Objekten aufgebaut ist, ist prinzipiell noch abdeckbar. Dabei ist wiederholtes Verwenden des GJK-Algorithmus für jedes Teilobjektepaar verschiedener Ursprungsobjekte vonnöten. \\
+Es lohnt sich, konvexe Teilobjektpaare durch andere Verfahren vorzufiltern und auszuschließen, wenn möglich.\\
+Möglicher Ansatz hierfür ist z.B.~ wieder AABB-Pruning (wir bereits aus L1 bekannt).
+\\
+Überprüfung der erfüllung gestellter Anforderungen aus L3:\\
+\begin{itemize}
+	\item Die Kollision wird ermittelt
+	\item Die Kollisionszeit wird in einem bestimmten Genauigkeitsrahmen während der Wurzelsuche bekannt.
+	\item Die beteiligten Merkmale können aus den ermittelten nähersten Supportpunkten zurückgerechnet werden. Dazu werden zu den Supportpunkten die Quellpunkte mitgeführt.
+\end{itemize}
+
+Für das GJK-Wurzelverfahren wird ein Fazit gezogen:
+\begin{itemize}
+	\item abstrahiert erfolgreich das Intrusionsproblem durch die Distanz für beliebige stetige Bewegungen oder gar Objektveränderungen
+	\item fordert Aufteilung in konvexe Objekte
+	\item Wurzelsuche optimierbar oder erweiterbar durch weitere Verfahren (vgl. \cite{gdc-physics})
+	\item Verwendbar in vielen weiteren Kollisionsverfahren, in denen Distanz ermittelt werden muss
+\end{itemize}
+%TODO Complexity
+
+Weitere Anmerkungen zum GJK-Algorithmus.
+Der Kernpart des GJK-Algorithmus behandelt das Inklusionsproblem in beliebigen Dimensionen. Denkbar ist daher die Verwendung des GJK bei 4-dimensionalen Objekten, wie sie bei der linearen Interpolation behandelt wurden. Generell ist dieser Part des GJK im O-Kalkül sogar schneller als die $O(m*n)$ der linearen Interpolation. Die Informationen über beteiligte Features und vor allem, der konkrete Zeitpunkt der Kollision gehen dabei allerdings verloren. In bestimmten Szenarien\\
+Es gibt noch zahlreiche andere Algorithmen, welche den GJK-Algorithmus verwenden um Situationsbedingt bessere Ergebnisse zu erzielen (vgl.~\cite{gdc-physics}). GJK wird in diesem Projekt in ein vergleichsweise naives Verfahren eingabaut.\\
+

@@ -1,7 +1,7 @@
 
 Als einen Tick bezeichnet man in der Computergraphik oft einen Zeitabschnitt. Der Zeitabschnitt dient der Entkopplung der Zeit der realen Welt (Realzeit) gegenüber des Zeitablaufs in der Simulation.\\
 Die Zeit in einem Tick wird hier mit Zeiten zwischen dem Beginn des Ticks $t_0$ und dem Ende des Ticks $t_1$ bezeichnet.\\
-Das Rendering einer Szene läuft schon getaktet ab. Es wird üblicherweise Double-Buffering verwendet (siehe \ref{sec:doublebuffer}). Das Intervall, in dem ein Buffer gewechselt wird nennt man dabei den Grafiktick. Das Ziel ist es, das Ausgabebild zum Ende eines jeden Ticks mit dem internen Simulationsstatus zu syncronisieren.\\
+Eine Einheit von Prozessen des renderns einer Szene bis zum Anzeigen dieser Szene nennt man einen Grafiktick. Das Ziel ist es, das Ausgabebild zum Ende eines jeden Ticks mit dem internen Simulationsstatus zu synchronisieren.\\
 Die selbe Terminologie kann nun für die Physikberechnung verwendet werden. Man spricht von Physikticks, zu deren Ende die interne Simulation sich zur Realzeit synchronisiert.\\
 Die Aufgabe der Simulation ist also innerhalb eines Ticks den Status der Simulation vom Zeitpunkt $t_0$ auf den Status der Simulation vom Zeitpunkt $t_1$ zu ändern. Braucht das System länger als von der Spezifikaton gefordert (Anforderungen stammen meist von grafischer Bildrate ab) werden Realzeit und Simulationszeit diskrepant. Vermeidung dieses Effekts ist die Echtzeitanforderung an das Simulationssystem.
 Alle nötigen Berechnungen müssen demnach innerhalb dieser Zeit durchgeführt werden. Am Ende des Ticks besteht ein neuer Status, mit dem ein neuer Tick begonnen wird.\\

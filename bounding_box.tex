@@ -5,10 +5,11 @@ Eine Spezialform der Bounding-Box ist die Axis-Alligned-Bounding-Box (AABB). All
 Die AABB hat folgende weitere relevante Eigenschaften:
 \begin{itemize}
 	\item kleine Datenrepresentation möglich\\
-		Sei ein Objekt $O$ als Ansammlung der Positionen gegeben, welche es im Raum $\mathbb{R}^3$ einnimmt, so kann die AABB durch 2 d-dimensionale Vektoren $(v_{min}, v_{max}) \in (\mathbb{R}^{d}\times\mathbb{R}^{d})$ dargestellt werden. In ihnen werden Minimal- und Maximalpositionen der AABB festgehalten.
+		Sei ein Objekt $O$ als Ansammlung der Positionen gegeben, welche es im Raum $\mathbb{R}^3$ einnimmt, so kann die AABB durch zwei d-dimensionale Vektoren $(v_{min}, v_{max}) \in (\mathbb{R}^{d}\times\mathbb{R}^{d})$ dargestellt werden. In ihnen werden Minimal- und Maximalpositionen der AABB festgehalten.
 	\item Schnelle Kollisionsüberprüfung zwischen AABBs durch Vergleiche der Extrema (Komplexität $= \mathcal{O}(1)$)
 	\item Ermittlung einer minimalen AABB für ein Objekt durch Suche der Minima/Maxima (Komplexität $\le \mathcal{O}(n); n $ ist die Anzahl der Objektmerkmale (z.B. Ecken bei Polygon-Meshes))\\
 		Die AABB muss sich an das eingeschlossene Objekt bei Bewegung anpassen. Standardmäßig durch Neuermittlung der AABB($\mathcal{O}(n)$). Optimierungen für verschiedene Arten von Bewegung möglich (Positionsänderung, Skalierung, etc.), aber manchmal schwierig (z.B. bei Rotation).
 \end{itemize}
 
-Im Fall von dem Spiel Minecraft werden AABBs als Hitboxen verwendet (siehe \ref{fig:mwhitbox, fig:mphitbox}).
+Im Fall von dem Spiel Minecraft werden AABBs als Hitboxen verwendet (vgl. \ref{fig:mwhitbox, fig:mphitbox}), welche jedoch scheinbar dem Kriterium $Objekt \subseteq BB$ zuwiderlaufen. Es muss an dieser Stelle zwischen der mathematischen Korrektheit einer Bounding-Box gegenüber einem gegebenen physikalischen Modell und der Designentscheidung gemacht werden, dass das sichtbare Modell nicht die Grundlage des physikalischen Modells ist. In Minecraft ist die AABB das physikalische Modell ($Objekt = AABB$) und hat keinen Bezug zum grafisch sichbaren Modell. Das Bounding-Box-Kriterium ist damit theoretisch erfüllt. Die Designentscheidung selbst soll an dieser Stelle nicht eingeschätzt werden.
+

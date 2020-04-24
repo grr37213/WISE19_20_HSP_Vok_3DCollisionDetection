@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Einleitung}{3}
+\contentsline {section}{\numberline {2}Terminologie}{3}
+\contentsline {subsection}{\numberline {2.1}Tick}{3}
+\contentsline {subsection}{\numberline {2.2}Hitbox}{3}
+\contentsline {subsection}{\numberline {2.3}Bounding Box}{5}
+\contentsline {subsubsection}{\numberline {2.3.1}Axis-Alligned-Bounding-Box}{5}
+\contentsline {section}{\numberline {3}Problemdefinition}{6}
+\contentsline {subsection}{\numberline {3.1}Problemgrenzen}{6}
+\contentsline {section}{\numberline {4}Verwendungszwecke}{7}
+\contentsline {section}{\numberline {5}Physikalischer Realismus}{7}
+\contentsline {section}{\numberline {6}L0 : Datenrepr\IeC {\"a}sentation}{8}
+\contentsline {subsection}{\numberline {6.1}Zeit}{9}
+\contentsline {subsection}{\numberline {6.2}Raum}{9}
+\contentsline {subsection}{\numberline {6.3}Objektform}{9}
+\contentsline {subsection}{\numberline {6.4}Bewegung}{10}
+\contentsline {section}{\numberline {7}L1 : Suchraumverkleinerung/Kollisionspaarermittlung}{10}
+\contentsline {section}{\numberline {8}L3: Kollisionsaufl\IeC {\"o}sung}{10}
+\contentsline {section}{\numberline {9}L2 : Akkurate paarweise Kollsionserkennung}{13}
+\contentsline {subsection}{\numberline {9.1}Input}{13}
+\contentsline {subsection}{\numberline {9.2}Output}{13}
+\contentsline {subsection}{\numberline {9.3}Methoden}{13}
+\contentsline {subsubsection}{\numberline {9.3.1}Lineare Interpolation}{14}
+\contentsline {subsubsection}{\numberline {9.3.2}Gilbert-Johnson-Keerhi-Algorithmus (GJK)}{15}
+\contentsline {section}{\numberline {10}Projektverlaufsbericht}{21}
+\contentsline {section}{\numberline {11}Umsetzungen}{21}
+\contentsline {section}{\numberline {12}Zusammenfassung}{21}

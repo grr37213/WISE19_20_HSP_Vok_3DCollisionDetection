@@ -4,10 +4,3 @@
 \input{hitbox.tex}
 \subsection{Bounding Box}
 \input{bounding_box.tex}
-\subsection{Double Buffering}
-\label{sec:doublebuffer}
-Beim grafischen Rendern einer Szene werden übicher weise mehrere (hier 2) Buffer angelegt, in welche die Szene gezeichnet wird.\\
-Dabei ist ein Buffer der Renderbuffer, zu dem aktiv gezeichnet wird,\\
-der andere ist der Displaybuffer, welcher zur Anzeige aktivgeschaltet ist und dann in einem Fenster angezeigt werden kann.\\
-Nach einem volzogenen Rendering-Vorgang werden die Rollen der Buffer vertauscht und der nächste Rendering-Schritt durchgeführt. Dieser Zyklus wird Grafiktick genannt (siehe \ref{sec:tick})\\
-Dieses Verfahren wird verwendet um Race-Conditions auf den Buffer zu vermeiden, was sichtabre flickernde Fragmente im Ausgabebild erzeugen kann.
