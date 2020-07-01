@@ -39,24 +39,20 @@ Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$
 
 \subsection{Objektform}
 \label{sec:l0_objects}
-Objekte besitzen eine geometrische Form, welche relativ zur Objektposition angegeben wird. 
-Wie in der Computergrafik üblich werden Objekte in Form von Vertices (Ecken) angegeben, welche zu Dreiecken verbunden werden.\\
-Für das Intrusionsproblem im speziellen genügt einschätzungsweise die Betrachtung der Hülle des Objektes. Es ist üblicherweise auch nur die Hülle des Objektes, die für die Grafik von Interesse ist. Die Hülle stellt also die minimal benötigte Objektrepräsentation dar.\\
-
-Über die Grafikbibliothek OpenGL können Objekte graphisch dargestellt werden. Die Bibliothek fordert die Darstellung folgendermaßen:\\
-Es wird eine Ansammlung an Ecken (eng. vertices) über 3D-Vektoren (32Bit-floating-point) gegeben. Weiter eine Ansammlung von 3er Gruppen an Integers zu der Eckenansammlung um Dreiecke zu spezifizieren. Die Dreiecke Bilden dann den Körper. Diese Art der Darstellung entspricht der einer Polygon-Mesh.\\
-Da diese Art der Repräsentation von OpenGL auf diese Weise im allgemeinen verwendet wird und von der Seite der Physiksimulation keine konkreten Anforderungen gestellt sind, wurde entschieden die Objektrepresentationen gleich zu halten, um dynamische Unformungen zwischen Repräsentationen zu vermeiden.\\
-Die Vertices sind relativ zu einer dem Objekt zugehörigen Positionsvariable angegeben. Interagierende Objekte müssen sich daher vor einer Interaktion gegenseitig relativieren.\\
+Theoretisch können Objekte als eine Menge von Punkten dargstellt werden. Die Menge der Punkte ist dabei begrenzt durch die Form des Objektes und die Art der Darstellung ($\mathbb{S}$, bzw. im Relativen $\mathbb{F}$).
+Bei einer zeitlichen Bewegung nimmt das Objekt entlang einer Zeitdimension ebenfalls Positionen ein. Theoretisch ist das Kollisionsproblem also das Problem der Ermittlung des Schnittes zweier Objekte $O_0 \cap O_1$ in 4-dimensionaler Darstellung. Diese Objektdarstellung ist im gegebenen Kontext in der Mathematik üblich, in der Computergraphik und Simulation jedoch auf Grund potentiell unendlich großer Punktemengen suboptimal.\\
+In der Computergraphik hat sich daher eine andere Darstellung etabliert:\\
+Objekte besitzen eine geometrische Form, welche relativ zu einer zentralen Objektposition angegeben wird. Wir nennen diese zentrale Position an dieser Stelle das \glqq Center of Mass(COM)\grqq . 
+Wie in der Computergrafik üblich werden Objekte in Form von Vertices (Ecken) angegeben, welche zu Dreiecken verbunden werden. Dreiecke, Kanten und Ecken werden als Objektmerkmale bezeichnet.\\
+Für das Intrusionsproblem im speziellen genügt trivial die Betrachtung der Hülle des Objektes. Es ist üblicherweise auch nur die Hülle des Objektes, die für die Grafik von Interesse ist. Die Hülle stellt also die hier minimal benötigte Objektrepräsentation dar.\\
 
 Im Verlauf dieses Projekts werden Objekte außerdem als starr/rigide, unveränderlich und unzerstörbar angenommen.
 	
 \subsection{Bewegung}
-Eititäten in der 3D-Simulation nehmen eine Position im Raum ein.\\
+Entitäten in der 3D-Simulation nehmen eine Position im Raum ein.\\
 Physikalische 3D-Objekte sind Entitäten und haben zusätzlich eine Ausrichtung im Raum (Rotation).\\
 Beide dieser Größen (Position und Rotation) können einer zeitlichen Änderung unterliegen (Geschwindigkeit, Drehgeschwindigkeit).\\
-An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen standardmäßig nicht. Vertexpositionen können durch Transformation mit Transformationsmatrizen leicht zu bliebig ausgewählten Zeitpunkten des Ticks ermittelt werden.\\
-Denkbar sind daher auch weitere Transformationsmöglichkeiten (z.B.~Skalierung).\\
-Eine weitere Form der Bewegung, auf die hier nicht im Implementiertungsumfang des Projekts enthalten sein soll, ist die der Animation, welche eine übliche Art der Bewegung in vielen Spielen darstellt und daher erwähnt werden sollte.\\
-Animation funktioniert meist über die Zuweisung von Objektecken zu einer Drehachse (Gelenk) an einem Skelett, welche in einer Baumstruktur nacheinander transformiert werden. Animierte Objekte sind entweder nicht kontinuierlich (bestehen aus mehreren Teilen), oder aber flexibel (nicht rigide), durch die Problemstellung der Animation an Gelenken (Ecken des Objekts, welche zu mehreren Teilen des animierten Objekts gehören müssen). Gelenke werden daher gegenüber der Kollisionslogik oft als Kugeln approximiert (vgl. \ref{fig:chitbox}).
+An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht. Vertexpositionen zu bestimmten Zeiten können durch Matrixtransformationen errechnet werden.
+Andere Arten der Bewegung (wie z.B. durch Animation oder andere Transformationen wie Skalierung) sind in der Zukunft des Projektes denkbar, allerdings nicht Teil dieses Projektes.
 
 

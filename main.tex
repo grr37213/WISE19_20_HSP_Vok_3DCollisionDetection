@@ -1,25 +1,26 @@
 \documentclass[11pt,twoside,a4paper]{article}
 
-\usepackage{german,a4wide,amsmath,amssymb}
+\usepackage{a4wide,amsmath,amssymb}
 
 % Mann will direkt Umlaute eingeben können statt \"a, \"o, \"u usw.
 % Entweder:
 \usepackage[utf8]{inputenc}
 % oder:
 %\usepackage{umlaut}
+\usepackage[german]{babel}
 
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{subcaption}
 
-\usepackage[german]{babel}
+
 
 % Trennvorschl"age (in {} einfuegen, wenn nicht automatisch getrennt wird:
 % z.B. Authen-ti-ka-tions-sys-tem)
-\hyphenation{}
+%\hyphenation{}
 
-\hyphenation{min-des-tens}
-\hyphenation{Kol-li-sions-er-ken-nung}
+%\hyphenation{min-des-tens}
+%\hyphenation{Kol-li-sions-er-ken-nung}
 
 
 %-------------------------- Formatsachen --------------------------%
@@ -40,58 +41,8 @@
 %\draftcopySetScale{1}
 
 %--------------- Zeilen- und Absatzabstaende ----------------------%
-\setlength{\parindent}{0em}
-\setlength{\parskip}{\medskipamount}    % Abstand zwischen Abs"atzen
-
-% ---------- Umgebungen f"ur Satz/ Lemma, etc. --------------------%
-\newtheorem{satz}{Satz}
-\newtheorem{nota}{Notation}
-\newtheorem{defi}{Definition}
-\newtheorem{kons}{Konstruktion}
-
-\newenvironment{notation}{\noindent \textbf{Notation: }}{}
-\newenvironment{beweis}{\noindent \textbf{Beweis: }}{}
-\newenvironment{anmerkung}{\noindent \textbf{Anmerkung: }}{}
-\newenvironment{anmerkungen}{\noindent \textbf{Anmerkungen: }}{}
-\newenvironment{beispiel}{\noindent \textbf{Beispiel: }}{}
-\newenvironment{beispiele}{\noindent \textbf{Beispiele: }}{}
-
-% URLs und Mailadressen etc. richtig trennen:
-\usepackage{url}
-% Auch praktisch fuer Mailadressen: \url{blabla@laberlaber.de}
-
-% --------------------- Eigene Befehle fuer math. Mengen ---------%
-\newcommand{\N}{{\rm I\!N}}             % die natuerlichen Zahlen
-\newcommand{\Z}{\mathbb{Z}}             % fuer ganze Zahlen
-\newcommand{\R}{\mathbb{R}}             % die reellen Zahlen
-\newcommand{\Prim}{{\rm I\!P}}          % die Primzahlen
-
-
-% -- Sinnvolle Befehle, um sich selbst Notizen im Text zu machen --%
-
-% "Ungeordnete Gedanken, die noch irgendwo reinsollen":
-\newcommand{\kramsubsection}[1][Unsortierte Textfragmente]{%
-\subsection*{#1}%
-\addcontentsline{toc}{subsection}{#1}%
-}
-
-% Randbemerkung:
-\newcommand{\bemerkung}[1]{\marginpar{\small\textsl{\textsf{#1}}}}
-
-% "Hier muss noch [weiter-]geschrieben werden" (Baustellensymbol am Rand)
-%
-% [Damit dieser Befehl funktioniert, muss man natuerlich erstmal
-%  das Icon "Baustelle.eps" besorgen!!  Also entweder selbermachen
-%  oder downloaden:
-%  http://www.net.in.tum.de/teaching/WS04/routing/Baustelle.eps.gz  ]
-\newcommand{\baustelle}[1][]{
- \marginpar{%
-   \centerline{\includegraphics[scale=0.3]{Baustelle.eps}}
-   {\small\textsl{\textsf{\raggedright #1}}}
-}}
-
-
-
+%\setlength{\parindent}{0em}
+%\setlength{\parskip}{\medskipamount}    % Abstand zwischen Abs"atzen
 
 \begin{document}
 
@@ -137,7 +88,7 @@
 \input{l1.tex}
 \section{L3: Kollisionsauflösung}
 \input{l3.tex}
-\section{L2 : Akkurate paarweise Kollsionserkennung}
+\section{L2 : Paarweise Modellkollsionserkennung}
 \input{l2.tex}
 
 \section{Projektverlaufsbericht}

@@ -1,49 +1,55 @@
-
-Die Kollisionserkennung involviert die Ermittlung des Auftritts einer Kollision, kann aber unter Umständen auch die Ermittlung von relvanter Zusatzinformation Beinhalten. Diese sind zum Beispiel Zeit, Ort oder an der Kollision beteiligte Objektmerkmale.(vgl. \cite[Abschn. 2]{cd2D})\\
-
 Die paarweise Kollisionserkennung (L2) behandelt die Kollision von ausschließlich zwei Objekten miteinander. Von L2 gefordert ist nun eine Bestätigung oder Falsifizierung der in L1 aufgestellten Kollisionsvermutung zweier Objekte.\\
-Anzumerken ist, dass die Kollisionsvermutung nur für den Zeitraum eines Ticks gilt. Weiter ist ebenfalls von L2 nur die Kollisionserkennung innerhalb dieses Zeitraums gefordert!
+Anzumerken ist, dass die Kollisionsvermutung nur für den Zeitraum eines Ticks gilt. Das Kollisionsproblem ist daher in L2 ebenfalls dadurch begrenzbar.
+
 
 \subsection{Input}
 Unter der Annahme eines naiven Suchraumfilters (L1), müssten $k^2$ (mit $k$ Anzahl der simulierten Körper im Raum) Körperpaare überprüft werden.\\
 Durch die Bemühungen zur Filterung, wie in Kapitel \ref{sec:l1}
 %TODO insert label in HLs text
  beschrieben, kann die Anzahl der genauer zu überprüfenden Körperpaare verringert werden.\\
+ 
+Des weiteren ist es teilweise vonnäten, die vorliegende Objektrepresentation gegebenenfalls zu erweitern. Da diese Erweiterung jedoch Algorithmusspezifisch ist, sollen solche Änderungen im Folgenden bei den konkreten Methoden beschrieben werden. Es muss dabei außerdem abgewogen werden, welche Laufzeiteinflüsse eine solche Transformation hat und ob die allgemein vorliegende Objektrepräsentation and diesen Stellen angepasst werden sollte.
 
 
 \subsection{Output}
-Der tatsächliche Output der L2-Schicht hängt stark von den tatsächlichen Anforderungen an das System ab. Die Anforderungen werden von der nächsten Schicht L3 gestellt. Durch die Evaluierung von L3 (siehe Ende \ref{sec:l3} wurden die vom L2-Algorithmus zu ermittelnden Informationen festgelegt.\\
+Von einem Kollisionserkennungsalgorithmus, der das in Abschnitt~\ref{label:problemdefinition} beschriebene Kollisionsproblem löst, können verschiedene Resultate gefordert werden.\\
+Im Folgenden soll ein kurzer Überblick über die Auswahl gegeben werden:\\
+\begin{enumerate}
+	\item Inklusion (ungezeitet/statisch)\\
+		Die Frage ob zwei oder mehrer Objekte (teilweise) die selben Raumpositionen einnehmen. $O_0 \cap O_1$.
+	\item Intrusion(gezeitete Inklusion)\\
+		Es wird nach den Zeitpunkten $t_c \in T$ gesucht, bei dem ein Objekt in ein anderes eindringt.
+		$\{t_c | t_c \in T; (O_0(t_c)\cap O_1(t_c))\neq\emptyset\land(O_0(t_{c-1})\cap O_1(t_{c-1})=\emptyset\}$.
+	\item Erste Intrusion in einem Zeitintervall
+	\item Präziser erster Itrusionsort\\
+		Der Ort kann dabei absolut oder relativ zu den jeweiligen Objekten von Interesse sein.
+	\item Beteiligte Objekterkmale\\
+		Gegeben einem Zeitpunkt sollen miteinander schneidende Merkmale der Objekte ermittelt werden.
+\end{enumerate}
+Es mag weiter unzählige weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die von uns in betracht gezogenen ein.
+
+Verschiedene Sets an Resultaten werden von den konkreten Kollisionsfällen gefordert, welche in einer Simulation auftreten können. Bestimmte komplexe Algorithmen zur Ermittlung eines speziellen Resultats sind also u.U.~nur in bestimmten Fällen nötig.
 
 \subsection{Methoden}
-Theoretisch können Objekte als eine Menge von Punkten dargstellt werden. Die Menge der Punkte ist dabei begrenzt durch die Form des Objektes und die Art der Darstellung ($\mathbb{S}$, bzw. im Relativen $\mathbb{F}$).
-Bei einer zeitlichen Bewegung nimmt das Objekt entlang einer Zeitdimension ebenfalls Positionen ein. Theoretisch ist das Kollisionsproblem also das Problem der Ermittlung des Schnittes zweier Objekte $O_0 \cap O_1$ in 4-dimensionaler Darstellung.\\
 
-Dieses Problem ist berechnungstechnisch auf Grund der Darstellung in Punktmengen viel zu komplex. Das Problem muss vereinfacht werden.\\
 Wie in Abschnitt \label{sec:l0_objects} beschrieben werden Objekte in Form von Polygon-Meshes dargestellt. Diese Darstellung ist simpler. Es wird dabei stattdessen auf mathematische Eigenschaften der Merkmale der Mesh (Ecken, Kanten und Dreiecksflächen) zurückgegriffen um die in der ehemaligen Punktemenge enthaltenen Punkte mit einzugrenzen.\\
 An dieser Stelle kann grundsätlich zwischen zwei Problemklassen unterschieden werden:
-\begin{enumerate}
-	\item Inklusionsproblem\\
-		Das Problem zweier sich schneidender Objekte $O_0 \cap O_1$. Beantwortet die Frage: Schneiden sich zu diesem bestimmten Zeitpunkt die beiden Objekte?
-	\item Intrusionsproblem\\
-		Das Problem des Eindringens eines Objektes in das andere. Beantwortet die Frage: Zu welchem Zeitpunkt durchdringt die Hülle eines Objektes die Hülle des anderen Objektes.
-\end{enumerate}
+
 Die Probleme sind ähnlich und Lösen beide in gewisser Art und Weise das Kollisionserkennungsproblem.\\
 Jedoch wird unter dieser Anschauung schnell klar: Die Antwort auf das Inklusionsproblem liefert wenig Information für die in \ref{sec:l3} gestellten Anforderungen.\\
 Es wird sich daher auf das Intrusionsproblem mit Hüllobjekten konzentriert.
 
 
-\subsubsection{Lineare Interpolation}
-Annahme: Beteiligte Objekte haben keine Rotation (Rotation wird ignoriert).\\
+\subsubsection{Lineare Interpolation der Objektbewegung}
+\begin{itemize}
+\item[Annahme 1:] Beteiligte Objekte haben keine Rotation (Rotation wird ignoriert oder liegt nicht vor).
+\item[Annahme 2:] Die Geschwindigkeit der Objekte ist im vom Algorithmus behandelten Zeitpunkt konstant.
+\end{itemize}
 Bei einer Relativierung zu einem der beteiligten Objekte sind die Flugbahnen aller Ecken immernoch linear und parallel zu anderen Ecken des selben Objektes.\\
 Eine Methode, um unter diesen Umständen Kollisionen zu errechnen ist lineare Interpolation.\\
 \\
 Objekte sind aus Dreiecken aufgebaut. Es können also Dreiecke miteinander kollidiert werden.\\
-		Merkmale von Dreiecken sind:
-		\begin{itemize}
-			\item Ecke (eng. Vertex; Menge der Ecken von Objekt $i$ : $V_i$)
-			\item Kante (eng. Edge; Menge der Kanten von Objekt $i$ : $E_i$)
-			\item Fläche (eng. Face; Menge der Flächen von Objekt $i$ : $F_i$)
-		\end{itemize}
+		Merkmale von Dreiecken sind Ecken (eng. Vertex; Ecken von Objekt $O_i$ : $V_i$), Kante (eng. Edge; Kanten von Objekt $O_i$ : $E_i$), Flächen (eng. Face; Flächen von Objekt $O_i$ : $F_i$)\\
 		Es ist zu ermitteln, welche Merkmale miteinander mindestens kollidieren müssen, wenn eine Dreieckskollision stattfindet. Die Antwort hierzu ist:
 		\begin{itemize}
 			\item [(V$\times$F)] Eine Ecke durchschlägt eine Fläche.\\
@@ -95,21 +101,17 @@ Objekte sind aus Dreiecken aufgebaut. Es können also Dreiecke miteinander kolli
 			\item Zuverlässige Ermittlung der ersten Kollision (durch zeitliche Sortierung der einzelnen Merkmalskollisionen)
 		\end{itemize}
 Probleme:\\
-Der Ansatz der linearen Interpolation bei rotierenden Körpern ist implizit auf Grund der nichtlinearen Natur der Rotationstransformationen fehlerhaft.\\
-Bei der linearen Approximation einer Rotation werden Schwingungen/Kreisbahnen mit linien approximiert. Der Fehler ist dabei abhängig von der Rotationsgeschwindigkeit.\\
-Ansätze, welche das Problem mit der Rotation verbessern würden, zum Beispiel die Krümmung des Raums zur Begradigung von Kreisbahnen bei der Relativierung einzellner Merkmale erscheinen zu komplex.
-		Der Ansatz der linearen Interpolation wird and dieser Stelle nicht mehr weiterverfolgt. Es erscheint zu viel Aufwand, rechnerisch und entwicklungstechnisch, für ein ungenaues Verfahren zu sein.\\
-\\
+Der Einsatz der linearen Interpolation ist im Kontext eines Videospiels recht beschränkt.
+Es scheint nicht möglich sie effektiv auf die beschriebene Art und Weise einzusetzen um Kollisionen bei rotierenden Körpern zu erkennen.
 Für lineare Interpolation wird ein Fazit gezogen:
 \begin{itemize}
-	\item Um den Fehler durch Approximierung von Rotation zu midigieren muss die Roationsgeschwindigkeit beschränkt werden.
 	\item Ohne Rotation ist der Ansatz exakt und erfüllt alle gestellten Anforderungen.
-	\item Praktisch immernoch in vielen Fällen gut einsetzbar (Beispiel: Punktförmigen Projektil gegen Terrain)
+	\item Praktisch immernoch in vielen Fällen gut einsetzbar. Beispiel: Punktförmiges Projektil gegen unbewegliches Terrain.
 \end{itemize}
 
 \subsubsection{Gilbert-Johnson-Keerhi-Algorithmus (GJK)}
-GJK ist ein Algorithmus zur Berechnung der minimalen Distanz zwischen für konvexen Sets, publiziert 1988 \cite{gjk}, der in vielen Kollisionverfahren eingesetzt wird.\\
-		Der Algorithmus wird in vielen Videospielen verwendet, nachweislich in Blizzard Entertainments Diabolo 3 (\cite{gdc-physics}), und Valves Half-Life 2(\cite{gjk-blog}).\\
+GJK ist ein Algorithmus zur Berechnung der minimalen Distanz zwischen konvexen Sets, publiziert 1988 \cite{gjk}, der in vielen Kollisionverfahren eingesetzt wird.\\
+		Der Algorithmus wird in vielen Videospielen verwendet, beispielsweise in Blizzard Entertainments Diabolo 3 (\cite{gdc-physics}) und Valves Half-Life 2(\cite{gjk-blog}).\\
 		
 		Seien die Objekte $K_0, K_1$ als kompakte Mengen von Raumpositionen gegeben, welche ein Objekt einnimmt.\\
 		Die Menge $M = \{c | c = a - b; a\in K_0 ; b\in K_1\}$ denotiert dabei die so genannte Minkowski-Differenz, deren Eigenschaften in diesem Verfahren ausgenutzt werden.\\

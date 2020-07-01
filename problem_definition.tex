@@ -1,11 +1,13 @@
-Kollisionserkennung (\textit{eng. collision detection}) ist die Erkennung der Überschneidung von zwei aus $k\in\mathbb{N}$ sich bewegenden Objekten in einem Raum.
-Gesucht wird dabei der gezeitete Übergang vom Zustand der Nicht-Kollision zur Kollision.\\
-Es gilt außerdem die Echtzeitanforderung (vgl.~Abschnitt \ref{sec:tick}).
+Kollisionserkennung (\textit{eng. collision detection}) ist die Ermittlung der Überschneidung von Objekten aus einer Menge von $k\in\mathbb{N}$ sich bewegenden Objekten in einem Raum.\\
+$$\{(O_0, O_1) : O_0, O_1 \in Object^k\, O_0 \cap O_1 \neq \emptyset\}$$
+Im Kontext dieser Arbeit sind Objekte dreidimensional und gezeitet(bewegend), d.h. unterliegen Transformationen abhängig von der Zeit.
 \\
 \subsection{Problemgrenzen}
 Kollisionserkennung scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein. Die anerkannte Terminologie für Kollisionserkennung scheint semantisch nicht eindeutig. Daher müssen für diese Studie klare Problemgrenzen und spezifische Begriffe definiert werden.\\
 \\
 Die erste Grenze ist temporal. Ein Tick (vgl.~Abschnitt \ref{sec:tick}) grenzt einen Simulationsschritt ein. Das Problem kann dabei auf die Abhandlung von einzelnen Simulationschritten beschränkt werden. Algorithmen müssen daher dynamisch bezüglich der Zeitgrenzen sein (Tickintervallgröße nicht konstant), diese dynamischen Grenzen aber nicht überschreiten können.\\
+\\
+Es gilt außerdem die Echtzeitanforderung (vgl.~Abschnitt \ref{sec:tick}).
 \\
 Weiter werden verschiedene Level des Problems definiert:
 \begin{itemize}
