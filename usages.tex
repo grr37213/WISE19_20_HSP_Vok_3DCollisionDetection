@@ -1,18 +1,32 @@
+Kollisionsberechnung kann in Simulationen und im speziellen in Videospielen zu Realisierung vieler Features verwendet werden und wird daher in vielen verschiedenen Kontexten benötigt. 
 
-Es gibt in Videospielen mehrere Verwendungszwecke für Kollisionserkennung in der Simulation.
-Einige Beispiele sind:
+Hinsichtlich der Menge von generell möglichen Anwendungen für Simulation sollen im Folgenden exemplarisch Anwendungsmöglichkeiten der Kollisionsermittlung aufgelistet werden, welche im Projekt von Relevanz sein können. Die Liste grenzt dabei auch den betrachteten Raum an Kontexten im Projekt auf ein überschaubares Maß ein. 
+
 \begin{enumerate}
-	\item physikalische Simulation\\
-		Objekte, die sich gegenseitig durch Kollision beeinflussen.
-	\item Ermittlung eines Fokusobjektes\\
-		In 3D-Spielen wird oft ein Fadenkreuz in die Mitte des Bildes gelegt, welches als Auswahlwerkzeug dient. Um dies zu realisieren muss ermittelt werden, auf welches Objekt das Fadenkreuz zeigt. Das ist beispielsweise durch die Kollision mit einem Strahl in Blickrichtung zu bewerkstelligen.
-	\item Relative Interaktion\\
-		Beispiel: In einem bestimmten Bereich um den Spieler werden Gegenstände ins Inventar des Spielers gebracht. Realisierbar durch Kollidierenden Körper um den Spieler. Wenn Kollision, dann Aufnahme ins inventar.
-	\item Objektplazierung
-		Unter Gravitation: Objekte sollen auf den Boden plaziert werden. Ermittlung der Höhe.
+	\item logische Kollision\\
+	\begin{enumerate}
+		\item Anwesenheitsermittlung von Objekten\\
+	Die Ermittlung der Anwesenheit von Objekten in einem bestimmten Teil des Raumes. Daraufhin können Eigenschaften der Objekte ermittelt werden, welche Auslöser für Ereignisse sein können oder Interaktionen unter Objekten können ausgelöst werden. Spezifischere Konzepte sind zum Beispiel: 
+		\begin{enumerate}
+			\item Raycasting\\
+	Zur Ermittlung vom Objekt in Blickrichtung/Fokusobjekt oder Objekt am Cursor/Fadenkreuz wird ein Strahl in dieser Richtung mit Objekten kollidiert.\\
+	Beispiel: Spieler möchte Tür öffnen, schaut Tür an, drückt Taste, Strahl ermittelt Tür in Blickrichtung und interpretiert Tastendruck als Tür-Öffnen-Befehl.
+			\item Areale\\
+	Objekte befinden sich in einem bestimmten Areal.
+	Beispiel: In Stealth-Spielen werden zur Ermittlung, ob ein  Spieler sich im Sichtbereich eines Gegners befinden oft sogenannte View-Cones eingesetzt. Wie der Name suggeriert werden Entsprechende Berechnungen zur Sichtbarkeit des Spielers gegenüber dem Gegener ausgerechnet, sollte der Spieler mit der View-Cone des Gegners kollidieren
+		\end{enumerate}
+		\item Clipping\\
+	Verhinderung, dass zwei Objekte in der Simulation den selben Raum einnehmen und miteinander verschmelzen, da dies bei typischen soliden Objekten nicht der Realität entspricht.
+		\item Projektiltrefferermittlung
+	\end{enumerate}
+
+	\item Physikalische Kollision
+		\begin{enumerate}
+			\item Rigide Kollision\\
+		Kollision von unzerstörbaren, unveränderlichen Objekten mit korrektem physikalischem Verhalten hinsichtlich Impuls.
+			\item Zerstörung/Zerteilung von Objekten durch Kollision
+		\end{enumerate}
 \end{enumerate}
 
-Die verschiedenen Verwendungszwecke haben unterschiedliche Anwendungen an Kollisionlogik in Punkten Kollisionsgenauigkeit und welche Informationen zur Kollision benötigt werden.\\
-Beispielsweise: Für die Ermittlung des Fokusobjektes soll das Objekt der Kollision ermittelt werden. Der Konkrete treffpunkt oder die Auftrittszeit innerhalb des Ticks ist für diese Aufgabe irrelvant.\\
-\\
-Anforderungen an die Kollisionserkennung entstehen daher aus vielen Szenarien. Kollisionserkennung ist demnach nicht nur ein einziges Verfahren im System. Kollisionserkennung umfasst auch den Kontext und die Auswahl des passenden Verfahrens mit Blick auf Performanz und Genauigkeit.
+Es gibt viele weitere Anwendungen, welche durch die Verwendung von Kollisionsermittlung realisiert werden können, welche an dieser Stelle nicht betrachtet werden sollen.
+

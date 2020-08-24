@@ -7,4 +7,6 @@
 *.gz
 *.toc
 main.pdf
+*.tks
+*.dvi
 

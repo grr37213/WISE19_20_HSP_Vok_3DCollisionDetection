@@ -1,4 +1,4 @@
-Das L0-Level (siehe \ref{l0}) beschäftigt sich mit der Datenrepräsentation von Modellen, Zeit und Raum.\\
+Technische Repräsentationen von reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathbb{F} \subset \mathbb{R}$ bezeichnet werden.
 
 Die Repr"asentation stellt sich dabei jedoch Anforderungen verschiedener technologischer Perspektiven:
 		\begin{itemize}
@@ -13,29 +13,37 @@ Die Repr"asentation stellt sich dabei jedoch Anforderungen verschiedener technol
 Im Folgenden werden die zu repräsentierenden, angesprochenen Konzepte näher erläutert.
 
 \subsection{Zeit}
-Es existieren die Realzeit der echten Welt und die Simulationszeit. Die Zeiten können prinzipiell asynchron ablaufen.\\
-In einer Echzeitsimulation müssen beide zeiten jedoch synchronisiert werden.\\
-Es genügt dabei, diese Synchronisation in kurzen Zeitabschnitten herzustellen.\\
-Diese zeitlichen Abstände werden oft Ticks genannt (siehe \ref{sec:tick}).\\
-Gefordert sind hierbei Tickraten von ca. $60 Ticks/s \Rightarrow 16.6ms /Tick$.\\
-Realzeit wird in Microsekunden-Genauigkeit vom ausführenden Betriebssystem zu Beginn jedes Ticks erhalten. Das Intervall der vergangenen Simulationszeit kann so durch den Abgleich mit der erhaltenen Zeit des vorherigen Ticks errechnet werden. Dieser Anzahl Microsekunden wird dann in einen Floating-Point-Wert in Sekunden umgewandelt, welche als Zeitfaktor in physikalischen Berechnungen verwendet werden kann.
+Es existieren die durch maschinelle Abtastung diskrete Realzeit der echten Welt $T_r$ und die Simulationszeit $T_s$. Beide Zeiten sind Sequenzen 
+\begin{center}
+$T:=\langle t_{epoch}, ..., t_{max} \rangle ; t_{epoch}, t_{max}$ die minimal, bzw.~maximal darstellbare Zeit
+\end{center} 
+von potentiellen Zeitpunkten in einer gegebenen minimalen maschinellen Genauigkeit in Mikrosekunden $\epsilon_t:=10^(-6)s ; T(c) + \epsilon_t = T(c+1)$.
+Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$.
+Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t \in \mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert $$\forall t_{r0},  t_{r1} \in T_r^2 ; t_{diff}=t_{r1}-t_{r0} : \mathcal{T}(t_1) = \mathcal{T}(t_0) + t_{diff}*r_t)$$
+Beispiele für die Rate sind $r_t = 1 \Leftrightarrow$ synchron zur Echtzeit, $r_t = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht.\\
+Wird diese Eigenschaft verletzt, werden die aktuellen Echtzeitanforderungen verletzt.
 
 \subsection{Raum}
-Der geforderte Raum ist 3-dimensional. Die Darstellung der Positionen im Raum erfolgt über 3-dimensionale Vektoren in der Einheit von Metern.\\
-Es wird daher ein Datentyp für Dezimalbrüche verwendet um kleinere Raumanteile zu erfassen.
-Floating-Point-Dezimalbrüche würden sich anbieten, jedoch tritt für große Räume ein Genauigkeitsproblem auf Grund der Werteverteilung in Floating-Point Datentypen auf.\\
-Sei $\mathbb{F} \subset \mathbb{R}$ mit $\mathbb{F}$ als Floating-Point-Datentyp, so ist die Verteilung der verfügbaren Werte des Floats dichter je näher am Ursprung($0.0$) \cite{floatdistribution}.\\
-Für eine Darstellung im Raum $\mathbb{F}^3$ existiert dabei das selbe Problem in 3 Dimensionen. Physikalische Prozesse können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.
-Es wird allerdings an dieser stelle Konsistenz der simulierten Prozesse unabhängig vom Ort im Raum gefordert.\\
-Lösungen des Problems sind
-\begin{enumerate}
-	\item Relativierung interagierender Objekte zueinander.\\
-		Funktioniert unter der Annahme, dass Entfernungen zwischen interagierenden Objekten gegenüber der Gesamtgröße des Raums relativ klein sind.
-	\item Aufteilung des Raums und Positionswerte von Objekten relativiert zu einem nahen Raumanteilsursprung\\
-		Sorgt dafür das Objektpositionswerte nicht dem Ungenauigkeitsproblem verfallen, wenn Objekte sich weit vom Raumursprung befinden. Dafür muss ein Positionsdatentyp $\mathbb{S}$ definiert werden, welcher den betreffenden Raumanteil pro Positionswert mitführt $\mathbb{S}:\mathbb{Z}\times\mathbb{F}$. Die Relativierung zweier Positionen kann dann über eine Funktion $ \mathbb{S}\times \mathbb{S} \mapsto \mathbb{F}$ realisiert werden, wodurch die Distanz wieder auf eine gängige Einheit euklidischen Maßes zurückgeführt werden kann (hier in Metern).
+Der geforderte Raum ist 3-dimensional. Es werden daher 3-dimensionale Vektoren verwendet um Raumpositionen zu beschreiben.
+Positionen $P \in \mathbb{F}^3$ können dafür verwendet werden.\\
+Durch die Eigenschaften von Floating-Point-Datentype treten jedoch bei großen Räumen für Positionen mit großer Entfernung um Ursprung auf Grund der Werteverteilung in $\mathbb{F}$ auf.\\
+Diese ist dichter, je näher am Ursprung \cite{floatdistribution}.\\
+Physikalische Prozesse berechnet auf Basis von Positionen in \mathbb{F}^3 können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
+An dieser Stelle soll diese Unabhängigkeit jedoch gefordert werden.\\
+Das Problem wird hier durch einen neuen Längendatentypen $$\mathbb{S} : \mathbb{Z} \times \mathbb{F}$$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{Z}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert. Die Umrechnung zu Metern $ m: (\mathbb{Z}\times\mathbb{F}) \mapsto \mathbb{R}; m(i, f) = i * size_{grid} + f * size_{grid}$. Typischerweise gilt $f \in \lceil 0;1\rceil$.
 \end{enumerate}
 
-Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathbb{F}^3$ in der Einheit Meter umgewandelt.
+Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathbb{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen.
+
+Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Typumwandlung, Relativierung und Transformation dargestellt werden.
+
+\begin{enumerate}
+\item Worldspace, in \mathbb{S}^3 zur Darstellung von Positionen im Raum
+\item Cameraspace, \in{mathbb{F}^3, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zu Kamera relativiert
+\item Objektspace, \in{mathbb{F}^3, Ursprung am Center of Mass eines Objektes, zur Verarbeitung von physikalischen Objektinteraktionen++
+\end{enumerate}
+
+
 
 \subsection{Objektform}
 \label{sec:l0_objects}
