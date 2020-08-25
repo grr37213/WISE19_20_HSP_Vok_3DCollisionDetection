@@ -1,66 +1,120 @@
-Technische Repräsentationen von reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathbb{F} \subset \mathbb{R}$ bezeichnet werden.
+Implementierungstechnisch schränkt eine Rechenmaschine die mathematischen Zahlenräume ein:
+\begin{itemize}
+\item Die Reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathbb{F} \subset \mathbb{R}$ bezeichnet werden
+\item Integern $\mathbb{Z}$ sind maschinell in ihrer Darstellungsgröße beschränkt. Diese beschränkte Menge an Integern wird $\mathbb{I} \subset \mathbb{Z}$ genannt
+\end{itemize}
 
-Die Repr"asentation stellt sich dabei jedoch Anforderungen verschiedener technologischer Perspektiven:
-		\begin{itemize}
-			\item graphische Darstellung/Rendering
-				F"ur die graphische Darstellung m"ussen bestimmte Formate eingehalten werden. Datenkonfomit"at mit graphischen Bibliotheken erspart umst"andliche Umwandlungen von Repr"asentationen.
-			\item physikalische Berechnung
-				F"ur die Kollisionsberechnung k"onnen bestimmte Repr"asentationen vorteilhaft sein. Die Repr"asentation versucht m"oglichst statisch Information "uber Objekte bereitzustellen und vermeidet dynamische Nachberechnung von Objekteigenschaften.
-			\item menschliche Manipulation
-				F"ur Entwicklungszwecke ist es zum Vorteil, wenn Objektrepr"asentationen menschlich lesbar, verst"andlich und nachvollziehbar sind. Dieses Konzept vereinfacht die Erstellung von Tests und die Behebung von Fehlern. Unter diesen Aspekt fällt ebenso die Konformität mit Tooling.
-		\end{itemize}
-
-Im Folgenden werden die zu repräsentierenden, angesprochenen Konzepte näher erläutert.
 
 \subsection{Zeit}
-Es existieren die durch maschinelle Abtastung diskrete Realzeit der echten Welt $T_r$ und die Simulationszeit $T_s$. Beide Zeiten sind Sequenzen 
-\begin{center}
-$T:=\langle t_{epoch}, ..., t_{max} \rangle ; t_{epoch}, t_{max}$ die minimal, bzw.~maximal darstellbare Zeit
-\end{center} 
-von potentiellen Zeitpunkten in einer gegebenen minimalen maschinellen Genauigkeit in Mikrosekunden $\epsilon_t:=10^(-6)s ; T(c) + \epsilon_t = T(c+1)$.
-Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$.
-Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t \in \mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert $$\forall t_{r0},  t_{r1} \in T_r^2 ; t_{diff}=t_{r1}-t_{r0} : \mathcal{T}(t_1) = \mathcal{T}(t_0) + t_{diff}*r_t)$$
-Beispiele für die Rate sind $r_t = 1 \Leftrightarrow$ synchron zur Echtzeit, $r_t = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht.\\
-Wird diese Eigenschaft verletzt, werden die aktuellen Echtzeitanforderungen verletzt.
+
+\def\finite#1{\ooalign{\hfil$\mapstochar\mkern 3mu\mapstochar\mkern 5mu$\hfil\cr$#1$}}
+
+Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche Sequenzen:
+\begin{enumerate}
+\item Die durch maschinelle Abtastung diskrete Realzeit der echten Welt\\
+	\begin{itemize}
+	\item $T_r:=\langle t_{epoch}, ... , t_{max}\rangle ; t_{epoch}, t_{max}$ als minimal, bzw.~maximal darstellbare Zeit
+	\item die in einer maschinellen Genauigkeit in Mikrosekunden $$\epsilon_t:=10^{-6}s ; \forall c \in \mathbb{Z}: T_r(c) + \epsilon_t = T_r(c+1)$$ gegeben ist
+	\item und immer monoton wächst $\forall c \in \mathbb{Z}: T_r(c) < T_r(c+1)$. 
+	\end{itemize}
+
+\item Die Simulationszeit $T_s:=\langle t_{start}, ... , t_{end}\rangle; t_{start}, t_{end}$ als Start- und Endzeitpunkt der Simulation.
+	\begin{itemize}
+	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive, endliche Abbildung $\mathcal{T}:T_r \finite{\twoheadrightarrow} T_s$
+	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
+	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
+	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_0$ und $t_1$ gleich bleibt $\forall t \in [t_0,t_1]: r_t(t_0) = r_t(t)$. Wird diese Eigenschaft verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
+	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbe+reiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind. Wir nennen diese Zeitbereiche in diesem Kontext "Ticks".\\
+Beispiele für die Rate sind 
+\begin{itemize}
+\item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Echtzeit
+\item $r_t(x) = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht
+\end{itemize}
+Technisch wird für große $|r_t|$ die Simulation schwierig, da viele Vorgänge schnell simuliert werden müssten. Diese werden daher vermieden.\\
+Theoretisch kann die Rate auch negative Werte annehmen. Die Simulationszeit würde dann rückwärts laufen. Dieses Verhalten ist technisch durch die monoton steigende Realzeit nicht leicht in konsistenter Weise umzusetzen, da Realzeiteinflüsse durch Tasteneingaben existieren und soll daher hier ebenfalls vermieden werden.
+	\end{itemize}
+\end{enumerate}	
+
+
+\subsection{Tick \& Frame}
+\input{tick.tex}
 
 \subsection{Raum}
-Der geforderte Raum ist 3-dimensional. Es werden daher 3-dimensionale Vektoren verwendet um Raumpositionen zu beschreiben.
-Positionen $P \in \mathbb{F}^3$ können dafür verwendet werden.\\
-Durch die Eigenschaften von Floating-Point-Datentype treten jedoch bei großen Räumen für Positionen mit großer Entfernung um Ursprung auf Grund der Werteverteilung in $\mathbb{F}$ auf.\\
-Diese ist dichter, je näher am Ursprung \cite{floatdistribution}.\\
-Physikalische Prozesse berechnet auf Basis von Positionen in \mathbb{F}^3 können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
+\label{sec:space}
+Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathbb{F}^3$ beschrieben werden.\\
+Durch die Werteverteilung in $\mathbb{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf. Die Genauigkeit ist dabei dichter, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
+Physikalische Prozesse berechnet auf Basis von Positionen in $\mathbb{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
 An dieser Stelle soll diese Unabhängigkeit jedoch gefordert werden.\\
-Das Problem wird hier durch einen neuen Längendatentypen $$\mathbb{S} : \mathbb{Z} \times \mathbb{F}$$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{Z}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert. Die Umrechnung zu Metern $ m: (\mathbb{Z}\times\mathbb{F}) \mapsto \mathbb{R}; m(i, f) = i * size_{grid} + f * size_{grid}$. Typischerweise gilt $f \in \lceil 0;1\rceil$.
-\end{enumerate}
+Das Problem wird hier durch einen neuen Längendatentypen $\mathbb{S} : \mathbb{Z} \times \mathbb{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{I}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
+Die Umrechnung zu Metern ist dann: $$ meter: \mathbb{S} \mapsto \mathbb{F};  meter((i, f)) = i * size_{grid} + f * size_{grid}$$ 
+Typischerweise gilt $f \in [0;1]$, um eine eindeutige Repräsentation für einen beschriebenen Punkt zu erhalten.
 
-Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathbb{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen.
+Diese Darstellung hat folgende weitere Vorteile
+\begin{itemize}
+\item Einfache Implementierung
+\item Schnelle Indizierung der durch $\mathbb{I}$ indizierten Raumanteile für raumaufteilende Teile-und-Herrsche-Algorithmen
+\end{itemize}
 
-Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Typumwandlung, Relativierung und Transformation dargestellt werden.
+Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathbb{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen. Dadurch ist effektiv die Eigenschaft $\mathbb{F}\subset\mathbb{S}$ nicht gefordert, auch wenn sie in der in diesem Projekt verwendeten Implementierung prinzipiell gilt.
+
+Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Relativierung, Längenumrechnung und Transformation dargestellt werden.
 
 \begin{enumerate}
-\item Worldspace, in \mathbb{S}^3 zur Darstellung von Positionen im Raum
-\item Cameraspace, \in{mathbb{F}^3, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zu Kamera relativiert
-\item Objektspace, \in{mathbb{F}^3, Ursprung am Center of Mass eines Objektes, zur Verarbeitung von physikalischen Objektinteraktionen++
+\item Worldspace $= \mathbb{S}^3$ absolute Positionen von Objekten
+\item Cameraspace $= \mathbb{F}^3$, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
+\item Viewspace $= \mathbb{F}^3$, Verzerrung durch die Kameralinse, um einen Blickwinkel auf einen Bildschirm anzupassen.
+\item Objektspace,$= \mathbb{F}^3$, Ursprung am vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
 \end{enumerate}
 
+Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
 
 
-\subsection{Objektform}
-\label{sec:l0_objects}
-Theoretisch können Objekte als eine Menge von Punkten dargstellt werden. Die Menge der Punkte ist dabei begrenzt durch die Form des Objektes und die Art der Darstellung ($\mathbb{S}$, bzw. im Relativen $\mathbb{F}$).
-Bei einer zeitlichen Bewegung nimmt das Objekt entlang einer Zeitdimension ebenfalls Positionen ein. Theoretisch ist das Kollisionsproblem also das Problem der Ermittlung des Schnittes zweier Objekte $O_0 \cap O_1$ in 4-dimensionaler Darstellung. Diese Objektdarstellung ist im gegebenen Kontext in der Mathematik üblich, in der Computergraphik und Simulation jedoch auf Grund potentiell unendlich großer Punktemengen suboptimal.\\
-In der Computergraphik hat sich daher eine andere Darstellung etabliert:\\
-Objekte besitzen eine geometrische Form, welche relativ zu einer zentralen Objektposition angegeben wird. Wir nennen diese zentrale Position an dieser Stelle das \glqq Center of Mass(COM)\grqq . 
-Wie in der Computergrafik üblich werden Objekte in Form von Vertices (Ecken) angegeben, welche zu Dreiecken verbunden werden. Dreiecke, Kanten und Ecken werden als Objektmerkmale bezeichnet.\\
-Für das Intrusionsproblem im speziellen genügt trivial die Betrachtung der Hülle des Objektes. Es ist üblicherweise auch nur die Hülle des Objektes, die für die Grafik von Interesse ist. Die Hülle stellt also die hier minimal benötigte Objektrepräsentation dar.\\
+\subsection{Objektrepräsentation}
+\label{sec:objects_rep}
+Objekte werden mathematisch oft als eine Menge von Punkten betrachtet, welche einen Raumanteil darstellen $ o \subseteq \mathbb{S}$.\\
+Durch die in Abschnitt~\ref{sec:space} angesprochene Relativierung ist ein Objekt jedoch in allen Berechnungskontexten (nicht Darstellungskontexten) durch die Relativierung definiert. Ein Objekt enthält folgende Informationen:
+\begin{itemize}
+\item Raumposition $pos : OBJ \mapsto \mathbb{S}^3$
+\item Ausrichtung $rot : OBJ \mapsto \mathbb{F}^3$. Der Vektor $(x, y, z) \in\mathbb{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathbb{F}^3 \mapsto \mathbb{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
+\item Ein relativ zum einem eigenen Ursprung angegebenes Modell.\\
+\sloppy
+Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ \mapsto \mathcal{P}(\mathbb{F}^3) $$ definiert sein.
+\fussy
+Durch diese mathematische Darstellung führen Rechenoperationen mit Objekten auf relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
+Polygon-Mesh $$M: (V \times I); V \subseteq \mathbb{F}^3, I \subseteq [0, |V|-1]_\mathbb{Z}^3 )$$ beschreibt ein Objekt durch zusammenhängende Dreiecksflächen. In der Repräsentation werden dabei nur die Dreieckspunkte $V$(Ecken, eng. \textit{vertices}) und die Kombinationen dieser zu Dreiecken durch Indizierung $I$ gegeben.\\
+Die zusammenhängenden Dreiecksflächen beschreiben dabei mindestens die Objekthülle $\mathcal{H}: M \mapsto M, \forall m'\in M: \mathcal{H}(m') \subseteq m'$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
+\end{itemize}  
+Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt beschrieben werden:
+$$ O:=(POS, ROT, M); POS:= dom(pos); ROT:=dom(rot) $$
+Ecken (eng. \textit{vertices}): $ V = \{s + (f * rotm(rot(O)) | s = pos(O), f\in m(O)\} = \{v_0, v_1 ... , v_{|V|-1}\}$\\
+Kanten (eng. \textit{edges}): $ E = {(v_a, v_b), (v_b, v_c),(v_c, v_a) | (a, b, c) \in I\} $,\\
+welche die Punkte $E_p:E\mapsto\mathbb{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen\\
+Flächen (eng. \textit{areas}): $ A = \{(v_a, v_b, v_c) | (a, b, c) \in I\} $,\\
+welche die Punkte $A_p:A\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen\\
 
+\\
+Vorteile \& Nachteile o.B.d.A:
+\begin{itemize}
+\item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen. $V\ll o$
+\item [+]Berechnungen durch klassische Geometrie.
+\item [-]Verlust der Information von Innen \& Außenseite am Hüllobjekt.
+\item [-]Beschränkung auf durch Polygon-Meshes darstellbare Objekte $M\subset OBJ$
+\end{itemize}
+
+Weitere Berechnungen, wie z.B. Kollision, werden über die Hüllobjekte abgebildet.
 Im Verlauf dieses Projekts werden Objekte außerdem als starr/rigide, unveränderlich und unzerstörbar angenommen.
-	
-\subsection{Bewegung}
-Entitäten in der 3D-Simulation nehmen eine Position im Raum ein.\\
-Physikalische 3D-Objekte sind Entitäten und haben zusätzlich eine Ausrichtung im Raum (Rotation).\\
-Beide dieser Größen (Position und Rotation) können einer zeitlichen Änderung unterliegen (Geschwindigkeit, Drehgeschwindigkeit).\\
+
+\subsection{Objektbewegung}
+Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es wird sich hier auf
+\begin{enumerate}
+\item Geschwindigkeit $v: OBJ \times T_s \mapsto \mathbb{S}^3$  und
+\item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathbb{F}^3 $
+\end{enumerate}
+beschränkt.
 An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht. Vertexpositionen zu bestimmten Zeiten können durch Matrixtransformationen errechnet werden.
 Andere Arten der Bewegung (wie z.B. durch Animation oder andere Transformationen wie Skalierung) sind in der Zukunft des Projektes denkbar, allerdings nicht Teil dieses Projektes.
+
+\subsection{Projektleistung}
+Im Rahmen des Projektes wurden Schnittstellen für~\ref{sec:objects_rep}, angelegt um entsprechenden Zugriff auf die Information von Ecken, Kanten und Flächen während Interaktionsroutinen zu erhalten. Außerdem wurden physikalische Entitäten im Code Repräsentiert, die die für die paarweise Kollisionsberechnung benötigten Attribute für Rotation und Rotationsgeschwindigkeit als Erweiterung zur herkömmlichen Entität beinhalten, die diese nicht besitzt. Alle anderen Teile des bisher behandelten Kontext von Zeit, Raum Objektrepräsentation und Objektbewegung enthalten im Rahmens dieses Projektes maximal marginale Neuleistung.
 
 
