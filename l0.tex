@@ -20,7 +20,7 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 
 \item Die Simulationszeit $T_s:=\langle t_{start}, ... , t_{end}\rangle; t_{start}, t_{end}$ als Start- und Endzeitpunkt der Simulation.
 	\begin{itemize}
-	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive, endliche Abbildung $\mathcal{T}:T_r \finite{\twoheadrightarrow} T_s$
+	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
 	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
 	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_0$ und $t_1$ gleich bleibt $\forall t \in [t_0,t_1]: r_t(t_0) = r_t(t)$. Wird diese Eigenschaft verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
