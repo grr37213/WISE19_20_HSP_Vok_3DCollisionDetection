@@ -111,7 +111,8 @@ Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es
 \item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathbb{F}^3 $
 \end{enumerate}
 beschränkt.
-An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht. Vertexpositionen zu bestimmten Zeiten können durch Matrixtransformationen errechnet werden.
+An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht $\forall t \in ]t_0, t_1] : v(\mathcal{T}(t)) = v(\mathcal{T}(t_1)); \omega(\mathcal{T}(t)) = \omega(\mathcal{T}(t_1));$.\\
+Vertexpositionen zu bestimmten Zeiten können durch Matrixtransformationen errechnet werden.\\
 Andere Arten der Bewegung (wie z.B. durch Animation oder andere Transformationen wie Skalierung) sind in der Zukunft des Projektes denkbar, allerdings nicht Teil dieses Projektes.
 
 \subsection{Projektleistung}
