@@ -1,38 +1,21 @@
-Kollisionserkennung (\textit{eng. collision detection}) ist die Ermittlung der Überschneidung von Objekten aus einer Menge von $k\in\mathbb{N}$ sich bewegenden Objekten in einem Raum.\\
-$$\{(O_0, O_1) : O_0, O_1 \in Object^k\, O_0 \cap O_1 \neq \emptyset\}$$
-Im Kontext dieser Arbeit sind Objekte dreidimensional und gezeitet(bewegend), d.h. unterliegen Transformationen abhängig von der Zeit.
-\\
-\subsection{Problemgrenzen}
-Kollisionserkennung scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein. Die anerkannte Terminologie für Kollisionserkennung scheint semantisch nicht eindeutig. Daher müssen für diese Studie klare Problemgrenzen und spezifische Begriffe definiert werden.\\
-\\
-Die erste Grenze ist temporal. Ein Tick (vgl.~Abschnitt \ref{sec:tick}) grenzt einen Simulationsschritt ein. Das Problem kann dabei auf die Abhandlung von einzelnen Simulationschritten beschränkt werden. Algorithmen müssen daher dynamisch bezüglich der Zeitgrenzen sein (Tickintervallgröße nicht konstant), diese dynamischen Grenzen aber nicht überschreiten können.\\
-\\
-Es gilt außerdem die Echtzeitanforderung (vgl.~Abschnitt \ref{sec:tick}).
-\\
-Weiter werden verschiedene Level des Problems definiert:
+Kollisionserkennung (\textit{eng. collision detection}) scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein und beschreibt daher eine Sammlung verschiedener Teilprobleme.\\
+Wir beschränken uns hier für die Zwecke des Projektes auf Folgende:
+\begin{enumerate}
+\item Die Ermittlung der Menge von Objektpaaren $C$ aus einer Menge von sich bewegenden Objekten $OBJ$ in einem Raum, welche sich innerhalb eines Zeitraums, hier einem Tick $\delta_i$, überschneiden.
+$$C = \{(O_0, O_1) : O_0, O_1 \in OBJ; t\in \Upsilon_{\delta_i};  D(O_0, t) \cap D(O_1, t) \neq \emptyset\}$$
+\item Die Ermittlung von Informationen über den Hergang einer Kollision.
+Die genauen Anforderungen, welche Informationen ermittelt werden müssen, gehen aus den Verwendungszwecken hervor (vgl.~\ref{sec::usages}. 
+\end{enumerate}
+
+Während mögliche Anforderungen von Verwendungszwecken zwar betrachtet werden müssen, sollen die Verwendungszwecke selbst in diesem Projekt konkret nicht realisiert werden.
+
+Wir schätzen an dieser Stelle modellgenaue Kollisionen als schwierig ein. In Teilproblem 1 entsteht daraus das Problem einer schnell steigenden Komplexität, da die Anzahl der möglichen Kollisionspaare quadratisch wächst $|C|\leq |OBJ|^2$.\\
+Das Teilproblem 1 wird daher in 2 separaten Schritten behandelt.
 \begin{itemize}
-	\label{l0}
-	\item[L0] Physikalische Repräsentation\\
-		Überlegungen auf dieser Ebene behandelt die Auswahl möglicher mathematisch-technologischer Repräsentationen der Kollisionsphysik, welche wiederum Repräsentationen des Raums, der Zeit und der zu kollidierenden Objekte fordert.\\
-		In dieser Studie wird sich damit nicht aktiv beschäftigt. Eine Repräsenation ist nötig und kommt daher passiv durch die Anforderungen der verwendeten Algorithmen und Technologien zu Stande.\\
-			
-	\label{l1}
-	\item[L1] Suchraumfilter\\
-		Annahme: Kollisionen finden zwischen Paaren von Objekten statt.
-		Sei die Menge der Objekte im Raum $k\in\mathbb{N}$ so ist die Menge der Paare von Objekten, und damit die Menge möglicher Kollisionspaare, $k^2$.\\
-		Bei naiver Überprüfung jedes Paares beträgt die Komplexität in dieser Ebene demnach $O(k^2)$ (vgl. \cite[Abschn. 2]{cd2D}).\\
-		Verbesserungen dieser Komplexität können jedoch durch Vorfilterung des Suchraumes erreicht werden.\\
-		Ziel ist dieses Levels ist es, eine Menge von Objektpaaren mit minimaler Anzahl von False-Positives zu ermitteln.
-
-	\label{l2}
-	\item[L2] Paarweise Kollisionserkennung\\
-		Aus \ref{l1} vorliegende Objektepaare müssen auf tatsächliche Modellkollision Überprüft werden, da in L1 noch False-Positives enthalten sein können.
-		Aus dieser genaueren Modellkollision können meist auch zusätzliche Informationen über die Kollision ermittelt werden (genaue Zeit, Ort, beteiligte Objektmerkmale), welche für die Kollisionsantwort benötigt werden.
-
-	\label{l3}
-	\item[L3] Kollisionsantwort/-auflösung\\
-		In einer physikalischen Simulation hat eine Kollision meist eine physikalische Konsequenz, z.B. Geschwindigkeitsveränderung oder Verformung von Objekten. Die Konsequenz betrifft dabei nicht nur das beteiligte Objekt, sondern auch den gesamten Simulationsverlauf (z.B.~neue Kollisionsmöglichkeiten nach Kursänderung eines Objektes).\\
-		Die L3-Schicht befasst sich mit der Umsetzung der Konsequenzen einer Kollision.
-		Obwohl sich in dieser Arbeit mit den Konsequenzen der Kollision eigentlich nicht beschäftigt werden soll, muss hierzu ein Kontext hergestellt werden, vor allem um Anforderungen an andere Schichten zu ermitteln.
+\item[1.1] Elegante und Effiziente Vorfilterung von Objekten $OBJ$, um die modellgenaue Überprüfung von großen Mengen von Objektpaaren in $C$ zu vermeiden.
+\item[1.2] Die abstrakte Behandlung des Kollisionsproblems bei genau zwei Objekten. Dabei werden Algorithmen gewählt, welche die für Teilproblem 2 benötigten Informationen mitliefern.
 \end{itemize}
 
+Für beide dieser Schritte sollen im Folgenden Algorithmen beschrieben werden.
+
+\input{physical_realism.tex}
