@@ -74,9 +74,9 @@ Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigk
 Objekte werden mathematisch oft als eine Menge von Punkten betrachtet, welche einen Raumanteil darstellen $ o \subseteq \mathbb{S}$.\\
 Durch die in Abschnitt~\ref{sec:space} angesprochene Relativierung ist ein Objekt jedoch in allen Berechnungskontexten (nicht Darstellungskontexten) durch die Relativierung definiert. Ein Objekt enthält folgende Informationen:
 \begin{itemize}
-\item Raumposition $pos : OBJ \mapsto \mathbb{S}^3$
-\item Ausrichtung $rot : OBJ \mapsto \mathbb{F}^3$. Der Vektor $(x, y, z) \in\mathbb{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathbb{F}^3 \mapsto \mathbb{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
-\item Ein relativ zum einem eigenen Ursprung angegebenes Modell.\\
+\item Raumposition zu bestimmter Zeit $pos : OBJ \times T_s \mapsto \mathbb{S}^3$
+\item Ausrichtung zu bestimmter Zeit $rot : OBJ \times T_s \mapsto \mathbb{F}^3$. Der Vektor $(x, y, z) \in\mathbb{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathbb{F}^3 \mapsto \mathbb{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
+\item Ein relativ zum einem eigenen Ursprung angegebenes rigides unveränderliches Modell.\\
 \sloppy
 Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ \mapsto \mathcal{P}(\mathbb{F}^3) $$ definiert sein.
 \fussy
@@ -85,17 +85,20 @@ Polygon-Mesh $$M: (V \times I); V \subseteq \mathbb{F}^3, I \subseteq [0, |V|-1]
 Die zusammenhängenden Dreiecksflächen beschreiben dabei mindestens die Objekthülle $\mathcal{H}: M \mapsto M, \forall m'\in M: \mathcal{H}(m') \subseteq m'$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
 \end{itemize}  
 Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt beschrieben werden:
-$$ O:=(POS, ROT, M); POS:= dom(pos); ROT:=dom(rot) $$
-Ecken (eng. \textit{vertices}): $ V = \{s + (f * rotm(rot(O)) | s = pos(O), f\in m(O)\} = \{v_0, v_1 ... , v_{|V|-1}\}$\\
-Kanten (eng. \textit{edges}): $ E = {(v_a, v_b), (v_b, v_c),(v_c, v_a) | (a, b, c) \in I\} $,\\
-welche die Punkte $E_p:E\mapsto\mathbb{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen\\
-Flächen (eng. \textit{areas}): $ A = \{(v_a, v_b, v_c) | (a, b, c) \in I\} $,\\
-welche die Punkte $A_p:A\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen\\
+\begin{enumerate}
+\item $ O:=(POS, ROT, M); POS:= dom(pos); ROT:=dom(rot) $
+\item Ecken zur Zeit $t$: $V:OBJ\times T_s\mapsto\mathbb{F}^3; V(O, t) = \{s + (f * rotm(rot(O, t))\\ | s = pos(O, t), f\in V\} = \{v_0, v_1 ... , v_{|V|-1}\}$
+\item Kanten (eng. \textit{edges}) zur Zeit $t$: $ E:OBJ\times T_s\mapsto V^2; E(O, t) = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V(O, t);(a, b, c) \in I\} $\\
+, welche die Punkte $E_p:ran(E)\mapsto\mathbb{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
+\item Flächen (eng. \textit{areas}) zur Zeit $t$: $ A:OBJ\times T_s\mapsto V^3; A = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(O, t); (a, b, c) \in I\} $,\\
+welche die Punkte $A_p:ran(A)\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
+\item Die Gesamtpunktemenge $D$, die zum Zeitpunkt $t$ vom Objekt $O$ eingenommen wird ist dann:
+$ D: OBJ\times T_s: \mathbb{F}^3; D(O, t) = V(O, t)\cup E_p(E(O, t)) \cup A_p(A(O, t))$
+\end{enumerate}
 
-\\
 Vorteile \& Nachteile o.B.d.A:
 \begin{itemize}
-\item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen. $V\ll o$
+\item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen: $V\ll o$
 \item [+]Berechnungen durch klassische Geometrie.
 \item [-]Verlust der Information von Innen \& Außenseite am Hüllobjekt.
 \item [-]Beschränkung auf durch Polygon-Meshes darstellbare Objekte $M\subset OBJ$
@@ -111,8 +114,10 @@ Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es
 \item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathbb{F}^3 $
 \end{enumerate}
 beschränkt.
-An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht $\forall t \in ]t_0, t_1] : v(\mathcal{T}(t)) = v(\mathcal{T}(t_1)); \omega(\mathcal{T}(t)) = \omega(\mathcal{T}(t_1));$.\\
-Vertexpositionen zu bestimmten Zeiten können durch Matrixtransformationen errechnet werden.\\
+An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht $\forall t \in ]t_0, t_1] : v(\mathcal{T}(t)) = v(\mathcal{T}( t_1 )); \omega(\mathcal{T}(t)) = \omega(\mathcal{T}(t_1));$.\\
+Im vorigen Abschnitt wurden die gezeitete Position und Rotation zu allen Zeiten $T_s$ definiert.
+Es werden jedoch tatsächlich nur Position $pos(O, \mathcal{T}(t_0))$ und Rotation $rot(O, \mathcal{T}(t_0))$ zu Beginn eines Ticks $\delta_i$ festgehalten. Diese Zählen zum Objektstatus, der während eines Ticks von $t_0$ auf $t_1$ aktualisiert werden muss. Dadurch, dass sich die zeitlichen Änderungsgrößen während eines Ticks nicht ändern, können Statusattribute des Objekts während des Ticks(Position, Rotation, Eckpunkte, ...) durch ihre Linearität leicht bestimmt werden.  
+
 Andere Arten der Bewegung (wie z.B. durch Animation oder andere Transformationen wie Skalierung) sind in der Zukunft des Projektes denkbar, allerdings nicht Teil dieses Projektes.
 
 \subsection{Projektleistung}
