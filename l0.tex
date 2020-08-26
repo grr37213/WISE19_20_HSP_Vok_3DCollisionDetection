@@ -6,7 +6,7 @@ Implementierungstechnisch schränkt eine Rechenmaschine die mathematischen Zahle
 
 
 \subsection{Zeit}
-
+\label{sec:time}
 \def\finite#1{\ooalign{\hfil$\mapstochar\mkern 3mu\mapstochar\mkern 5mu$\hfil\cr$#1$}}
 
 Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche Sequenzen:
@@ -23,9 +23,9 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
 	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
-	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_0$ und $t_1$ gleich bleibt $\forall t \in [t_0,t_1]: r_t(t_0) = r_t(t)$. Wird diese Eigenschaft verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
-	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbe+reiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind. Wir nennen diese Zeitbereiche in diesem Kontext "Ticks".\\
-Beispiele für die Rate sind 
+	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_{r0}$ und $t_{r1}$ gleich bleibt $\forall t \in [ t_{r0},t_{r1}]: r_t( t_{r0}) = r_t(t)$. Wird die Eigenschaft des Zeitflusses in der festgelegten Rate verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
+	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbereiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind.\\
+Beispiele für Raten sind 
 \begin{itemize}
 \item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Echtzeit
 \item $r_t(x) = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht
@@ -82,7 +82,7 @@ Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ
 \fussy
 Durch diese mathematische Darstellung führen Rechenoperationen mit Objekten auf relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
 Polygon-Mesh $$M: (V \times I); V \subseteq \mathbb{F}^3, I \subseteq [0, |V|-1]_\mathbb{Z}^3 )$$ beschreibt ein Objekt durch zusammenhängende Dreiecksflächen. In der Repräsentation werden dabei nur die Dreieckspunkte $V$(Ecken, eng. \textit{vertices}) und die Kombinationen dieser zu Dreiecken durch Indizierung $I$ gegeben.\\
-Die zusammenhängenden Dreiecksflächen beschreiben dabei mindestens die Objekthülle $\mathcal{H}: M \mapsto M, \forall m'\in M: \mathcal{H}(m') \subseteq m'$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
+
 \end{itemize}  
 Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt beschrieben werden:
 \begin{enumerate}
@@ -95,8 +95,9 @@ welche die Punkte $A_p:ran(A)\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a +
 \item Die Gesamtpunktemenge $D$, die zum Zeitpunkt $t$ vom Objekt $O$ eingenommen wird ist dann:
 $ D: OBJ\times T_s: \mathbb{F}^3; D(O, t) = V(O, t)\cup E_p(E(O, t)) \cup A_p(A(O, t))$
 \end{enumerate}
+Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathbb{F}^3 \mapsto \mathbb{F}^3, \forall O\in OBJ: \mathcal{H}(D(O, t)) \subseteq D(O, t)$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
 
-Vorteile \& Nachteile o.B.d.A:
+Vorteile \& Nachteile dieser Darstellung o.B.d.A:
 \begin{itemize}
 \item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen: $V\ll o$
 \item [+]Berechnungen durch klassische Geometrie.
@@ -108,6 +109,7 @@ Weitere Berechnungen, wie z.B. Kollision, werden über die Hüllobjekte abgebild
 Im Verlauf dieses Projekts werden Objekte außerdem als starr/rigide, unveränderlich und unzerstörbar angenommen.
 
 \subsection{Objektbewegung}
+\label{sec:objects_mov}
 Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es wird sich hier auf
 \begin{enumerate}
 \item Geschwindigkeit $v: OBJ \times T_s \mapsto \mathbb{S}^3$  und

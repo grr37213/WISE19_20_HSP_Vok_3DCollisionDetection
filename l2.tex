@@ -1,15 +1,15 @@
 Die paarweise Kollisionserkennung bezieht sich auf die Kollision von zwei 3D-Modellen. In diesem Schritt ist die Genauigkeit der Kollision bei steigender Modellkomplexität im Fokus.
 Ziel ist es die Diskrepanzen zwischen der grafischen Anzeige von Modellen und der physikalischen Simulation zu deckeln.
 \subsection{Input}
-Aus dem vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|O|^2$ Objektpaare erhalten ($O :=$ Menge simulierter Objekte), für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $K_{definitive}\subseteq O^2$ in der Menge der vermuteten Kollisionspaare $K_{guess}\subseteq O^2$  vollständig enthalten ist $K_{definitive}\subseteq K_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verlorengehen.
+Aus dem vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|OBJ|^2$ Objektpaare $K_{guess}\subseteq OBJ^2$ erhalten, für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $K_{definitive}\subseteq OBJ^2$ in der Menge der vermuteten Kollisionspaare  vollständig enthalten ist $K_{definitive}\subseteq K_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verlorengehen. Es ist eine Aufgabe dieses Schritts, die Reduzierung von $K_{guess}$ auf $K_{defintive}$ zu vollenden.
 
 \subsection{Output}
-Im Abschnitt~\ref{use_cases} werden einige Verwendungszwecke der Kollisionsermittlung aufgelistet. 
+Im Abschnitt~\ref{sec:usages} werden einige Verwendungszwecke der Kollisionsermittlung aufgelistet. 
 Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benötigter Information über den Kollisionsvorgang um realisiert werden zu können.
 
 \begin{enumerate}
 	\item Inklusion\\
-		Die Frage ob Objekte sich an einem bestimmten Zeitpunkt schneiden/gegenseitig enthalten. $O_0 \cap O_1 \neq \emptyset$.
+		Die Frage ob Objekte $O_0, O_1 \in OBJ$ sich an einem konkreten Zeitpunkt während eines Ticks $t\in \Upsilon_{\delta i}$ schneiden/gegenseitig enthalten. $D(O_0, t) \cap D(O_1, t) \neq \emptyset$.
 	\item Intrusion\\
 		Die Frage nach den Eigenschaften
 		\begin{enumerate}
@@ -18,100 +18,44 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 		\item an welcher Raumposition
 		\item mit welchen Teilen des Objektes
 		\end{enumerate}
-		ein Eindringen eines Objektes in ein anderes stattfindet.
-		Hier beziehen wir uns auf die Zeitspanne eines Ticks $\delta_i$.
-		Ermittelt wird, ob 
-		$$\exists s \in [0, |\Upsilon_{\delta i}|], t_{nc} = \Upsilon_{\delta i}(s), t_c= \Upsilon_{\delta i}(s+1):$$
-		$$  D(O_0, t_{nc})\cap D(O_1, t_{nc}) = \emptyset \wedge D(O_0, t_c)\cap D(O_1, t_c) \neq \emptyset$$
-		und können dann aus der Schnittmenge $D(O_0, t_c)\cap D(O_1, t_c)$ Ort und beteiligte Teile des Objekts ermitteln.
+		ein Eindringen eines Objektes in ein anderes stattfindet, d.h. ein Zustandsübergang von Nicht-Kollision zu Kollision stattfindet.
+		Hier beziehen wir uns auf die Zeitspanne eines Ticks $\delta_i$, während dem bei Zeitpunkt $\mathcal{T}(s)$ die erste Kollision (während $\delta_i$) auftritt. 
+		$$\exists s \in [1, |\Upsilon_{\delta i}|-1], t_c= \Upsilon_{\delta i}(s):$$
+		$$ D(O_0, t_c)\cap D(O_1, t_c) \neq \emptyset \wedge \forall s' < s: 
+		D(O_0, \Upsilon_{\delta i}(s'))\cap D(O_1, \Upsilon_{\delta i}(s')) = \emptyset$$
+		Aus der Schnittmenge $D(O_0, t_c)\cap D(O_1, t_c)$ können dann die Angeforderten Eigenschaften zur Kollision (Zeit, Ort, Beteiligte Objektteile) ermittelt werden.
 \end{enumerate}
-Es mag weiter unzählige weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die von uns in Betracht gezogenen ein.
+Es mag weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die von uns in Betracht gezogenen dar.
 
-Die Kollisionsauflösung L3 \ref{l3} soll in dieser Arbeit zwar nicht explizit behandelt, bzw. nicht umgesetzt werden, jedoch ist eine kurze Evaluation zur Ermittlung der Anforderungen für L2 unumgänglich.
-L3 stellt direkte Anforderungen zu Zusatzinformationen um die passenden Konsequenzen der Kollision zu ermitteln. Diese Informationen soll der Algorithmus in L2 (oft als Nebenprodukt) liefern. Beispiele sind Ort des ersten Kontakts zweier Objekte, Zeit oder beteiligte Merkmale an der Kollision.\\
-
-Es werden in Folgenden Evaluierungen zu L3 durchgeführt und spezifisch Anforderungen festgelegt.
-
-Auch in L3 gelten Überlegungen bezüglich physikalischem Realismus (vgl. \ref{sec:physical_realism}).
-
+Für physikalische Verwendungszwecke insbesondere bei der rigiden Objektkollision scheint der Bereich der Intrusion mehr relevant. In Simulationen mit rigiden Kollisionsobjekten ist typischerweise der Zustand des Überschneidens zweier Objekte (Inklusion) nicht erlaubt und muss daher aktiv durch eine Kollisionsreaktion verhindert werden. Durch die Ermittlung des ersten Zeitpunkts des Bruchs der Nicht-Überschneidungsbedingung kann die Kollisionsreaktion passend ermittelt werden.\\
 \begin{figure}
 	\centering
 	\includegraphics[width=0.6\textwidth]{./res/l3_col.png}
 	\caption{2D Kollisionsszenario mit alternativen Bewegungsbahnen eines Projektils an Kollisionskörpern}
 	\label{fig:l3col}
 \end{figure}
+Die Umsetzung der Auflösung von Kollisionen und Mehrfachkollisionen ist explizit aus diesem Projekt ausgeschlossen. Selbst jedoch bei der theoretischen Betrachtung von Mehrfachkollisionen während eines Ticks und Optionen zu deren Auflösung, bzw.~physikalischer Reaktion von Objekten , scheinen vorwiegend Erstkollisionen interessant zu sein. Man vergleiche hierzu Abbildung~\ref{fig:l3col}.\\
+An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkollisionen durch Intrusion interessanter sind sind und zuerst ermittelbar gemacht werden sollten.
 
-Die vorhandenen Freiheitsgrade sollen im Folgenden im Beispiel verdeutlicht werden. Die Abbildung~\ref{fig:l3col} zeigt mögliche Interpretationen eines Kollisionsszenarios.
-Auf der Abbildung in dunkelblau zu sehen ist die ursprüngliche Bahn des Projektils, welche innerhalb eines Ticks ($t_0$ bis $t_1$) durch zwei Körper verliefe. Diese Bahn kann als die Standardbewegung des Projektils angenommen werden und ist daher zu allen Zeitpunkten im Tick bekannt.\\
-Zum Zeitpunkt $t_0$ ist die in hellblau gekennzeichnete Linie der alternativen Flugbahn des Projektils noch unbekannt! Diese kann erst mit der Ermittlung der ersten Kollision errechnet werden.
-Über einen L2-Algorithmus werden die rot gekennzeichneten Kollisionspunkte bekannt.\\
-\\
-In der L3-Schicht muss nun entschieden werden, wie mit der gegebenen Information umgegangen wird. Mehr noch: Welche Information wird tatsächlich gebraucht.\\
-Es werden beispielhaft Aufösungsoptionen und Konsequenzen gelistet.
-\begin{itemize}
-	\item[O1] Akkurate Auflösung\\
-		Konsequenzen:
-		\begin{itemize}
-			\item Errechnete Kollisionen nach der ersten Kollision sind ungültig. Dies gilt sowohl für L1 als auch L2! (Projektil kann abgeprallt sein oder kann durchschlagen haben, was vor der ersten Kollision noch nicht bekannt war.)\\
-				$\Rightarrow$ Algorithmusanforderung: Nur die erste Kollision muss ermittelt werden.
-			\item Kollisionen nach der ersten Kollision müssen neu errechnet werden (Projektil abgeprallt oder Durchschlag?, ursprünglicher oder alternativer Pfad, vgl.~Abbildung~\ref{fig:l3col})\\
-				$\Rightarrow$ iterativer/rekursiver Algorithmus $\Rightarrow$ Stellt die Frage zur maximalen Iterationstiefe, da potentiell unendlich viele Iterationen, aber Echtzeitanforderung muss eingehalten werden.
-		\end{itemize}
 
-	\item[O2] Maximal eine Kollision erlaubt pro Tick\\
-		Konsequenzen:
-		\begin{itemize}
-			\item Kollisionsverhalten nicht realitätsgetreu (Kollisionen nach erster Kollision treten nicht auf)
-			\item Festlegung: Verhalten der Kollisionspartner nach der ersten Kollision zum Zeitpunkt dieser: Verharren, weiterbewegung im nächsten Tick.
-			\item Algorithmus ist konstant (im Sinne von nicht iterativ)
-		\end{itemize}
-	\item[O3] Zustandsänderung von Objekten nur am Ende des Ticks.\\
-		Konsequenzen:
-		\begin{itemize}
-			\item Bei abprallendem Projektil: Kursänderung des Projektils erst bei $t_1$, alternative Kollisionen werden nicht erkannt.\\
-				$\Rightarrow$ nicht realitätsgetreu
-			\item Bei penetrierendem Projektil: Diskrepanz zwischen wie weit das Projektil physikalisch penetriert und der zurückgelegt weg zwischen $t_0$ und $t_1$.
-				$\Rightarrow$ Schwierigkeiten in der Umsetzung des Durchschlagsverhaltens.
-			\item Algorithmus ist konstant (im Sinne von nicht iterativ)
-		\end{itemize}
-\end{itemize}
+%%TODO look if one can fit that under his hat somewhere, would be rad 
+%Ein interessanter Fehler bezogen auf L3 in freier Wildbahn ist in \cite{skyrimwallglitch} zu sehen. Es handelt sich dabei um einen Glitch im Spiel The Elder Scrolls V:Skyrim. Dabei wird eine gleichzeitige Kollision des Spielermodells (welches sich durch eine Ingame-Fähigkeit unüblich schnell bewegt), eines Objekts und einer Wand oder Tür provoziert. Die Kollision, bzw. die wiederholten Kollisionen zwischen dem Spielermodell, dem Objekt (Kessel/Teller/Korb) und der Wand/Tür werden nicht richtig aufgelöst, was dazu führt, dass der Spieler durch die Wand laufen kann.\\
 
-Sind die Realitätsungetreuheiten in O2/O3 vertretbar? Wie hoch ist die Auftrittswahrscheinlichkeit in einer Konkreten Anwendung?\\
-\\
-Anzustreben ist O1, aber um die Tickgrenzen einzuhalten muss unter Umständen die Iterations-/Rekursionstiefe beschränkt werden. O2/O3 könnten verwendet werden um eine O1-Iteration zum vorzeitigen Abschluss zu bringen. Nötig ist die Evaluierung der Kritikalität der Diskrepanz zu O1 mit unendlicher Iterationstiefe.
- 
-Ein interessanter Fehler bezogen auf L3 in freier Wildbahn ist in \cite{skyrimwallglitch} zu sehen. Es handelt sich dabei um einen Glitch im Spiel The Elder Scrolls V:Skyrim. Dabei wird eine gleichzeitige Kollision des Spielermodells (welches sich durch eine Ingame-Fähigkeit unüblich schnell bewegt), eines Objekts und einer Wand oder Tür provoziert. Die Kollision, bzw. die wiederholten Kollisionen zwischen dem Spielermodell, dem Objekt (Kessel/Teller/Korb) und der Wand/Tür werden nicht richtig aufgelöst, was dazu führt, dass der Spieler durch die Wand laufen kann.\\
 
-An dieser Stelle können die Anforderungen an L2 bezüglich zu ermittelnder Informationen ermittelt werden. Es wird sich an dieser Stelle für den weiteren Verlauf des Projektes auf Folgendes festgelegt:
+\subsection{Intrusionsermittlung durch lineare Interpolation der Objektbewegung}
+Um das Problem zu vereinfachen wird die zunächst die Rotation von Objekten vernachlässigt.\\
+Genauer: In diesem Kontext erfährt ein Objekt $O\in OBJ$ während eines Ticks $\delta_i$ keine zeitliche Änderung der Rotation $\forall t \in \Upsilon_{\delta i} : rot(O, t) = rot(O, \Upsilon_{\delta i}(0))$. Dies hat mehrere Gründe:
 \begin{enumerate}
-	\item Kollisionsauftritt während des Ticks (boolean)
-	\item Zeit der ersten Kollision
-	\item An der ersten Kollision beteiligte Merkmale
+\item Objekte beinhielten zum Start des Projekts noch keine Repräsentation für Rotation.
+\item Rotation mit einzubeziehen wurde zu Anfang schon als schwierig eingestuft. Dieser Verhalt sollte sich später bestätigen.
+\item Es gibt genügend Kollisionsszenarien/Verwendungszwecke für denen Rotation keine Rolle spielt. (Punktförmige Objekte, statische Objekte, Verwendungszwecke mit hoher Fehlertoleranz)
+\item Es wird ein Experiment der Vernachlässigung von Rotation durchgeführt. Kann auch ohne Behandlung der Rotation eine zufriedenstellende Illusion von physikalischem Realismus geschaffen werden?
 \end{enumerate}
 
+Wie in Abschnitt~\ref{sec:objects_mov} bereist beschrieben sind die zeitlichen Änderungen eines Objektes während eines Ticks konstant. Zusammen mir der Vernachlässigung der Rotation beschreiben ein Objekt $O$, bzw.~alle im Objekt enthaltenen Punkte $p \in D(O, t_0)$ lineare, parallele Flugbahnen $l_p$ abhängig zur Zeit $t$ und Geschwindigkeit$v$ des Objekts $O$.
+$$l_p = \{p + (t - t_0) * v(O, t_0) | t_0 \leq t \leq t_1\}$$ 
+Dies ermöglicht die Ermittlung von Kollisionen durch lineare Interpolation.\\
 
-
-
-
-
-
-
-
-\subsection{Methoden}
-
-Wie in Abschnitt \label{sec:l0_objects} beschrieben werden Objekte in Form von Polygon-Meshes dargestellt. Diese Darstellung ist simpler. Es wird dabei stattdessen auf mathematische Eigenschaften der Merkmale der Mesh (Ecken, Kanten und Dreiecksflächen) zurückgegriffen um die in der ehemaligen Punktemenge enthaltenen Punkte mit einzugrenzen.\\
-An dieser Stelle kann grundsätlich zwischen zwei Problemklassen unterschieden werden:
-
-Die Probleme sind ähnlich und Lösen beide in gewisser Art und Weise das Kollisionserkennungsproblem.\\
-Jedoch wird unter dieser Anschauung schnell klar: Die Antwort auf das Inklusionsproblem liefert wenig Information für die in \ref{sec:l3} gestellten Anforderungen.\\
-Es wird sich daher auf das Intrusionsproblem mit Hüllobjekten konzentriert.
-
-
-\subsubsection{Lineare Interpolation der Objektbewegung}
-\begin{itemize}
-\item[Annahme 1:] Beteiligte Objekte haben keine Rotation (Rotation wird ignoriert oder liegt nicht vor).
-\item[Annahme 2:] Die Geschwindigkeit der Objekte ist im vom Algorithmus behandelten Zeitpunkt konstant.
-\end{itemize}
 Bei einer Relativierung zu einem der beteiligten Objekte sind die Flugbahnen aller Ecken immernoch linear und parallel zu anderen Ecken des selben Objektes.\\
 Eine Methode, um unter diesen Umständen Kollisionen zu errechnen ist lineare Interpolation.\\
 \\
