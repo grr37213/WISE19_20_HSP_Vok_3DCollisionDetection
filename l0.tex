@@ -1,7 +1,7 @@
 Implementierungstechnisch schränkt eine Rechenmaschine die mathematischen Zahlenräume ein:
 \begin{itemize}
-\item Die Reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathbb{F} \subset \mathbb{R}$ bezeichnet werden
-\item Integern $\mathbb{Z}$ sind maschinell in ihrer Darstellungsgröße beschränkt. Diese beschränkte Menge an Integern wird $\mathbb{I} \subset \mathbb{Z}$ genannt
+\item Die Reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathfrak{F} \subset \mathbb{R}$ bezeichnet werden
+\item Integern $\mathbb{Z}$ sind maschinell in ihrer Darstellungsgröße beschränkt. Diese beschränkte Menge an Integern wird $\mathfrak{I} \subset \mathbb{Z}$ genannt
 \end{itemize}
 
 
@@ -22,7 +22,7 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 	\begin{itemize}
 	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
-	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathbb{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
+	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathfrak{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
 	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_{r0}$ und $t_{r1}$ gleich bleibt $\forall t \in [ t_{r0},t_{r1}]: r_t( t_{r0}) = r_t(t)$. Wird die Eigenschaft des Zeitflusses in der festgelegten Rate verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
 	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbereiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind.\\
 Beispiele für Raten sind 
@@ -41,29 +41,29 @@ Theoretisch kann die Rate auch negative Werte annehmen. Die Simulationszeit wür
 
 \subsection{Raum}
 \label{sec:space}
-Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathbb{F}^3$ beschrieben werden.\\
-Durch die Werteverteilung in $\mathbb{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf. Die Genauigkeit ist dabei dichter, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
-Physikalische Prozesse berechnet auf Basis von Positionen in $\mathbb{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
+Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathfrak{F}^3$ beschrieben werden.\\
+Durch die Werteverteilung in $\mathfrak{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf. Die Genauigkeit ist dabei dichter, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
+Physikalische Prozesse berechnet auf Basis von Positionen in $\mathfrak{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
 An dieser Stelle soll diese Unabhängigkeit jedoch gefordert werden.\\
-Das Problem wird hier durch einen neuen Längendatentypen $\mathbb{S} : \mathbb{I} \times \mathbb{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{I}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
-Die Umrechnung zu Metern ist dann: $$ meter: \mathbb{S} \mapsto \mathbb{F};  meter((i, f)) = i * size_{grid} + f * size_{grid}$$ 
+Das Problem wird hier durch einen neuen Längendatentypen $\mathbb{S} : \mathfrak{I} \times \mathfrak{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathfrak{I}$ aufteilt und indiziert und $\mathfrak{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
+Die Umrechnung zu Metern ist dann: $$ meter: \mathbb{S} \mapsto \mathfrak{F};  meter((i, f)) = i * size_{grid} + f * size_{grid}$$ 
 Typischerweise gilt $f \in [0;1]$, um eine eindeutige Repräsentation für einen beschriebenen Punkt zu erhalten.
 
 Diese Darstellung hat folgende weitere Vorteile
 \begin{itemize}
 \item Einfache Implementierung
-\item Schnelle Indizierung der durch $\mathbb{I}$ indizierten Raumanteile für raumaufteilende Teile-und-Herrsche-Algorithmen
+\item Schnelle Indizierung der durch $\mathfrak{I}$ indizierten Raumanteile für raumaufteilende Teile-und-Herrsche-Algorithmen
 \end{itemize}
 
-Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathbb{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen. Dadurch ist effektiv die Eigenschaft $\mathbb{F}\subset\mathbb{S}$ nicht gefordert, auch wenn sie in der in diesem Projekt verwendeten Implementierung prinzipiell gilt.
+Positionen und Richtungen im Raum werden demnach mit Vektoren $s\in\mathbb{S}^3$ dargestellt. Für Berechnungsvorgänge werden Positionen zunächst relativiert, dann in $\mathfrak{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen. Dadurch ist effektiv die Eigenschaft $\mathfrak{F}\subset\mathbb{S}$ nicht gefordert, auch wenn sie in der in diesem Projekt verwendeten Implementierung prinzipiell gilt.
 
 Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Relativierung, Längenumrechnung und Transformation dargestellt werden.
 
 \begin{enumerate}
 \item Worldspace $= \mathbb{S}^3$ absolute Positionen von Objekten
-\item Cameraspace $= \mathbb{F}^3$, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
-\item Viewspace $= \mathbb{F}^3$, Verzerrung durch die Kameralinse, um einen Blickwinkel auf einen Bildschirm anzupassen.
-\item Objektspace,$= \mathbb{F}^3$, Ursprung am vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
+\item Cameraspace $= \mathfrak{F}^3$, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
+\item Viewspace $= \mathfrak{F}^3$, Verzerrung durch die Kameralinse, um einen Blickwinkel auf einen Bildschirm anzupassen.
+\item Objektspace,$= \mathfrak{F}^3$, Ursprung am vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
 \end{enumerate}
 
 Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
@@ -75,27 +75,27 @@ Objekte werden mathematisch oft als eine Menge von Punkten betrachtet, welche ei
 Durch die in Abschnitt~\ref{sec:space} angesprochene Relativierung ist ein Objekt jedoch in allen Berechnungskontexten (nicht Darstellungskontexten) durch die Relativierung definiert. Ein Objekt enthält folgende Informationen:
 \begin{itemize}
 \item Raumposition zu bestimmter Zeit $pos : OBJ \times T_s \mapsto \mathbb{S}^3$
-\item Ausrichtung zu bestimmter Zeit $rot : OBJ \times T_s \mapsto \mathbb{F}^3$. Der Vektor $(x, y, z) \in\mathbb{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathbb{F}^3 \mapsto \mathbb{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
+\item Ausrichtung zu bestimmter Zeit $rot : OBJ \times T_s \mapsto \mathfrak{F}^3$. Der Vektor $(x, y, z) \in\mathfrak{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathfrak{F}^3 \mapsto \mathfrak{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
 \item Ein relativ zum einem eigenen Ursprung angegebenes rigides unveränderliches Modell.\\
 \sloppy
-Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ \mapsto \mathcal{P}(\mathbb{F}^3) $$ definiert sein.
+Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ \mapsto \mathcal{P}(\mathfrak{F}^3) $$ definiert sein.
 \fussy
 Durch diese mathematische Darstellung führen Rechenoperationen mit Objekten auf relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
-Polygon-Mesh $$M: (V \times I); V \subseteq \mathbb{F}^3, I \subseteq [0, |V|-1]_\mathbb{Z}^3 )$$ beschreibt ein Objekt durch zusammenhängende Dreiecksflächen. In der Repräsentation werden dabei nur die Dreieckspunkte $V$(Ecken, eng. \textit{vertices}) und die Kombinationen dieser zu Dreiecken durch Indizierung $I$ gegeben.\\
+Polygon-Mesh $$M: (V \times I); V \subseteq \mathfrak{F}^3, I \subseteq [0, |V|-1]_\mathbb{Z}^3 )$$ beschreibt ein Objekt durch zusammenhängende Dreiecksflächen. In der Repräsentation werden dabei nur die Dreieckspunkte $V$(Ecken, eng. \textit{vertices}) und die Kombinationen dieser zu Dreiecken durch Indizierung $I$ gegeben.\\
 
 \end{itemize}  
 Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt beschrieben werden:
 \begin{enumerate}
 \item $ O:=(POS, ROT, M); POS:= dom(pos); ROT:=dom(rot) $
-\item Ecken zur Zeit $t$: $V:OBJ\times T_s\mapsto\mathbb{F}^3; V(O, t) = \{s + (f * rotm(rot(O, t))\\ | s = pos(O, t), f\in V\} = \{v_0, v_1 ... , v_{|V|-1}\}$
+\item Ecken zur Zeit $t$: $V:OBJ\times T_s\mapsto\mathfrak{F}^3; V(O, t) = \{s + (f * rotm(rot(O, t))\\ | s = pos(O, t), f\in V\} = \{v_0, v_1 ... , v_{|V|-1}\}$
 \item Kanten (eng. \textit{edges}) zur Zeit $t$: $ E:OBJ\times T_s\mapsto V^2; E(O, t) = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V(O, t);(a, b, c) \in I\} $\\
-, welche die Punkte $E_p:ran(E)\mapsto\mathbb{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
+, welche die Punkte $E_p:ran(E)\mapsto\mathfrak{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
 \item Flächen (eng. \textit{areas}) zur Zeit $t$: $ A:OBJ\times T_s\mapsto V^3; A = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(O, t); (a, b, c) \in I\} $,\\
-welche jeweils die Punkte $A_p:ran(A)\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
+welche jeweils die Punkte $A_p:ran(A)\mapsto\mathfrak{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
 \item Die Gesamtpunktemenge $D$, die zum Zeitpunkt $t$ vom Objekt $O$ eingenommen wird ist dann:
-$ D: OBJ\times T_s: \mathbb{F}^3; D(O, t) = V(O, t)\cup \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\}$. Dabei sind jeweils die Punkte von Ecken in Kanten und von Kanten in Flächen jeweils enthalten $ V(O, t) \subset \{E_p(e)|e \in E(O, t)\} \subset \{A_p(a) |a \in A(O, t)\} \Rightarrow D(O, t) =  \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\} = \{A_p(a) |a \in A(O, t)\}$
+$ D: OBJ\times T_s: \mathfrak{F}^3; D(O, t) = V(O, t)\cup \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\}$. Dabei sind jeweils die Punkte von Ecken in Kanten und von Kanten in Flächen jeweils enthalten $ V(O, t) \subset \{E_p(e)|e \in E(O, t)\} \subset \{A_p(a) |a \in A(O, t)\} \Rightarrow D(O, t) =  \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\} = \{A_p(a) |a \in A(O, t)\}$
 \end{enumerate}
-Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathbb{F}^3 \mapsto \mathbb{F}^3, \forall O\in OBJ: \mathcal{H}(D(O, t)) \subseteq D(O, t)$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
+Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathfrak{F}^3 \mapsto \mathfrak{F}^3, \forall O\in OBJ: \mathcal{H}(D(O, t)) \subseteq D(O, t)$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
 
 Vorteile \& Nachteile dieser Darstellung o.B.d.A:
 \begin{itemize}
@@ -113,7 +113,7 @@ Im Verlauf dieses Projekts werden Objekte außerdem als starr/rigide, unverände
 Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es wird sich hier auf
 \begin{enumerate}
 \item Geschwindigkeit $v: OBJ \times T_s \mapsto \mathbb{S}^3$  und
-\item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathbb{F}^3 $
+\item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathfrak{F}^3 $
 \end{enumerate}
 beschränkt.
 An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht $\forall t \in ]t_0, t_1] : v(\mathcal{T}(t)) = v(\mathcal{T}( t_1 )); \omega(\mathcal{T}(t)) = \omega(\mathcal{T}(t_1));$.\\
