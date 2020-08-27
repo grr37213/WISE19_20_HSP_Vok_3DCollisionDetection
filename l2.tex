@@ -48,8 +48,8 @@ Genauer: In diesem Kontext erfährt ein Objekt $O\in OBJ$ während eines Ticks $
 \begin{enumerate}
 \item Objekte hielten zum Start des Projekts noch keine Repräsentation für Rotation.
 \item Rotation mit einzubeziehen wurde zu Anfang schon als schwierig eingestuft. Dieser Verhalt sollte sich später bestätigen.
-\item Es gibt genügend Kollisionsszenarien/Verwendungszwecke für denen Rotation keine Rolle spielt. (Punktförmige Objekte, statische Objekte, Verwendungszwecke mit hoher Fehlertoleranz)
-\item Es wird ein Experiment der Vernachlässigung von Rotation durchgeführt. Es soll dabei beantwortet werden, ob auch ohne Behandlung der Rotation eine zufriedenstellende Illusion von physikalischem Realismus geschaffen werden kann.
+\item Es gibt genügend Kollisionsszenarien/Verwendungszwecke für denen Rotation keine Rolle spielen muss. (Logische Kollision, Punktförmige Objekte, statische Objekte wie z.B. oft Terrain, Verwendungszwecke mit hoher Fehlertoleranz)
+\item Es wird ein Experiment der Vernachlässigung von Rotation durchgeführt. Es soll dabei beantwortet werden, ob auch ohne Behandlung der Rotation eine ausreichend zufriedenstellende Illusion von physikalischem Realismus geschaffen werden kann.
 \end{enumerate}
 
 Wie in Abschnitt~\ref{sec:objects_mov} bereits beschrieben sind die zeitlichen Änderungen (Geschwindigkeit $v$ und Drehgeschwindigkeit $\omega$) eines Objektes während eines Ticks konstant. Durch die Vernachlässigung der Drehgeschwindigkeit $\omega$ kann die zeitliche Änderung eines Objektes $O$ allein auf Bezug zu Geschwindigkeit $v$ und der Zeit $t$ beschrieben werden, bzw.~alle im Objekt enthaltenen Punkte $p \in D(O, t_0)$ beschreiben lineare, parallele Flugbahnen.
