@@ -45,7 +45,7 @@ Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathbb{F}^3$ bes
 Durch die Werteverteilung in $\mathbb{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf. Die Genauigkeit ist dabei dichter, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
 Physikalische Prozesse berechnet auf Basis von Positionen in $\mathbb{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
 An dieser Stelle soll diese Unabhängigkeit jedoch gefordert werden.\\
-Das Problem wird hier durch einen neuen Längendatentypen $\mathbb{S} : \mathbb{Z} \times \mathbb{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{I}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
+Das Problem wird hier durch einen neuen Längendatentypen $\mathbb{S} : \mathbb{I} \times \mathbb{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathbb{I}$ aufteilt und indiziert und $\mathbb{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
 Die Umrechnung zu Metern ist dann: $$ meter: \mathbb{S} \mapsto \mathbb{F};  meter((i, f)) = i * size_{grid} + f * size_{grid}$$ 
 Typischerweise gilt $f \in [0;1]$, um eine eindeutige Repräsentation für einen beschriebenen Punkt zu erhalten.
 
