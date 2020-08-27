@@ -91,9 +91,9 @@ Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt besc
 \item Kanten (eng. \textit{edges}) zur Zeit $t$: $ E:OBJ\times T_s\mapsto V^2; E(O, t) = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V(O, t);(a, b, c) \in I\} $\\
 , welche die Punkte $E_p:ran(E)\mapsto\mathbb{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
 \item Flächen (eng. \textit{areas}) zur Zeit $t$: $ A:OBJ\times T_s\mapsto V^3; A = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(O, t); (a, b, c) \in I\} $,\\
-welche die Punkte $A_p:ran(A)\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
+welche jeweils die Punkte $A_p:ran(A)\mapsto\mathbb{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
 \item Die Gesamtpunktemenge $D$, die zum Zeitpunkt $t$ vom Objekt $O$ eingenommen wird ist dann:
-$ D: OBJ\times T_s: \mathbb{F}^3; D(O, t) = V(O, t)\cup E_p(E(O, t)) \cup A_p(A(O, t))$
+$ D: OBJ\times T_s: \mathbb{F}^3; D(O, t) = V(O, t)\cup \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\}$. Dabei sind jeweils die Punkte von Ecken in Kanten und von Kanten in Flächen jeweils enthalten $ V(O, t) \subset \{E_p(e)|e \in E(O, t)\} \subset \{A_p(a) |a \in A(O, t)\} \Rightarrow D(O, t) =  \{E_p(e)|e \in E(O, t)\} \cup \{A_p(a) |a \in A(O, t)\} = \{A_p(a) |a \in A(O, t)\}$
 \end{enumerate}
 Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathbb{F}^3 \mapsto \mathbb{F}^3, \forall O\in OBJ: \mathcal{H}(D(O, t)) \subseteq D(O, t)$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
 
