@@ -58,18 +58,18 @@ Dies ermöglicht die Ermittlung von Kollisionen durch lineare Interpolation der 
 Die Eigenschaft der Linearität hat dabei noch den weiteren entscheidenden Vorteil, dass bei einer Relativierung der Objekte wechselseitig zueinander, eine Operation der einer Transformation in Form einer Translation gleichkommt, die Linearität weiterhin gewahrt bleibt. Zum Vergleich: Mit aktiver Rotation beschrieben Objekte relativ zueinander Kurvenflugbahnen.\\
 Es kann also wechselseitig zu beiden Objekten relativ gerechnet werden.\\
 Wir definierten $D(O, t)$ als die Sammlung aller Flächen, Kanten und Ecken eines Objektes. Zur Vereinfachung benennen wir Objekte $O_x := (A_x, E_x, V_x)$ mit $A_x = A(O_x, t_0); E_x = (O_x, t_0); V_x = (O_x, t_0)$. Diese Merkmale sollen nun durch die Zeitdimension erweitert und dann kollidiert werden.
-Es müssen nicht alle Merkmalskombinationen $\in \{Fläche, Kante, Ecke\}^2$ getestet werden. Es konnten essenzielle Merkmalskombinationen ermittelt werden, welche bei sich bei einer Erstkollision auftreten können:
+Es müssen nicht alle Merkmalskombinationen $\in \{Area, Edge, Vertex\}^2$ getestet werden. Es konnten essenzielle Merkmalskombinationen ermittelt werden, welche bei sich bei einer Erstkollision auftreten können:
 		\begin{itemize}
-			\item [$\{Ecke, Fläche\}$] Eine Ecke durchschlägt eine Fläche.\\
+			\item [$\{Vertex, Area\}$] Eine Ecke durchschlägt eine Fläche.\\
 				$\Rightarrow$ Zu überpfüfende Paare: $(V_0\times A_1)\times (V_1\times A_0)$
-			\item [$\{Kante, Kante\}$] Kanten durchschneiden sich gegenseitig.
+			\item [$\{Edge, Edge\}$] Kanten durchschneiden sich gegenseitig.
 				$\Rightarrow$ Zu überprüfende Paare: $(E_0\times E_1)\times (E_1\times E_0) = (E_0\times E_1)$
 		\end{itemize}
-		Alle anderen Kombinationen sind entweder in diesen beiden enthalten (z.B. $\{Ecke, Kante\}$ in 1.) oder eine Ereignis dieser beiden Szenarien muss logisch vorher passieren (z.B. 1. oder 2. muss vor $\{Kante, Fläche\}$ bereits passiert sein).
+		Alle anderen Kombinationen sind entweder in diesen beiden enthalten (z.B. $\{Vertex, Edge\}$ in 1.) oder eine Ereignis dieser beiden Szenarien muss logisch vorher passieren (z.B. 1. oder 2. muss vor $\{Edge, Area\}$ bereits passiert sein).
 \ \\
 		Aufgrund der Relativierung muss nur eines der Merkmale muss eine zeitliche Bewegung durchführen
 		\begin{itemize}
-			\item [$\{Ecke, Fläche\}$] 2 Möglichkeiten:
+			\item [$$\{Vertex, Area\}$$] 2 Möglichkeiten:
 				\begin{itemize}
 					\item[Option0:] Linie(Eckpunkt \& Zeitdimension) schneidet ein Dreieck\\
 					Eckpunkt $v \Rightarrow l_v$
@@ -77,7 +77,7 @@ Es müssen nicht alle Merkmalskombinationen $\in \{Fläche, Kante, Ecke\}^2$ get
 					Dreiecksfläche $a \Rightarrow {l_p | p \in A_p(a)}$
 				\end{itemize}
 				Gewählt wird Option0, da einfachere Berechnung.
-			\item [$\{Kante, Kante\}$]  Parallelogramm(Linie \& Zeitdimension) schneidet Linie
+			\item [$\{Edge, Edge\}$]  Parallelogramm(Linie \& Zeitdimension) schneidet Linie
 		\end{itemize}
 \ \\
 		Geometrische Eigenschaften nun beteiligter Formen:
@@ -92,16 +92,16 @@ Es müssen nicht alle Merkmalskombinationen $\in \{Fläche, Kante, Ecke\}^2$ get
 \ \\
 		Beide Szenarien können über Gleichungssysteme zur Ermittlung der Koeffizienten in konstanter Zeit überprüft werden:
 		\begin{itemize}
-			\item [$\{Ecke, Fläche\}$] $l_0 + x * l_1 = t_0 + y*t_1 + z*t_2$\\
+			\item [$\{Vertex, Area\}$] $l_0 + x * l_1 = t_0 + y*t_1 + z*t_2$\\
 				$x$ ist zudem hier der Koeffizient der Zeit, da die Linie in der Zeitdimension liegt.
-			\item [$\{Kante, Kante\}$] $l_0 + x * l_1 = p = p_0 + y*p_1 + z*p_2$\\
+			\item [$\{Edge, Edge\}$] $l_0 + x * l_1 = p = p_0 + y*p_1 + z*p_2$\\
 				Sei die ursprüngliche Linie, aus dem das Parallelogram generiert wurde $p_0+y*p_1$, so liegt die andere Linie $p_0 + z*p_2$ in der Zeitdimension und somit ist hier z der Zeitkoeffizient.
 		\end{itemize}
 \ \\
 		Komplexität:
 \begin{itemize}
-			\item [$\{Ecke, Fläche\}$] $|V(O_0, t_0)|* |A(O_1, t_0)| + |V(O_1, t_0)|*|A(O_0, t_0)|$
-			\item [$\{Kante, Kante\}$] $|E(O_0, t_0)| * |E(O_1, t_0)|$
+			\item [$\{Vertex, Area\}$] $|V(O_0, t_0)|* |A(O_1, t_0)| + |V(O_1, t_0)|*|A(O_0, t_0)|$
+			\item [$\{Edge, Edge\}$] $|E(O_0, t_0)| * |E(O_1, t_0)|$
 		\end{itemize}
 \ \\
 		Eigenschaften der Kollisionserkennung von linearer Interpolation unter den getroffenen Annahmen:
