@@ -2,7 +2,7 @@ Kollisionserkennung (\textit{eng. collision detection}) scheint, je nach Anwendu
 Wir beschränken uns hier für die Zwecke des Projektes auf Folgende:
 \begin{enumerate}
 \item Die Ermittlung der Menge von Objektpaaren $C$ aus einer Menge von sich bewegenden Objekten $OBJ$ in einem Raum, welche sich innerhalb eines Zeitraums, hier einem Tick $\delta_i$, überschneiden.
-$$C = \{(O_0, O_1) : O_0, O_1 \in OBJ; t\in \Upsilon_{\delta_i};  D(O_0, t) \cap D(O_1, t) \neq \emptyset\}$$
+$$C = \{(o_0, o_1) | o_0, o_1 \in OBJ; t\in \Upsilon_{\delta_i};  D(o_0, t) \cap D(o_1, t) \neq \emptyset\}$$
 \item Die Ermittlung von Informationen über den Hergang einer Kollision.
 Die genauen Anforderungen, welche Informationen ermittelt werden müssen, gehen aus den Verwendungszwecken hervor (vgl.~\ref{sec::usages}. 
 \end{enumerate}

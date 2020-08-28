@@ -1,7 +1,7 @@
 Die paarweise Kollisionserkennung bezieht sich auf die Kollision von zwei 3D-Modellen. In diesem Schritt ist die Genauigkeit der Kollision bei steigender Modellkomplexität im Fokus.
 Ziel ist es die Diskrepanzen zwischen der grafischen Anzeige von Modellen und der physikalischen Simulation zu deckeln.
 \subsection{Input}
-Aus dem vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|OBJ|^2$ Objektpaare $K_{guess}\subseteq OBJ^2$ erhalten, für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $K_{definitive}\subseteq OBJ^2$ in der Menge der vermuteten Kollisionspaare  vollständig enthalten ist $K_{definitive}\subseteq K_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verlorengehen. Es ist eine Aufgabe dieses Schritts, die Reduzierung von $K_{guess}$ auf $K_{defintive}$ zu vollenden.
+Aus dem vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|OBJ|^2$ Objektpaare $C_{guess}\subseteq OBJ^2$ erhalten, für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $C_{definitive}\subseteq OBJ^2$ in der Menge der vermuteten Kollisionspaare  vollständig enthalten ist $C_{definitive}\subseteq C_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verlorengehen. Es ist eine Aufgabe dieses Schritts, die Reduzierung von $C_{guess}$ auf $C_{defintive}$ zu vollenden.
 
 \subsection{Output}
 Im Abschnitt~\ref{sec:usages} werden einige Verwendungszwecke der Kollisionsermittlung aufgelistet. 
@@ -9,7 +9,7 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 
 \begin{enumerate}
 	\item Inklusion\\
-		Die Frage ob Objekte $O_0, O_1 \in OBJ$ sich an einem konkreten Zeitpunkt während eines Ticks $t\in \Upsilon_{\delta i}$ schneiden/gegenseitig enthalten. $D(O_0, t) \cap D(O_1, t) \neq \emptyset$.
+		Die Frage ob Objekte $o_0,o_1 \in OBJ$ sich an einem konkreten Zeitpunkt während eines Ticks $t\in \Upsilon_{\delta i}$ schneiden/gegenseitig enthalten. $D(o_0, t) \cap D(o_1, t) \neq \emptyset$.
 	\item Intrusion\\
 		Die Frage nach den Eigenschaften
 		\begin{enumerate}
@@ -21,9 +21,9 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 		ein Eindringen eines Objektes in ein anderes stattfindet, d.h. ein Zustandsübergang von Nicht-Kollision zu Kollision stattfindet.
 		Hier beziehen wir uns auf die Zeitspanne eines Ticks $\delta_i$, während dem bei Zeitpunkt $\mathcal{T}(s)$ die erste Kollision (während $\delta_i$) auftritt. 
 		$$\exists s \in [1, |\Upsilon_{\delta i}|-1], t_c= \Upsilon_{\delta i}(s):$$
-		$$ D(O_0, t_c)\cap D(O_1, t_c) \neq \emptyset \wedge \forall s' < s: 
-		D(O_0, \Upsilon_{\delta i}(s'))\cap D(O_1, \Upsilon_{\delta i}(s')) = \emptyset$$
-		Aus der Schnittmenge $D(O_0, t_c)\cap D(O_1, t_c)$ können dann die Angeforderten Eigenschaften zur Kollision (Zeit, Ort, Beteiligte Objektteile) ermittelt werden.
+		$$ D(o_0, t_c)\cap D(o_1, t_c) \neq \emptyset \wedge \forall s' < s: 
+		D(o_0, \Upsilon_{\delta i}(s'))\cap D(o_1, \Upsilon_{\delta i}(s')) = \emptyset$$
+		Aus der Schnittmenge $D(o_0, t_c)\cap D(o_1, t_c)$ können dann die Angeforderten Eigenschaften zur Kollision (Zeit, Ort, Beteiligte Objektteile) ermittelt werden.
 \end{enumerate}
 Es mag weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die von uns in Betracht gezogenen dar.
 
@@ -44,7 +44,7 @@ An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkoll
 
 \subsection{Intrusionsermittlung durch lineare Interpolation der Objektbewegung}
 Um das Problem zu vereinfachen wird die zunächst die Rotation von Objekten vernachlässigt.\\
-Genauer: In diesem Kontext erfährt ein Objekt $O\in OBJ$ während eines Ticks $\delta_i$ keine zeitliche Änderung der Rotation $\forall t \in \Upsilon_{\delta i} : rot(O, t) = rot(O, \Upsilon_{\delta i}(0))$. Dies hat mehrere Gründe:
+Genauer: In diesem Kontext erfährt ein Objekt $o\in OBJ$ während eines Ticks $\delta_i$ keine zeitliche Änderung der Rotation $\forall t \in \Upsilon_{\delta i} : rot(o, t) = rot(o, t_0)$. Dies hat mehrere Gründe:
 \begin{enumerate}
 \item Objekte hielten zum Start des Projekts noch keine Repräsentation für Rotation.
 \item Rotation mit einzubeziehen wurde zu Anfang schon als schwierig eingestuft. Dieser Verhalt sollte sich später bestätigen.
@@ -52,13 +52,13 @@ Genauer: In diesem Kontext erfährt ein Objekt $O\in OBJ$ während eines Ticks $
 \item Es wird ein Experiment der Vernachlässigung von Rotation durchgeführt. Es soll dabei beantwortet werden, ob auch ohne Behandlung der Rotation eine ausreichend zufriedenstellende Illusion von physikalischem Realismus geschaffen werden kann.
 \end{enumerate}
 
-Wie in Abschnitt~\ref{sec:objects_mov} bereits beschrieben sind die zeitlichen Änderungen (Geschwindigkeit $v$ und Drehgeschwindigkeit $\omega$) eines Objektes während eines Ticks konstant. Durch die Vernachlässigung der Drehgeschwindigkeit $\omega$ kann die zeitliche Änderung eines Objektes $O$ allein auf Bezug zu Geschwindigkeit $v$ und der Zeit $t$ beschrieben werden, bzw.~alle im Objekt enthaltenen Punkte $p \in D(O, t_0)$ beschreiben lineare, parallele Flugbahnen.
-$$l_p = \{p + (t - t_0) * v(O, t_0) | t_0 \leq t \leq t_1\}$$ 
+Wie in Abschnitt~\ref{sec:objects_mov} bereits beschrieben sind die zeitlichen Änderungen (Geschwindigkeit $v$ und Drehgeschwindigkeit $\omega$) eines Objektes während eines Ticks konstant. Durch die Vernachlässigung der Drehgeschwindigkeit $\omega$ kann die zeitliche Änderung eines Objektes $o$ allein auf Bezug zu Geschwindigkeit $v$ und der Zeit $t$ beschrieben werden, bzw.~alle im Objekt enthaltenen Punkte $p \in D(o, t_0)$ beschreiben lineare, parallele Flugbahnen, die in ihrer Gesamtheit das durchlaufene Volumen des Objekts während eines Ticks beschreiben.
+$$l_p = \{p + (t - t_0) * v(o, t_0) | t_0 \leq t \leq t_1\}$$ 
 Dies ermöglicht die Ermittlung von Kollisionen durch lineare Interpolation der Zeit.\\
 Die Eigenschaft der Linearität hat dabei noch den weiteren entscheidenden Vorteil, dass bei einer Relativierung der Objekte wechselseitig zueinander, eine Operation der einer Transformation in Form einer Translation gleichkommt, die Linearität weiterhin gewahrt bleibt. Zum Vergleich: Mit aktiver Rotation beschrieben Objekte relativ zueinander Kurvenflugbahnen.\\
 Es kann also wechselseitig zu beiden Objekten relativ gerechnet werden.\\
-Wir definierten $D(O, t)$ als die Sammlung aller Flächen, Kanten und Ecken eines Objektes. Zur Vereinfachung benennen wir Objekte $O_x := (A_x, E_x, V_x)$ mit $A_x = A(O_x, t_0); E_x = (O_x, t_0); V_x = (O_x, t_0)$. Diese Merkmale sollen nun durch die Zeitdimension erweitert und dann kollidiert werden.
-Es müssen nicht alle Merkmalskombinationen $\in \{Area, Edge, Vertex\}^2$ getestet werden. Es konnten essenzielle Merkmalskombinationen ermittelt werden, welche bei sich bei einer Erstkollision auftreten können:
+Wir definierten $D(o, t)$ als die Sammlung aller Flächen, Kanten und Ecken eines Objektes. Zur Vereinfachung benennen wir Objekte $o_x := (A_x, E_x, V_x)$ mit $A_x = A(o_x, t_0); E_x = E(o_x, t_0); V_x = V(o_x, t_0)$. Diese Merkmale sollen nun durch die Zeitdimension erweitert und dann kollidiert werden.\\
+Es müssen nicht alle Merkmalskombinationen $\in \{Area, Edge, Vertex\}^2$ getestet werden. Es konnten essenzielle Merkmalskombinationen ermittelt werden, welche bei einer Erstkollision auftreten können:
 		\begin{itemize}
 			\item [$\{Vertex, Area\}$] Eine Ecke durchschlägt eine Fläche.\\
 				$\Rightarrow$ Zu überpfüfende Paare: $(V_0\times A_1)\times (V_1\times A_0)$
@@ -71,23 +71,18 @@ Es müssen nicht alle Merkmalskombinationen $\in \{Area, Edge, Vertex\}^2$ getes
 		\begin{itemize}
 			\item [$$\{Vertex, Area\}$$] 2 Möglichkeiten:
 				\begin{itemize}
-					\item[Option0:] Linie(Eckpunkt \& Zeitdimension) schneidet ein Dreieck\\
-					Eckpunkt $v \Rightarrow l_v$
-					\item[Option1:] Punkt schneidet ein schiefes Prisma(Dreicksfläche \& Zeitdimension)\\
-					Dreiecksfläche $a \Rightarrow {l_p | p \in A_p(a)}$
+					\item[Option0:] Eckpunkt $v \Rightarrow$ Linie $l_v$
+					\item[Option1:] Dreiecksfläche $a \Rightarrow$ Schiefes Prisma $ \{l_p | p \in A_p(a)\}$
 				\end{itemize}
 				Gewählt wird Option0, da einfachere Berechnung.
-			\item [$\{Edge, Edge\}$]  Parallelogramm(Linie \& Zeitdimension) schneidet Linie
+			\item [$\{Edge, Edge\}$] Kante $e \Rightarrow$ Parallelogramm $\{l_p | p \in E_p(e)\}$
 		\end{itemize}
 \ \\
 		Geometrische Eigenschaften nun beteiligter Formen:
 		\begin{itemize}
-			\item [Linie] $L = \{l | x\in\mathcal{F} ; l_0, l_1 \in \mathcal{F}^3 ; l = l_0 + x * l_1; 0\le x\le 1 \}$ \\
-			mit Startpunkt $l_0$ und Endpunkt $l_0 + l_1$
-		\item [Dreieck] $T = \{t | x,y \in\mathcal{F}; t_0, t_1, t_2 \in \mathcal{F}; t = t_0 + x*t_1 + y*t_2; 0\le (x+y) \le 1\}$\\
-			mit Eckpunkten $a = t_0 ; b = t_0 + t_1 ; c = t_0 + t_2$ 
-			\item [Parallelogramm] $P = \{p | x,y \in\mathcal{F}; p_0, p_1, p_2 \in \mathcal{F}; p = p_0 + x*p_1 + y*p_2; 0\le x\le 1; 0\le y\le 1\}$\\
-			mit Eckpunkten $a = p_0 ; b = p_0 + 1.0*p_1 ; c = p_0 + 1.0*p_2; d = p_0 + 1.0*p_1 + 1.0*p_2$ 
+			\item [Linie] $L = \{l | x\in\mathcal{F} ; l_0, l_1 \in \mathcal{F}^3 ; l = l_0 + x * l_1; 0\le x\le 1 \}$
+		\item [Dreieck] $T = \{t | x,y \in\mathcal{F}; t_0, t_1, t_2 \in \mathcal{F}; t = t_0 + x*t_1 + y*t_2; 0\le (x+y) \le 1\}$
+			\item [Parallelogramm] $P = \{p | x,y \in\mathcal{F}; p_0, p_1, p_2 \in \mathcal{F}; p = p_0 + x*p_1 + y*p_2; 0\le x\le 1; 0\le y\le 1\}$
 		\end{itemize}
 \ \\
 		Beide Szenarien können über Gleichungssysteme zur Ermittlung der Koeffizienten in konstanter Zeit überprüft werden:
@@ -95,44 +90,48 @@ Es müssen nicht alle Merkmalskombinationen $\in \{Area, Edge, Vertex\}^2$ getes
 			\item [$\{Vertex, Area\}$] $l_0 + x * l_1 = t_0 + y*t_1 + z*t_2$\\
 				$x$ ist zudem hier der Koeffizient der Zeit, da die Linie in der Zeitdimension liegt.
 			\item [$\{Edge, Edge\}$] $l_0 + x * l_1 = p = p_0 + y*p_1 + z*p_2$\\
-				Sei die ursprüngliche Linie, aus dem das Parallelogram generiert wurde $p_0+y*p_1$, so liegt die andere Linie $p_0 + z*p_2$ in der Zeitdimension und somit ist hier z der Zeitkoeffizient.
+				Sei die ursprüngliche Kante, aus dem das Parallelogramm generiert wurde $\{p_0+y*p_1\}$, so liegt die andere Kante $\{p_0 + z*p_2\}$ in der Zeitdimension und somit ist hier z der Zeitkoeffizient.
 		\end{itemize}
 \ \\
-		Komplexität:
-\begin{itemize}
-			\item [$\{Vertex, Area\}$] $|V(O_0, t_0)|* |A(O_1, t_0)| + |V(O_1, t_0)|*|A(O_0, t_0)|$
-			\item [$\{Edge, Edge\}$] $|E(O_0, t_0)| * |E(O_1, t_0)|$
-		\end{itemize}
-\ \\
-		Eigenschaften der Kollisionserkennung von linearer Interpolation unter den getroffenen Annahmen:
-		\begin{itemize}
-			\item mathematisch exakte Ermittlung der Zeit einer Kollision
-			\item mathematisch exakte Ermittlung des Orts einer Kollision
-			\item Ermittlung der Beteiligen Objektmerkmale
-			\item Zuverlässige Ermittlung der ersten Kollision (durch zeitliche Sortierung der einzelnen Merkmalskollisionen)
-		\end{itemize}
-Probleme:\\
-Der Einsatz der linearen Interpolation ist im Kontext eines Videospiels recht beschränkt.
-Es scheint nicht möglich sie effektiv auf die beschriebene Art und Weise einzusetzen um Kollisionen bei rotierenden Körpern zu erkennen.
-Für lineare Interpolation wird ein Fazit gezogen:
-\begin{itemize}
-	\item Ohne Rotation ist der Ansatz exakt und erfüllt alle gestellten Anforderungen.
-	\item Praktisch immernoch in vielen Fällen gut einsetzbar. Beispiel: Punktförmiges Projektil gegen unbewegliches Terrain.
-\end{itemize}
+		Komplexität: $|V_0|* |A1| + |V_1|*|A_0|$ + $|E_0| * |E_1|$
 
-\subsubsection{Gilbert-Johnson-Keerhi-Algorithmus (GJK)}
-GJK ist ein Algorithmus zur Berechnung der minimalen Distanz zwischen konvexen Sets, publiziert 1988 \cite{gjk}, der in vielen Kollisionverfahren eingesetzt wird.\\
-		Der Algorithmus wird in vielen Videospielen verwendet, beispielsweise in Blizzard Entertainments Diabolo 3 (\cite{gdc-physics}) und Valves Half-Life 2(\cite{gjk-blog}).\\
-		
-		Seien die Objekte $K_0, K_1$ als kompakte Mengen von Raumpositionen gegeben, welche ein Objekt einnimmt.\\
-		Die Menge $M = \{c | c = a - b; a\in K_0 ; b\in K_1\}$ denotiert dabei die so genannte Minkowski-Differenz, deren Eigenschaften in diesem Verfahren ausgenutzt werden.\\
-		\begin{enumerate}
-			\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex.
-			\item Kollidieren/Überschneiden sich die Objekte $K_0, K_1$ so ist die Menge $K_0 \cap K_1$ nicht leer und so gilt, dass der Ursprung $O := (0,0,0)$ in der Minkowski-Differenz enthalten ist, da $\exists a_o, b_o \in K_0 \cap K_1 : a_o = b_o \Rightarrow a_o - b_o = O \Rightarrow O \in M_{K_0, K_1}$.
-			\item Der Ursprung markiert im Bezug auf $M$ die Distanz zwischen zwei Objekten, wobei die Distanz hier nicht die zwischen den einzelnen Objektursprüngen ist, sondern die minimale euklidische Distanz zwischen zwei Punkten der Objekte $distance: \mathbb{R}^3 \times \mathbb{R}^3 \mapsto \mathbb{R}; distance(K_0, K_1) = min\{|a - b| : a \in K_0 , b\in K_1\}$. Der näherste Punkt zum Urspung $P\in M$ hat die selbe Distanz wie die Objekte zueinander, wenn keine Schnittmenge besteht $if K_0 \cap K_1 = \emptyset \Rightarrow distance(P, O) = distance(K_0, K_1)$
-			\item Für den Fall $O \in M$ kann durch den Abstand zur konvexen Hülle $\mathcal{H}(M)$ eine Penetrationsziefe ermittelt werden, welche allerdings richtungslos ist, d.h. minimale Penetrationstiefe, nicht Penetrationstiefe bei Penetration von einer bestimmten Richtung.
-		\end{enumerate}
-		Die Berechnung von unendlich großen Mengen von Punkten ist jedoch berechnungstechnisch nicht praktikabel. Als Objektrepräsentation werden hier, wie auch in anderen 3D-Anwendungen üblich, stattdessen Ecken und Kanten der Hülle eines Objektes angegeben. Die entstehende diskrete Minkowski-Differenz $M_d$ ist daher nicht mehr kompakt. Die Verwendung der relevanten Eigenschaften der Minkowski-Differenz weicht deshalb etwas von der theoretischen Mengensemantik ab.
+		\begin{itemize}
+			\item Zuverlässige Ermittlung der Erstkollision durch Findung des minimalen Zeitkoeffizienten.
+			\item Mathematisch exakte Ermittlung der Zeit einer Kollision durch Zeitkoeffizienten.
+			\item Mathematisch exakte Ermittlung des Orts einer Kollision durch Ortskoeffizienten.
+			\item Ermittlung der Beteiligen Objektmerkmale der Erstkollision.
+		\end{itemize}
+Wie beschrieben kann dieses Verfahren bereits in einigen Szenarien, bei denen Rotation keine Rolle spielt, als vollständige Lösung zum Einsatz gebracht werden.\\
+Es bleibt das Experiment, eine Illusion physikalischer Vorgänge mit rigider Körperkollision über den Linearen-Interpolationsalgorithmus zu realisieren.\\
+Zunächst scheint dabei klar: Durch die Vernachlässigung der Rotation passieren physikungetreue Fehler, besonders, je größer die Varianz des Abstands der vom Objekt enthaltenen Punkte zum Objektursprung ist. Objekte sind dann unförmig und durchstreifen bei zeitlicher Bewegung logisch ein zu einem gewissen Grad anderes Volumen, als der lineare Interpolationsalgorithmus annimmt. Diese Diskrepanz kann sowohl zu False-Positives als auch zu False-Negatives führen.\\
+Des Weiteren muss die vernachlässigte Rotation nachgeholt werden. Durch einen Extremfall dieser Nachlässigkeit fällt ein weiteres Defizit des Algorithmus auf. Ist die relative Geschwindigkeit zweier Objekte $=0$, wird aus Sicht des Algorithmus' kein Volumen durchstriffen. Es werden zwischen diesen Objekten dann gar keine Kollisionen erkannt, welche durch Rotation logisch/visuell aber auftreten.\\
+Man versucht diese Problem durch statische Kollisionstests am Tickende zu lösen. Dabei wird die akkumulierte Rotationsbewegung/Rotationstransformation auf einmal ausgeführt. Vor und nach der Bewegung wird statisch eine Kollisionsabfrage berechnet.\\
+Diese Anpassung bringt eigene Probleme mit sich:
+\begin{enumerate}
+\item Durch die akkumulierte Drehung kann eine Kollision bei schnellen Drehgeschwindigkeiten durch nur die Tests am Anfang und am Ende des Ticks komplett übersehen werden.
+\item Nach der Rotationtransformation können Objekte sich in einem gegenseitigen Inklusionszustand $D(o_0, t_1)\cap D(o_1, t_1) \neq \emptyset$ befinden, da an dieser Stelle keine Intrusion erkannt werden kann. Der Zustand könnte durch einen Linearen-Interpolationsalgorithmus zwar erkannt werden, jedoch sind bis dato im Projekt keine Möglichkeiten enthalten, vernünftig auf diesen Fall zu reagieren.
+Eine Idee ist die Suche nach einem Zeitpunkt vor der Überschneidung, durch beispielsweise Bisection des Drehungsausschlags. Es erscheint jedoch, dass der wiederholte Aufwand durch Transformation und Ausführen des Interpolationsalgorithmus in der gegebenen Zeit ebenfalls keine Qualitativ hochwertigen Ergebnisse erzielt. Der Inklusionszustand wird zudem in der rigiden Körperkollision als fehlerhafter Zustand angesehen, den die Kollisionsroutine eigentlich verhindern soll.
+\end{enumerate}
+
+%%TODO glitchpic
+
+Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser annehmen.
+
+\subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
+GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1| | k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-blog}.\\
+Es sollen weiter die hier relevanten Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ ausgenutzt werden, die wie folgt lauten:\\
+Sei $O = (0,0,0)$ der Koordinatenursprung.
+	\begin{enumerate}
+		\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex.
+		\item $K_0 \cap K_1 \neq \emptyset \Rightarrow \exists a_o, b_o \in K_0 \cap K_1, a_0 \in K_0, b_0 \in K_1 : a_o = b_o \Rightarrow a_o - b_o = O \Rightarrow O \in \mathcal{M}(K_0, K_1)$
+		\item $K_0 \cap K_1 = \emptyset \Rightarrow \forall a_o\in K_0, \forall b_o\in K_1 : a_o \neq b_o \Rightarrow a_o - b_o \neq O \Rightarrow O \notin \mathcal{M}(K_0, K_1)$.
+		\item $distance(O, \mathcal{M}(K_0, K_1)) = distance(K_0, K_1)$
+		\item (2.) $\wedge$ (3.) $\wedge$ (4.) $\Rightarrow K_0 \cap K_1 \neq \emptyset \Leftrightarrow O \in \mathcal{M}(K_0, K_1)	\Leftrightarrow distance(K_0, K_1) = 0$	
+		\item (4.) $\Rightarrow distance: \mathcal{P}(\mathbb{R}^3)^2 \mapsto \mathbb{R}^+_0$ (nur definiert für positive Werte)
+	\end{enumerate}
+	Man bemerkt: Das Verfahren behandelt das Inklusionsproblem, statt des Intrusionsproblems. Beim Ansatz mit GJK soll das Intrusionsproblem durch Abstraktion über einer Nullstellensuche der Distanz zwischen zwei Objekten gelöst werden (vgl.~Eigenschaft 5).
+	
+Die Berechnung von unendlich großen Mengen von Punkten ist jedoch berechnungstechnisch nicht praktikabel. Als Objektrepräsentation werden hier, wie auch in anderen 3D-Anwendungen üblich, stattdessen Ecken und Kanten der Hülle eines Objektes angegeben. Die entstehende diskrete Minkowski-Differenz $M_d$ ist daher nicht mehr kompakt. Die Verwendung der relevanten Eigenschaften der Minkowski-Differenz weicht deshalb etwas von der theoretischen Mengensemantik ab.
 Eine Illustation unter diesen Umständen ist in den Abbildungen \ref{fig:minkov_col}, \ref{fig:minkov_col_solo} und \ref{fig:minkov_noncol}zu sehen. Zu sehen sind, in Rot und Blau, die 2 Objekte, welche sich in \ref{fig:minkov_col} überschneiden und in \ref{fig:minkov_noncol} nicht. Die Gebilde, deren Ecken grün sind und deren Kanten rot und blau sind sind die jeweiligen Minkowski-Differenzen.
 Die grünen Punkte sind alle Punkte, die durch die Anwendung der Minkowski-Different auf die Menge der Eckpunkte beider Körper ermittelbar sind.\\
 Die Kanten sind rot oder blau, je nachdem von welchem Ursprungskörper eine Kante Einfluss erhält. So ist die Beteiligung beider Körper an der Differenz besser zu erkennen. Theoretisch sind auch die Kanten zwischen jedem Punktepaar mit gemischten Einflüssen der beiden Ursprungsobjekte darstellbar, welche aus Darstellungsgründen nicht in der Grafik enthalten sind. Isoliert steht in Abbildung \ref{fig:minkov_col_solo} die Minkowski-Differenz aus Abbildung \ref{fig:minkov_col}.\\
