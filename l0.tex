@@ -15,19 +15,19 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 	\begin{itemize}
 	\item $T_r:=\langle t_{epoch}, ... , t_{max}\rangle ; t_{epoch}, t_{max}$ als minimal, bzw.~maximal darstellbare Zeit
 	\item die in einer maschinellen Genauigkeit in Mikrosekunden $$\epsilon_t:=10^{-6}s ; \forall c \in \mathbb{Z}: T_r(c) + \epsilon_t = T_r(c+1)$$ gegeben ist
-	\item und immer streng monoton wächst $\forall c \in \mathbb{Z}: T_r(c) < T_r(c+1)$. 
+	\item und immer monoton wächst $\forall c \in \mathbb{Z}: T_r(c) < T_r(c+1)$. 
 	\end{itemize}
 
 \item Die Simulationszeit $T_s:=\langle t_{start}, ... , t_{end}\rangle; t_{start}, t_{end}$ als Start- und Endzeitpunkt der Simulation.
 	\begin{itemize}
 	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
-	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeitrate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert.
+	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
 	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_{r0}$ und $t_{r1}$ gleich bleibt $\forall t \in [ t_{r0},t_{r1}]: r_t( t_{r0}) = r_t(t)$. Wird die Eigenschaft des Zeitflusses in der festgelegten Rate verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
 	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbereiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind.\\
 Beispiele für Raten sind 
 \begin{itemize}
-\item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Realzeit
+\item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Echtzeit
 \item $r_t(x) = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht
 \end{itemize}
 Technisch wird für große $|r_t|$ die Simulation schwierig, da viele Vorgänge schnell simuliert werden müssten. Diese werden daher vermieden.\\
@@ -41,7 +41,7 @@ Theoretisch kann die Rate auch negative Werte annehmen. Die Simulationszeit wür
 
 \subsection{Raum}
 \label{sec:space}
-Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathcal{F}^3$ beschrieben werden.\\
+Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathcal{F}^3$ in der Einheit Meter beschrieben werden.\\
 Durch die Werteverteilung in $\mathcal{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf, die zur Verletzung von Genauigkeitsanforderung führen können. Mögliche Floating-Point-Werte liegen dabei dichter beieinander, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
 Physikalische Prozesse berechnet auf Basis von Positionen in $\mathcal{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
 Das Problem wird hier durch einen neuen Längendatentypen $\mathcal{S} : \mathcal{I} \times \mathcal{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathcal{I}$ aufteilt und indiziert und $\mathcal{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
@@ -54,7 +54,7 @@ Diese Darstellung hat folgende weitere Vorteile
 \item Schnelle Indizierung der durch $\mathcal{I}$ indizierten Raumanteile für raumaufteilende Teile-und-Herrsche-Algorithmen
 \end{itemize}
 
-Absolute Positionen im Raum werden demnach mit Vektoren $s\in\mathcal{S}^3$ dargestellt. Für Berechnungen von Interaktionen zwischen Objekten werden Positionen zunächst relativiert, d.h. Positionen $p \in \mathcal{S}$ sollen zu $p_0$ relativ gesetzt werden, dann sind die relativen Positionen $p' = p - p_0$. Diese werden dann in $\mathcal{F}^3$ in der Einheit Meter umgewandelt, um darauf Berechnungen durchzuführen. Man geht dabei davon aus, das relative Strecken zwischen Objekten kurz genug sind, sodass die Genauigkeitsänderung in $\mathcal{F}$ vernachlässigbar ist.\\
+Absolute Positionen im Raum werden demnach mit Vektoren $s\in\mathcal{S}^3$ dargestellt. Für Berechnungen von Interaktionen zwischen Objekten werden Positionen zunächst relativiert, d.h. Positionen $p \in \mathcal{S}$ sollen zu $p_0$ relativ gesetzt werden, dann sind die relativen Positionen $p' = p - p_0$. Diese werden dann in in die für lokale Interaktionen sinnhafte  Einheit Meter $\mathcal{F}^3$ umgewandelt, um darauf Berechnungen durchzuführen. Man geht dabei davon aus, das relative Strecken zwischen Objekten kurz genug sind, sodass die Genauigkeitsänderung in $\mathcal{F}$ vernachlässigbar ist.\\
 Effektiv ist dabei die Eigenschaft $\mathcal{F}\subset\mathcal{S}$ nicht gefordert, auch wenn sie in der in diesem Projekt verwendeten Implementierung prinzipiell gilt.
 
 Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Relativierung, Längenumrechnung und Transformation dargestellt werden.
