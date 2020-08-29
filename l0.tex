@@ -15,19 +15,19 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 	\begin{itemize}
 	\item $T_r:=\langle t_{epoch}, ... , t_{max}\rangle ; t_{epoch}, t_{max}$ als minimal, bzw.~maximal darstellbare Zeit
 	\item die in einer maschinellen Genauigkeit in Mikrosekunden $$\epsilon_t:=10^{-6}s ; \forall c \in \mathbb{Z}: T_r(c) + \epsilon_t = T_r(c+1)$$ gegeben ist
-	\item und immer monoton wächst $\forall c \in \mathbb{Z}: T_r(c) < T_r(c+1)$. 
+	\item und immer streng monoton wächst $\forall c \in \mathbb{Z}: T_r(c) < T_r(c+1)$. 
 	\end{itemize}
 
 \item Die Simulationszeit $T_s:=\langle t_{start}, ... , t_{end}\rangle; t_{start}, t_{end}$ als Start- und Endzeitpunkt der Simulation.
 	\begin{itemize}
 	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
-	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
+	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeitrate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert.
 	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_{r0}$ und $t_{r1}$ gleich bleibt $\forall t \in [ t_{r0},t_{r1}]: r_t( t_{r0}) = r_t(t)$. Wird die Eigenschaft des Zeitflusses in der festgelegten Rate verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
 	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbereiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind.\\
 Beispiele für Raten sind 
 \begin{itemize}
-\item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Echtzeit
+\item $r_t(x) = 1 \Leftrightarrow$ Simulation synchron zur Realzeit
 \item $r_t(x) = 0 \Leftrightarrow$ Simulation ist pausiert/läuft nicht
 \end{itemize}
 Technisch wird für große $|r_t|$ die Simulation schwierig, da viele Vorgänge schnell simuliert werden müssten. Diese werden daher vermieden.\\
