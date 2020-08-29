@@ -119,7 +119,7 @@ Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser
 
 \subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
 GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1| | k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-blog}.\\
-Es sollen weiter die hier relevanten Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ ausgenutzt werden, die wie folgt lauten:\\
+Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ ausgenutzt werden, von der die Relevanten wie folgt lauten:\\
 Sei $O = (0,0,0)$ der Koordinatenursprung.
 	\begin{enumerate}
 		\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex.
@@ -127,40 +127,66 @@ Sei $O = (0,0,0)$ der Koordinatenursprung.
 		\item $K_0 \cap K_1 = \emptyset \Rightarrow \forall a_o\in K_0, \forall b_o\in K_1 : a_o \neq b_o \Rightarrow a_o - b_o \neq O \Rightarrow O \notin \mathcal{M}(K_0, K_1)$.
 		\item $distance(O, \mathcal{M}(K_0, K_1)) = distance(K_0, K_1)$
 		\item (2.) $\wedge$ (3.) $\wedge$ (4.) $\Rightarrow K_0 \cap K_1 \neq \emptyset \Leftrightarrow O \in \mathcal{M}(K_0, K_1)	\Leftrightarrow distance(K_0, K_1) = 0$	
-		\item (4.) $\Rightarrow distance: \mathcal{P}(\mathbb{R}^3)^2 \mapsto \mathbb{R}^+_0$ (nur definiert für positive Werte)
+		\item (4.) $\Rightarrow distance: \mathcal{P}(\mathbb{R}^3)^2 \mapsto \mathbb{R}^+_0$ (gibt nur positive Distanzen aus)
 	\end{enumerate}
-	Man bemerkt: Das Verfahren behandelt das Inklusionsproblem, statt des Intrusionsproblems. Beim Ansatz mit GJK soll das Intrusionsproblem durch Abstraktion über einer Nullstellensuche der Distanz zwischen zwei Objekten gelöst werden (vgl.~Eigenschaft 5).
-	
-Die Berechnung von unendlich großen Mengen von Punkten ist jedoch berechnungstechnisch nicht praktikabel. Als Objektrepräsentation werden hier, wie auch in anderen 3D-Anwendungen üblich, stattdessen Ecken und Kanten der Hülle eines Objektes angegeben. Die entstehende diskrete Minkowski-Differenz $M_d$ ist daher nicht mehr kompakt. Die Verwendung der relevanten Eigenschaften der Minkowski-Differenz weicht deshalb etwas von der theoretischen Mengensemantik ab.
-Eine Illustation unter diesen Umständen ist in den Abbildungen \ref{fig:minkov_col}, \ref{fig:minkov_col_solo} und \ref{fig:minkov_noncol}zu sehen. Zu sehen sind, in Rot und Blau, die 2 Objekte, welche sich in \ref{fig:minkov_col} überschneiden und in \ref{fig:minkov_noncol} nicht. Die Gebilde, deren Ecken grün sind und deren Kanten rot und blau sind sind die jeweiligen Minkowski-Differenzen.
-Die grünen Punkte sind alle Punkte, die durch die Anwendung der Minkowski-Different auf die Menge der Eckpunkte beider Körper ermittelbar sind.\\
+	Man bemerkt: Das Verfahren behandelt das Inklusionsproblem, statt des Intrusionsproblems. Durch die Fähigkeit des GJK-Algorithmus, die Distanz zwischen zwei Objekten zu ermitteln, ist dieser jedoch ein praktisches Werkzeug auch um das Intrusionsproblem ebenfalls zu lösen.
+Zum Beispiel ist ein Ansatz mit GJK, durch Abstraktion über einer Nullstellensuche der Distanz zwischen zwei Objekten das Intrusionsproblem zu lösen (vgl.~Eigenschaft 5, vgl. \cite{gdc-physics}).\\
+GJK soll daher in diesem Projekt implementiert werden. Die Urquelle \cite{gjk} gibt den Algorithmus im mathematischen Kontext an. Die Umwandlung der Mathematik in eine gute Maschinenimplementierung wird nicht als trivial eingeschätzt. Es fehlen die nötigen Erfahrungswerte mit dem Algorithmus. Es werden daher weitere Quellen mit praktischem Fokus zu Rate gezogen, um die Implementierung umzusetzen \cite{gjk-blog}\cite{gjk_vid}.
+
+Zunächst muss die Eingabeinformation von kompakten, konvexen Punktmengen, die der Algorithmus fordert, äquivalent hergestellt sein, um sicherzustellen, dass der Algorithmus auch mit Polygon-Meshes durchgeführt werden kann. Für diese ist allerdings keine Konvexität gefordert und eine entsprechende kompakte Repräsentation nicht gegeben.
+Zunächst soll Konvexität hergestellt werden. Definierte nicht-konvexe Objekte können in Konvexe Partitionen aufgeteilt werden. Jede Partition zählt dann als eigenes Objekt gegenüber dem Algorithmus. Das erhöht die erwartete Komplexität der gesamten Kollisionsroutine mit GJK um den Grad der Partitionierung.\\
+Es wurde zu einer automatisierten Methode recherchiert, um die Partitionierung herzustellen. Insbesondere die minimale Partitionierung scheint hier von Interesse, um die Erhöhung der Komplexität zu mitigieren.\\
+Zusätzlich zu eigenen Überlegungen bestätigen die Quellen \cite{ARTIGAS20111968} und \cite{grelier2019minimum} die NP-Vollständigkeit, bzw. NP-Härte zusammengehöriger Probleme der minimalen konvexen Partitionierung.\\
+Eine nicht minimale Partitionierung wäre zunächst auch ausreichend und auch lange Berechnungszeiten zur Partitionierung würden für rigide Objekte nur einmaligen Aufwand zum Programmstart bedeuten und wären daher nicht kritisch.\\
+Bei Versuchen, Algorithmen für dieses Problem zu erstellen, wird jedoch eine weiter klare Hürde erkenntlich: Allein durch die Polygon-Mesh, sind Innen und Außenseite des Objektes prinzipiell nicht definiert.\\
+Für grafische Zwecke kann dieser Bezug oft durch das sog. \textit{Winding} eines Dreiecks angegeben werden. Dabei wird die Reihenfolge der Angabe der Ecken eines Dreiecks konventionell festgelegt, wodurch die Richtung der Flächennormale eines Dreiecks kontrolliert werden kann, die dann Außen oder Innenseite spezifiziert. Auch die direkte Angabe einer Flächennormale zu jedem Dreieck (oder sogar jedem Eckpunkt) is im graphischen Kontext für bestimmte Effekte gebräuchlich. Diese Konzepte werden grafisch im Projekt jedoch bis dato nicht verwendet und sind daher auch nicht vorhanden.\\
+Eine Konvention für ein \textit{Winding} wurde allerdings im Projekt eingeführt, nicht zuletzt, da diese die Implementierung des GJK vereinfacht.\\
+Für die in dieser Projektarbeit verwendeten Testzwecke erscheint der Aufwand der Automatisierung der konvexen Partitionierung letztendlich doch zu hoch und thematisch zu fremd. Die konvexe Partitionierung des Objektes $o_x$ wird daher manuell und explizit bei Modellen durch die Angabe von Mengen von Indices von zueinander konvexen Eckpunkten $P_i \subseteq V_x$ angegeben.
+Zusätzlich ist die Äquivalenz zur kompakten Punktemenge gefordert. Diese ist nun implizit durch die Konvexität gegeben. Ein kompakt dargestelltes Objekt $K$ ist konvex, wenn für alle enthaltenen Punktepaare gilt: $\forall p_0, p_1 \in K : p0 + x * (p_1 - p0) \in K ; x \in [0,1]$. In unserer Repräsentation $D(K, t)$ sind nicht alle diese Punkte enthalten. Jedoch wurde etabliert, dass die Hülle $\mathcal{H}: \mathcal{F}^3 \mapsto \mathcal{F}^3, \forall o\in OBJ: \mathcal{H}(D(o, t)) \subseteq D(o, t)$. Ist $D(K, t)$ konvex, so ist die Hülle ebenfalls konvex und alle Punkte innerhalb der konvexen Hülle können durch die Konvexitätsdefinition impliziert werden. Die zusätzlich mit der Objektrepräsentation mitgelieferte Partitionierung erweitert also die verfügbare Information und schafft in dieser Hinsicht Äquivalenz zwischen Polygon-Meshes und kompakten Mengen und die Unterscheidung von Innen und Außen.\\
+Durch die Feststellung der Äquivalenz wurde ermittelt, dass eine Variante des GJK-Algorithmus auch an Polygon-Meshes durchgeführt werden kann.\\
+Wegen der Diskretion/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $D(o,t)$ wird die daraus Berechnete Menge der Minkowski-Punkte als diskrete Minkowski-Differenz $\mathcal{M}_d$ bezeichnet.
+
+%%TODO refactor and actually provide the images
+Eine Illustation einer diskreten Minkowski-Differenz ist in den Abbildungen \ref{fig:minkov_col}, \ref{fig:minkov_col_solo} und \ref{fig:minkov_noncol}zu sehen. Zu sehen sind, in Rot und Blau, die 2 Objekte, welche sich in \ref{fig:minkov_col} überschneiden und in \ref{fig:minkov_noncol} nicht. Die Gebilde, deren Ecken grün sind und deren Kanten rot und blau sind sind die jeweiligen Minkowski-Differenzen.
+Die grünen Punkte sind alle Punkte, die durch die Anwendung der Minkowski-Differenz auf die Menge der Eckpunkte beider Körper ermittelbar sind.\\
 Die Kanten sind rot oder blau, je nachdem von welchem Ursprungskörper eine Kante Einfluss erhält. So ist die Beteiligung beider Körper an der Differenz besser zu erkennen. Theoretisch sind auch die Kanten zwischen jedem Punktepaar mit gemischten Einflüssen der beiden Ursprungsobjekte darstellbar, welche aus Darstellungsgründen nicht in der Grafik enthalten sind. Isoliert steht in Abbildung \ref{fig:minkov_col_solo} die Minkowski-Differenz aus Abbildung \ref{fig:minkov_col}.\\
-An dieser Stelle wird auch festgehalten, dass das erhaltene Gebilde kein Hüllenobjekt mehr ist, da nun auch Punkte und Kanten im Innenraum bekannt sind.\\
-\\
-Um die Überschneidung der Objekte festzustellen, wird ermittelt, ob $O\in M$.\\
-$K_0, K_1$ sind konvex, daher ist $M$ ebenfalls konvex. Zwischen allen Punkten in einem konvexen Set existiert eine gerade Linie, die sie verbindet und die ebenfalls komplett im selben konvexen Set enthalten ist $\forall (P_0, P_1)\in M^2 : 0 \le x \le 1 ; (P_0 + P_1*x) \in M$. Dies gilt auch für $O$, wenn $O\in M \Rightarrow \exists (P_{O0}, P_{O1}) \in M^2 : P_{O0} + P_{O1}*x = O$.\\
-Die Restriktion auf $M_d$ verhindert allerdings die Verwendung dieser Eigenschaft, da die benötigten Punkte $(P_{O0}, P_{O1})$ nicht zwingen in $M_d$ enthalten sind, um die Verbindung zum Ursprung direkt herzustellen.\\
-Da der Ursprung also nicht direkt gesucht werden kann, wird versucht ihn einzugrenzen. Ist es möglich den Ursprung mit einem Simplex(im 3D-Fall ein Tetrahedron) mit Eckpunkten $v_i \in M_d$ zu umschließen, so ist $O\in M$.\\
-Der Algorithmus lautet wie folgt:
-\begin{itemize}
-	\item[1.] Starte an beliebigem Punkt $P_0 \in M_d$
-	\item[2.] Simplex $S = {P_0}$
-	\item[3.] Setze Richtung $D = -P_0$
-	\item[4.] Finde $P_{\#S}$, einen neuen Punkt für $S$, den maximalen Punkt in der Richtung $D$\\
-		Da $M$ konvex, existiert dieses Maximum in jede Richtung. Ermittelt wird dieser Punkt über die Größe des Skalarproduktes $P_1 = max\{D \cdot P_i ; P_i \in M_d\}$
-	\item[5.] Befindet sich der Ursprung noch hinter $P_{\#S}$ in Suchrichtung ist er nicht in $M$ enthalten, was ebenfalls über das Skalarprodukt ermittelbar ist $-P_{\#S} \cdot D > 0 \Rightarrow$ Frühzeitiger Abbruch, bzw. Ermittlung des nähersten Merkmals und dem Abstand zum Ursprung zur Distanzbestimmung.
-	\item[6.] $S \cup {P_{\#S}}$ Ermittle das näheste bekannte Merkmal. Die Art des bekannten Simplex hängt von der Größe von $S$, $\#S$ ab.
-		Gesucht wird immer das näherste Merkmal zum Ursprung. Darauf folgt Änderung der Suchrichtung in Richtung des Ursprungs orthogonal zu diesem Merkmal.
-		Dabei wird $S$ mit den Punkten des Merkmals übeschrieben und $D$ mit der neuen Richtung.
-		Wird bei $\#S$ festgestellt, dass sich der Ursprung im inneren des Tetrahedrons befindet, wurde die Kollision festgestellt.
-		Beispiel:\\
-			$\#S=2$: Linie $L_{P_0,P_1} = {P_O + x * P_1; 0\le x\le 1}$\\
-				%TODO check theory
-				Da von $P_0$ aus gesucht wurde und $P_1$ maximal $\Rightarrow$ $Linie L_{P_0,P_1}$ ist am nähersten am Ursprung.\\
-				Setze $D$ in die Richtung des Ursprungs orthogonal zu der Linie zwischen $ P_0, P_1 $, welche berechnet werden kann durch $L_0 \times OP_1 \times L_0$.
-	\item[7.] gehe zu 4.
-\end{itemize}
-Mit diesem Algorithmus können zwei statische 3D-Objekte auf Überschneidung überprüft werden. Der Algorithmus ist demnach eine Lösung für das Inklusionsproblem.\\
+
+An dieser Stelle kann auch erwähnt werden, dass das erhaltene Gebilde $\mathcal{M}_d(K_0, K_1)$ typischerweise kein Hüllenobjekt ist, da Punkte und Kanten im Innenraum bekannt sind, selbst, wenn $K_0$ und $K_1$ selbst Hüllenobjekte sind.\\
+
+Eigenschaften der Minkowski-Differenz müssen den Umstand der Diskretion respektierend ausgenutzt werden.\\
+
+\begin{enumerate}
+		\item Die diskrete Minkowski-Differenz ist ebenfalls konvex.	
+		\item Ein Simplex ist eine durch eine Anzahl $n\in\mathbb{N}$ Eckpunkte $V'\subseteq\mathcal{M}_d$ aufgespannte $n$-dimensionale geometrische, inherent konvexe und dadurch kompakt definierte Form (hier: Punkt für $n=1$, Gerade $n=2$, Dreieck $n=3$, Tetraeder $n=4$).
+		\item Für das näherste Simplex $s' \in \mathcal{M}$ zum Ursprung $O$ gilt außerdem $distance(O, s') = distance(K_0, K_1)$. 
+		\item Wenn gilt $O \in \mathcal{M}(K_0, K_1)$ muss aber durch die Beschränkung auf diskrete Eckpunkte nicht gelten, dass $O \in \mathcal{M}_d(K_0, K_1)$. Jedoch kann eine äquivalente Beziehung gefunden werden: $O \in \mathcal{M}(K_0, K_1) \equiv \exists Simplex~s \in \mathcal{M}_d(K_0, K_1) : O \in s$, , die den Ursprung enthält/umschließt.
+
+\end{enumerate}
+
+Die Implementierung des GJK bezieht sich also auf die Suche nach dem nähersten, bzw. umschließenden Simplex zum Ursprung.\\
+Es wird im Folgenden der Algorithmus beschrieben:
+\begin{enumerate}
+	\item Initialisiere mit
+	\begin{enumerate}
+		\item Zwei konvexen Körpern $K_0, K_1$
+		\item ihrer diskreten Minkowski-Differenz $\mathcal{M}_d = \mathcal{M}_d(K_0, K_1)$
+		\item beliebigem Startpunkt $P_0 \in \mathcal{M}_d$
+		\item der aktuellen Menge von Simplexeckpunkten $V' = \{V'_0, V'_1, ...\} = \{P_0\}$
+		\item der Suchrichtung $D = -P_0$
+		\item der minimalen gefundene Distanz $d_{min} = \infty$
+		\item der Fähigkeit, Abstände zwischen einem Simplex und dem Ursprung zu errechnen $distance: Simplex \times \mathcal{F}^3 \mapsto \mathcal{F}$
+	\end{enumerate}	
+	\item Finde neuen Punkt $V'_{|V'|}$ zur $(|V'|+1)$-dimensionalen Erweiterung des Simplex den maximalen Punkt $v \in \mathcal{M}_d$ in der Suchrichtung $D$ über das Skalarprodukt $V'_{|V'|} = v \in \mathcal{M}_d : v \circ D = max\{D \circ v_i ; v_i \in M_d\}$. Da $\mathcal{M}_d$ konvex, existiert dieses Maximum in jede Richtung.
+	\item $-V'_{|V'|} \circ D > 0 \Rightarrow$ Ursprung $O$ ist definitiv außerhalb von $\mathcal{M}_d$. Es wird $d_{min} = distance(V', O)$ gesetzt.
+	\item Durch die Punkte $Simplex~s_{new} = V' \cup {V'_{|V'|}}$ kann eine Menge von Simplices $\mathcal{P}(s_{new})$ beschrieben werden. Es soll das zum Ursprung nächste Simplex ausgewählt werden. Die Auswahl $\mathcal{P}(s_{new})$ kann weiter dadurch eingeschränkt werden, dass nur neue Simplices, die durch den neuen Punkt $V'_{|V'|}$ bekannt wurden überprüft werden müssen, da durch die Suche des Punkts in Suchrichtung $D$ an dieser Stelle eine Distanzverbesserung durch den neuen Punkt erwartet wird. Das Gegenereignis hierzu kann durch Konvexität von $\mathcal{M}_d$ und der Maximaleigenschaft der Punkte in $V'$ ausgeschlossen werden, solange das näheste Simplex nicht bereits erreicht ist.  Die reduzierte Menge $s_{check} \subset \mathcal{P}(s_{new}); s_{check} = \{ \mathcal{s} \in s_{new} | V'_{|V'|} \in s \}$ wird demnach stattdessen überprüft und das neue nächste Simplex 
+	 $s \in s_{check} : distance(s, O) = min\{distance(s', O) | s' \in s_{check}\}$
+	 ermittelt.
+	\item Falls keine kleinere Distanz gefunden wurde, ist das näherste Simplex zum Ursprung gefunden. $d_{min} \leq distance(s, O) \Rightarrow distance(K_0, K_1) = distance(V', O) = d_{min}$ (\textbf{RETURN})
+	\item Ist das ermittelte nächste Simplex ein Tetraeder $|V'| = 4$, ist der Ursprung im 3D-Problem komplett davon umschlossen und $\Rightarrow distance(\mathcal{M}_d, O) = 0$ (\textbf{RETURN})
+	\item $d_{min} = distance(V', O)$ 
+	\item Die neue Suchrichtung wird orthogonal zum Simplex $V'$ in Richtung des Ursprungs festgelegt. Die konkrete Berechnung hängt dabei von $|V'|$ ab. Ein Beispiel ist: $|V'| = 2 \Rightarrow D = (b-a)\times (O-a)\times (b-a);  \{a, b\} = V'$, mit $\times$ als Kreuzprodukt zweier Vektoren.
+	\item Wiederhole ab 2.
+\end{enumerate}
 
 \begin{figure}
 	\centering
