@@ -1,1 +1,26 @@
-Hmmm
+Da die exakte Berechnung einer Kollision signifikant viel Rechenleistung benötigt, ist eine Vorfilterung sinnvoll. Diese schließt einen Großteil der Objektpaare schon vorher aus. Eine Kollision kann z.B. nur dann passieren, wenn die Hüllobjekte der beiden Objekte ebenfalls kollidieren (wegen der Eigenschaft //TODO mathe). Hier wird als Hüllobjekt eine AABB verwendet. Bestimmte Arten der logischen Kollision benötigen außerdem keine genauere Berechnung, sodass die verbleibenden Objektpaare nach der Vorfilterung direkt eine logische Kollision eingehen. Um verschiedene Arten der Kollision behandeln zu können und die Objektpaare dem richtigen Algorithmus für die nächste Stufe zuführen zu können, wurde im Rahmen des Projekts eine Komponente erstellt, die dieses Problem mit austauschbarem Vorfilterungsalgorithmus löst. (Ungenügende Ansätze der Behandlung verschiedener Kollisionstypen unter Verwendung eines nicht austauschbaren Vorfilterungsalgorithmus haben schon vor dem Projektstart in der Codebasis existiert). \\
+Logische und physikalische Kollisionen werden als (lokale) Interaktionen zusammengefasst und werden in 2 Kategorien eingeteilt:
+//TODO format
+1. Symmetrische Interaktionen: Beide Objekte des Objektpaares gehören der selben Klasse an (z.B: die Kollision rigider Objekte, wie sie in //TODO ref beschrieben wird).
+2. Asymmetrische Interaktionen: Objektpaare setzen sich aus 2 Objekten verschiedener Klassen zusammen (z.B. Projektil und treffbares Objekt). Kollisionen innerhalb des selben Objekts treten hier nicht auf (Projektile interagieen nicht mit anderen Projektilen).
+
+In jeder Kategorie können mehrere Interaktionstypen enthalten sein. Jeder Typ wird hier einzeln betrachtet und ihm kann so ein eigener Vorfilterungsalgorithmus zugewiesen werden, der entsprechend zugeschnitten und problemspezifisch optimiert werden kann.
+Die Aufgabe des Vorfilterungsalgorithmus unterscheidet sich je nach Kategorie der Interaktion etwas:
+//TODO format
+1. Symmetrische Interaktionen: Aus Menge aus n Objekten werden alle diejenigen (maximal n²) Objektpaare ausgewählt, deren AABBs sich überschneiden. Als untere Schranke kann man Omega(n+i) angeben, wobei i die Anzahl der tatsächlichen Überschneidungen ist. Die obere Schranke O(n²) erhält man durch naives Ausprobieren jeder Kombination.
+2. Asymmetrische Interaktionen: Aus 2 Mengen von n und m Objekten werden alle diejenigen Objektpaare mit jeweils einem Mitglied aus jeder Menge ausgewählt, deren AABBs sich überschneiden. Als untere Schranke kann man Omega(n+m+i) angeben. Die obere Schranke O(n*m) erhält man durch naives Ausprobieren jeder Kombination.
+
+Für die Laufzeit bei praktischen Problemen sei angemerkt, dass die Konstante oft eben so wichtig zu betrachten ist wie die asymptotische Komplexität. \\
+
+Im folgenden werden 2 Algorithmen, die im Rahmen des Projekts implementiert wurden, näher beschrieben.
+
+//TODO format
+1. Boxsort
+//TODO
+
+//TODO format
+2. Space Hashing/Spatial Hashing
+Die Grundidee besteht hier dabei, den Raum in viele Bereiche (sog. chunks) aufzuteilen und Kollisionspaare nur innerhalb dieser Bereiche zu suchen. Sind 2 Objekte weit voneinander entfernt und somit nicht im selben chunk, ist eine Überschneidung der AABBs nicht möglich und muss deshalb auch nicht betrachtet werden. Ein Beispiel für 2 Dimensionen sieht man in Abb. //TODO \\
+
+
+
