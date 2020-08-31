@@ -1,18 +1,18 @@
-Kollisionserkennung (\textit{eng. collision detection}) scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein und beschreibt daher eine Sammlung verschiedener Teilprobleme.\\
-Wir beschränken uns hier für die Zwecke des Projektes auf Folgende:
+Der Begriff Kollisionserkennung (\textit{eng. collision detection}) scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein und beschreibt eine Sammlung verschiedener Teilprobleme.\\
+Wir beschränken uns für die Zwecke dieses Projektes auf Folgende:
 \begin{enumerate}
-\item Die Ermittlung der Menge von Objektpaaren $C$ aus einer Menge von sich bewegenden Objekten $OBJ$ in einem Raum, welche sich innerhalb eines Zeitraums, hier einem Tick $\delta_i$, überschneiden.
-$$C = \{(o_0, o_1) | o_0, o_1 \in OBJ; t\in \Upsilon_{\delta_i};  D(o_0, t) \cap D(o_1, t) \neq \emptyset\}$$
+\item Die Ermittlung der Menge von Objektpaaren $C \subseteq OBJ^2$ aus einer Menge von sich bewegenden Objekten $OBJ$ in einem Raum, welche sich innerhalb eines Zeitraums, hier einem Tick $\delta_i$, überschneiden.
+$$C = \{(o_0, o_1) | o_0, o_1 \in OBJ; t\in \Upsilon_{\delta_i}; G_{o_0, t} \cap G_{o_1, t} \neq \emptyset\}$$
 \item Die Ermittlung von Informationen über den Hergang einer Kollision.
-Die genauen Anforderungen, welche Informationen ermittelt werden müssen, gehen aus den Verwendungszwecken hervor (vgl.~\ref{sec::usages}. 
+Die genauen Anforderungen, welche Informationen ermittelt werden müssen, gehen aus den Verwendungszwecken hervor (vgl.~\ref{sec:usages}). 
 \end{enumerate}
 
 Während mögliche Anforderungen von Verwendungszwecken zwar betrachtet werden müssen, sollen die Verwendungszwecke selbst in diesem Projekt konkret nicht realisiert werden.
 
 Wir schätzen an dieser Stelle modellgenaue Kollisionen als schwierig ein. In Teilproblem 1 entsteht daraus das Problem einer schnell steigenden Komplexität, da die Anzahl der möglichen Kollisionspaare quadratisch wächst $|C|\leq |OBJ|^2$.\\
-Das Teilproblem 1 wird daher in 2 separaten Schritten behandelt.
+Das Teilproblem 1 wird daher in zwei separaten Schritten behandelt.
 \begin{itemize}
-\item[1.1] Elegante und Effiziente Vorfilterung von Objekten $OBJ$, um die modellgenaue Überprüfung von großen Mengen von Objektpaaren in $C$ zu vermeiden.
+\item[1.1] Elegante und effiziente Vorfilterung von Objekten $OBJ$, um die modellgenaue Überprüfung von großen Mengen von Objektpaaren in $C$ zu vermeiden.
 \item[1.2] Die abstrakte Behandlung des modellgenauen Kollisionsproblems bei genau zwei Objekten. Dabei werden Algorithmen gewählt, welche die für Teilproblem 2 benötigten Informationen mitliefern.
 \end{itemize}
 
