@@ -68,58 +68,65 @@ Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, i
 
 Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
 
+\subsection{Objektform}
+\label{object_form}
+Die Form eines Objektes ist in einem hier rigiden, d.h. unveränderlichen Modell beschrieben, welche die Form relativ zum Ursprung ihres eigenen Objektraums angibt.
+Für Modelle werden mathematisch oft als kompakte Punktemengen verwendet. Wir denotieren diese kompakten Modelle zugehörig zum Objekt $o$ als $ K_o \subseteq \mathcal{F}$.\\
 
-\subsection{Objektrepräsentation}
-\label{sec:objects_rep}
-Objekte $o\in OBJ$ werden mathematisch oft als eine Menge von Punkten betrachtet, welche einen Raumanteil darstellen $ K_o \subseteq \mathcal{S}$.\\
-Durch die in Abschnitt~\ref{sec:space} angesprochene Relativierung ist ein Objekt jedoch in allen Berechnungskontexten (nicht Darstellungskontexten) durch die Relativierung definiert. Ein Objekt enthält folgende Informationen:
-\begin{itemize}
-\item Raumposition zu bestimmter Zeit $pos : OBJ \times T_s \mapsto \mathcal{S}^3$
-\item Ausrichtung zu bestimmter Zeit $rot : OBJ \times T_s \mapsto \mathcal{F}^3$. Der Vektor $(x, y, z) \in\mathcal{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y für y-Achse und z um z-Achse. Es wird eine Rotationsmatrix $rotm: \mathcal{F}^3 \mapsto \mathcal{F}^{4\times 4}$ definiert, welche Positionen relativ zum Ursprung um diesen nach der Rotationsanweisung dreht. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
-\item Ein relativ zum einem eigenen Ursprung angegebenes rigides unveränderliches Modell.\\
-\sloppy
-Im Kontext der Mathematik würde das Modell wieder als Punktmenge $$ MODEL : OBJ \mapsto \mathcal{P}(\mathcal{F}^3) $$ definiert sein.
-\fussy
-Durch diese mathematische Darstellung führen Rechenoperationen mit Objekten auf relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
-Polygon-Mesh $$M: (V \times I); V \subseteq \mathcal{F}^3, I \subseteq [0, |V|-1]_\mathbb{Z}^3 )$$ beschreibt ein Objekt durch zusammenhängende Dreiecksflächen. In der Repräsentation werden dabei nur die Dreieckspunkte $V$(Ecken, eng. \textit{vertices}) und die Kombinationen dieser zu Dreiecken durch Indizierung $I$ gegeben.\\
+Durch die kompakte Mengendarstellung führen Rechenoperationen mit Objekten auf maschinell relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
+Für das Objekt $o$ ist eine Polygon-Mesh $M_o := (V_o, I_o); V \subseteq \mathcal{F}^3, I \subseteq [0, |V|-1]_\mathbb{N}^3 )$ beschreibt ein Polytop durch seine Eckpunkte $V_o$(Ecken, eng. \textit{vertices}), die durch 3-Gruppierungen ihrer Indices $I_o$ zu Dreiecksflächen verbunden sind.\\
+Aus der Definition der Polygon-Mesh gehen implizit weitere Definitionen hervor:
 
-\end{itemize}  
-Die in der Simulation verwendeten Meshobjekte $O$ können demnach wie folgt beschrieben werden:
 \begin{enumerate}
-\item $ o:=(POS, ROT, M); POS \in dom(pos); ROT \in dom(rot) $
-\item Ecken zur Zeit $t$: $V:OBJ\times T_s\mapsto\mathcal{F}^3; V(Oo, t) = \{s + (f * rotm(rot(o, t))\\ | s = pos(o, t), f\in V\} = \{v_0, v_1 ... , v_{|V|-1}\}$
-\item Kanten (eng. \textit{edges}) zur Zeit $t$: $ E:OBJ\times T_s\mapsto V^2; E(o, t) = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V(o, t);(a, b, c) \in I\} $\\
-, welche die Punkte $E_p:ran(E)\mapsto\mathcal{F}^3; E_p((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
-\item Flächen (eng. \textit{areas}) zur Zeit $t$: $ A:OBJ\times T_s\mapsto V^3; A = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(o, t); (a, b, c) \in I\} $,\\
-welche jeweils die Punkte $A_p:ran(A)\mapsto\mathcal{F}^3; A_p((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
-\item Die Gesamtpunktemenge $D$, die zum Zeitpunkt $t$ vom Objekt $O$ eingenommen wird ist dann:
-$ D: OBJ\times T_s: \mathcal{F}^3; D(o, t) = V(o, t)\cup \{E_p(e)|e \in E(o, t)\} \cup \{A_p(a) |a \in A(o, t)\}$. Dabei sind jeweils die Punkte von Ecken in Kanten und von Kanten in Flächen jeweils enthalten $ V(o, t) \subset \{E_p(e)|e \in E(o, t)\} \subset \{A_p(a) |a \in A(o, t)\} \Rightarrow D(o, t) =  \{E_p(e)|e \in E(o, t)\} \cup \{A_p(a) |a \in A(o, t)\} = \{A_p(a) |a \in A(o, t)\}$
+\item Kanten (eng. \textit{edges}) $E_o = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V_o;(a, b, c) \in I\} $\\
+, welche jeweils die Punkte $\mathcal{E}:E_o\mapsto\mathcal{F}^3; \mathcal{E}((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
+\item Flächen (eng. \textit{areas})$ A_o = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(o, t); (a, b, c) \in I\} $,\\
+welche jeweils die Punkte $\mathcal{A}:A_o\mapsto\mathcal{F}^3; \mathcal{A}((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
+\item Gesamtpunktemenge $G_o = (\bigcup_{v\in V_o} v) \cup (\bigcup_{e\in E_o} \mathcal{E}(e)) \cup (\bigcup_{a\in A_o} \mathcal{A}(a)) $ Dabei sind jeweils die Punkte von Ecken in Kanten und von Kanten in Flächen jeweils enthalten, daher gilt weiter $G_o = \bigcup_{a\in A_o} \mathcal{A}(a)$.
 \end{enumerate}
-Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathcal{F}^3 \mapsto \mathcal{F}^3, \forall o\in OBJ: \mathcal{H}(D(o, t)) \subseteq D(o, t)$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.
+Die Gesamtpunktemenge enthält zu allen Zeiten $t$ mindestens die Objekthülle $\mathcal{H}: \mathcal{F}^3 \mapsto \mathcal{F}^3, \forall o\in OBJ: \mathcal{H}(K_o) \subseteq G_o$ die den eingenommenen Raum des Objekts/Modells vom übrigen Raum durch Flächen abgrenzt.\\
+
 
 Vorteile \& Nachteile dieser Darstellung o.B.d.A:
 \begin{itemize}
-\item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen: $V\ll K_o$
-\item [+]Berechnungen durch klassische Geometrie.
+\item [+]Kürzere Iterationslängen im Vergleich zu Punktmengen: $V_o \ll G_o \ll K_o$
+\item [+]Berechnungen durch klassische Vektorarithmetik statt Mengenoperation.
 \item [-]Verlust der Information von Innen \& Außenseite am Hüllobjekt.
-\item [-]Beschränkung auf durch Polygon-Meshes darstellbare Objekte $ran(D)\subseteq OBJ$
+\item [-]Zum sinnvollen Einsatz von Polygon-Meshes ist die verwendbare Menge an Objekten beschränkt. Eine schwierig darstellbare Objektform sind beispielsweise Ellipsoide.
 \end{itemize}
 
-Im Verlauf dieses Projekts werden Objekte außerdem als starr/rigide, unveränderlich und unzerstörbar angenommen.
+Während semantisch von der Simulation die kompakte Repräsentation eines Objektes $K_o$ respektiert werden muss, rechnet diese tatsächlich mit gegebenem $G_o$ welches in den meisten Kontexten genügt.
 
-\subsection{Objektbewegung}
-\label{sec:objects_mov}
-Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen. Es wird sich hier auf
+\subsection{Objektplatzierung}
+\label{sec:objects_sim}
+
+Objekte $o\in OBJ$ müssen nun in der Simulation platziert werden, sollen sonst für Berechnungen aber in relativen Räumen behandelt werden. Es werden dafür zunächst absolute Beschreibungskriterien für Objekte angelegt.
+\begin{itemize}
+\item Raumposition zu Beginn eines Ticks $pos : OBJ \times \delta \mapsto \mathcal{S}^3$
+\item Ausrichtung zu Beginn eines Ticks $rot : OBJ \times \delta \mapsto \mathcal{F}^3$. Der Vektor $(x, y, z) \in\mathcal{F}^3$ wird für die Drehung um x (Radialmaß) für die Drehung um die x-Achse relativ zum Raum definiert, bzw. y und z analog. Andere etablierte Formate, wie Quaternionen, werden hier nicht verwendet.
+\end{itemize}
+Die Kontinuitätseigenschaft $\delta_{j1} = \delta_{(j+1)0}$ ermöglicht die Übernahme/Speicherung des Wertes zu Tickbeginn aus dem letzten Tick.
+
+Objekte sind in der Simulation zusätzlich zeitlichen Änderungen unterlegen.
+An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht und werden daher ebenfalls pro Tick definiert.\\
+ Es wird sich hier auf
 \begin{enumerate}
-\item Geschwindigkeit $v: OBJ \times T_s \mapsto \mathcal{S}^3$  und
-\item Winkelgeschwindigkeit $\omega : OBJ \times T_s \mapsto \mathcal{F}^3 $
+\item Geschwindigkeit $v: OBJ \times \delta \mapsto \mathcal{S}^3$  und
+\item Winkelgeschwindigkeit $\omega : OBJ \times \delta \mapsto \mathcal{F}^3 $
 \end{enumerate}
 beschränkt.
-An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konstanten zeitlichen Änderungsgrößen nicht $\forall t \in ]t_0, t_1] : v(\mathcal{T}(t)) = v(\mathcal{T}( t_1 )); \omega(\mathcal{T}(t)) = \omega(\mathcal{T}(t_1));$.\\
-Im vorigen Abschnitt wurden die gezeitete Position und Rotation zu allen Zeiten $T_s$ definiert.
-Es werden jedoch tatsächlich nur Position $pos(o, \mathcal{T}(t_0))$ und Rotation $rot(o, \mathcal{T}(t_0))$ zu Beginn eines Ticks $\delta_i$ festgehalten. Diese Zählen zum Objektstatus, der während eines Ticks von $t_0$ auf $t_1$ aktualisiert werden muss. Dadurch, dass sich die zeitlichen Änderungsgrößen während eines Ticks nicht ändern, können Statusattribute des Objekts während des Ticks(Position, Rotation, Eckpunkte, ...) durch ihre Linearität leicht bestimmt werden.  
 
-Andere Arten der Bewegung (wie z.B. durch Animation oder andere Transformationen wie Skalierung) sind in der Zukunft des Projektes denkbar, allerdings nicht Teil dieses Projektes.
+Während eines Ticks $\delta_i$ kann demnach eine Transformationsmatrix $A: OBJ \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}$ für alle für jedes Objekt zu jedem Zeitpunkt des Ticks angegeben werden, die die einem Objekt via Modell zugeordneten Punkte, seien dies $V_o, K_o$ usw., die relativ zum jeweiligen Objektspace angegeben sind nun in die entsprechende Position im Worldspace transformieren kann. Transformationsmatrizen sind typischerweise im Kontext der Computergrafik und Simulation von 3D-Räumen $t\times 4$ gewählt, um z.B. auch Translation zu realisieren \cite[ch. 4.4.1, p.76]{fourcrossfour}. Wir beschreiben dazu die 
+Translationsmatrix, die aus einer Position, und die Rotationsmatrix, die aus einer Rotationsanweisung hervorgeht $A_{trans}, A_{rot}:\mathcal{F}^3 \mapsto \mathcal{F}^{4\times 4}$. Beide dieser Funktionen, insbesondere $A_{trans}$ sind für $\mathcal{F}^3$ anstatt für $\mathcal{S}^3$ definiert, denn es wird erwartet, dass für die Berechnung zu einem relativ nahen Punkt $P \in\mathcal{S}^3$ relativiert und daraufhin in $\mathcal{F}^3$ durch die Funktion $meter$ umgewandelt wird.\\
+Sei $o \in OBJ; pos = pos(o, \delta_i); v = v(o, \delta_i); rot = rot(o, \delta_i); \omega = \omega(o, \delta_i)$, dann gilt
+$A(o, t) = A_{trans}(meter(pos + v * (t-t_0))) * A_{rot}(rot + \omega * (t - t_0))$.\\
+Bei der Relativierung von Objekten ,welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix 
+\begin{align}
+R: OBJ^2 \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}; R(o_1, o_0, t) = A(o_1 - o_0, t) = \\
+A_{trans}( meter(  pos(o_1, t)-pos(o_0, t) ) + meter(v(o_1, t)-v(o_0, t)) * (t-t_0) ) \\
+* A_{rot}((rot(o_1, t)-rot(o_0, t)) + (\omega(o_1, t)-\omega(o_0, t)) * (t-t_0))= I_4
+\end{align}
+. Ein Vorteil besteht dabei, dass bei Relativierung eines Objektes zu sich selbst dabei die Identitätsmatrix $I_4 = R(o_0, o_0, t) \forall t$ entsteht. Auf entsprechenden Modellpunkten von $o_0$ muss dann keine Operation ausgeführt werden, da $\forall p\in \mathbb{F}^3: p*I_4=p$. Dadurch kann bei der Berechnung einer Interaktion, bei der u.U.~ viele Modellpunkte Transformiert werden müssen, die Hälfte der Transformationen gespart werden.
 
 \subsection{Projektleistung}
 Im Rahmen des Projektes wurden Schnittstellen für~\ref{sec:objects_rep}, angelegt um entsprechenden Zugriff auf die Information von Ecken, Kanten und Flächen während Interaktionsroutinen zu erhalten. Außerdem wurden physikalische Entitäten im Code Repräsentiert, die die für die paarweise Kollisionsberechnung benötigten Attribute für Rotation und Rotationsgeschwindigkeit als Erweiterung zur herkömmlichen Entität beinhalten, die diese nicht besitzt. Alle anderen Teile des bisher behandelten Kontext von Zeit, Raum Objektrepräsentation und Objektbewegung enthalten im Rahmens dieses Projektes maximal marginale Neuleistung.
