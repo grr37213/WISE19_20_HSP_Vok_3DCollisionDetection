@@ -198,7 +198,7 @@ Es wird im Folgenden der Algorithmus beschrieben:
 	\item Die neue Suchrichtung $D = D_{new}(s)$ wird orthogonal zum Simplex $s$ in Richtung des Ursprungs festgelegt. Die konkrete Berechnung hängt dabei von $|V'|$ ab. Ein Beispiel ist: $|s| = 2 \Rightarrow D(s) = (b-a)\times (O-a)\times (b-a);  \{a, b\} = s$, mit $\times$ als Kreuzprodukt zweier Vektoren.
 	\item Wiederhole ab 2.
 \end{enumerate}
-Rückgabewerte sind immer $d_{min]$ \& $s$.
+Rückgabewerte sind immer $d_{min}$ \& $s$.
 Es werden Implementierungsspezifika und aufgetretene Probleme geschildert:\\
 \begin{enumerate}
 \item Für die Berechnung von Minkowski-Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ wurde ein Generator implementiert, der zum Minkowski-Punkt die Indices der Verwendeten Eckpunkte der Ursprungsmodelle $V_{o_0}$ und $V_{o_1}$ mitführt. Damit können durch den Erhalt des nächsten Simpex $s$ die Beteiligten Merkmale/Simplices and den Ursprungsobjekten ermittelt werden.
@@ -236,14 +236,12 @@ Bei Versuchen mit den Abbruchkriterien (b) und (c) konvergierte der Algorithmus 
 Die Minkowski-Summe produziert keine Hüllenobjekte, nur konvexe Vertex-Meshes. Es können daraus mehrere nächste Simplices zum Ursprung generiert werden, wie die Abbildung \cite{fig:parfeat} zeigt. Das Problem kann dann auftreten, wenn Simplices in (denselben oder gepaarten) Ursprungsmerkmalen komplanar sind.
 \item Verwendete Funktionen sind ausreichend genau.\\
 Theoretisch sollten komplanare Merkmale dieselbe neue Suchrichtung $D$ in Schritt 8.~erzeugen. Neue Punkte $s_{|s|}$ sind dabei dann eindeutig (maximales Skalarprodukt im Konvexen). Das scheint durch Berechnungsungenauigkeiten, insbesondere im Kreuzprodukt, nicht der Fall zu sein. 
-
-%TODO condition of cross produkt
 \end{enumerate}
+
 Die Uneindeutigkeit der nächsten Simplices und Berechnungsungenauigkeiten führten im Algorithmus zu wiederholt denselben Belegungen von $s$ und somit zu Endlosschleifen.\\
 Nur Abbruchkriterium (a) arbeitet nicht mit dem Kreuzprodukt, führte in allen Tests immer erfolgreich zur Konvergenz und wird daher letztendlich verwendet.
 \end{enumerate}
 
-\end{enumerate}
 ~\\
 GJK löst so das Schnittproblem zu einem Zeitpunkt $t$. Über die Suche der ersten Nullstelle des GJK als Distanzfunktion während eines Ticks kann die Zeit einer Erstkollision bestimmt werden, um zusätzlich das Intrusionsproblem zu lösen.
 Ein Nullstellen-/Wurzelsuchverfahren hat zudem den Vorteil, dass es unabhängig von der Bewegungsart der Objekte ist. Animation, Rotation oder beliebige Transformation ist prinzipiell denkbar, solange die Bewegung und damit die Distanz stetig ist.\\
@@ -264,7 +262,7 @@ Ein Durchlauf der in Schritt 9.~angelegten Schleife bringt die Komplexität der 
 \begin{enumerate}
 \item Schritt 2.: $\mathcal{O}(|\mathcal{M}(V_{o_0}, V_{o_1})|) = \mathcal{O}(|V_{o_0}|*|V_{o_1}|)$.
 Die Urquelle \cite[p.196, Mathindex 16, 17, 21]{gjk} beschreibt die Optimierung auf $\mathcal{O}(|V_{o_0}|+|V_{o_1}|)$. Diese ist in dieser Implementierung noch nicht enthalten.
-\item Schritt 4.: $\mathcal{O}(\mathcal{P}(s)) = \mathcal{O}(2^{|s|})$, aber $|s| \leq 4 \Rightarrow \mathcal{O}(2^4}) = \mathcal{O}(16})$. Außerdem ist 
+\item Schritt 4.: $\mathcal{O}(\mathcal{P}(s)) = \mathcal{O}(2^{|s|})$, aber $|s| \leq 4 \Rightarrow \mathcal{O}(2^4) = \mathcal{O}(16)$. Außerdem ist 
 \end{enumerate}
 Die Komplexität innerhalb der Schleife hängt also hauptsächlich von der Beschaffenheit der Objekte, bzw.~ihrer Minkowski-Differenz ab.\\
 Wie viele Schleifendurchläufe benötigt werden kann theoretisch nur durch $|\mathcal{M}| = |V_{o_0}|*|V_{o_1}|$ eingegrenzt werden.
