@@ -46,6 +46,7 @@ An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkoll
 
 
 \subsection{Intrusionsermittlung durch lineare Interpolation der Objektbewegung}
+\label{sec:linear_int}
 Um das Problem zu vereinfachen wird die zunächst die Rotation von Objekten vernachlässigt.\\
 Genauer: In diesem Kontext erfährt ein Objekt $o\in OBJ$ während eines Ticks $\delta_i$ keine zeitliche Änderung der Rotation $\forall t \in \Upsilon_{\delta i} : \omega(o, t) = (0,0,0)$. Dies hat mehrere Gründe:
 \begin{enumerate}
@@ -97,7 +98,7 @@ Essenziell zu überprüfende Merkmalspaare $\in \{Area, Edge, Vertex\}^2$ sind:
 				Sei die ursprüngliche Kante, aus dem das Parallelogramm generiert wurde $\{p_0+y*p_1\}$, so liegt die andere Kante $\{p_0 + z*p_2\}$ in der Zeitdimension und somit ist hier z der Zeitkoeffizient.
 		\end{itemize}
 \ \\
-		Komplexität: $|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}|$ + $|E_{o0}| * |E_{o1}|$
+		Komplexität: $\mathcal{O}(|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}|$ + $|E_{o0}| * |E_{o1}|)$
 
 		\begin{itemize}
 			\item Zuverlässige Ermittlung der Erstkollision durch Findung des minimalen Zeitkoeffizienten.
@@ -122,6 +123,7 @@ Eine Idee ist die Suche nach einem Zeitpunkt vor der Überschneidung, durch beis
 Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser annehmen.
 
 \subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
+\label{sec:gjk}
 GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1| | k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-blog}.\\
 Im Folgenden wird Die Urquelle \cite{gjk} gibt den Algorithmus im mathematischen Kontext an. Die Umwandlung der Mathematik in eine gute Maschinenimplementierung wird nicht als trivial eingeschätzt. Es fehlen die nötigen Erfahrungswerte mit dem Algorithmus. Es werden daher weitere Quellen mit praktischem Fokus zu Rate gezogen, um die Implementierung umzusetzen \cite{gjk-blog}\cite{gjk_vid}.
 Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ \cite[p.195]{gjk} ausgenutzt werden, von der die Relevanten wie folgt lauten:\\
@@ -149,7 +151,7 @@ Für grafische Zwecke kann dieser Bezug oft durch das sog. \textit{Winding} eine
 Eine Konvention für ein \textit{Winding} wurde allerdings im Projekt eingeführt, nicht zuletzt, da diese die Implementierung des GJK vereinfacht.\\
 Für die in dieser Projektarbeit verwendeten Testzwecke erscheint der Aufwand der Automatisierung der konvexen Partitionierung für dieses Projekt letztendlich doch zu hoch und thematisch zu fremd.\\
 \ \\
-Die konvexe Partitionierung des Objektes $o$ wird daher manuell und explizit bei Modellen durch die Angabe von Mengen von Indices von zueinander konvexen Eckpunkten $P_i \subseteq V_o$ angegeben.
+Die konvexe Partitionierung des Objektes $o$ wird daher manuell und explizit bei Modellen durch die Angabe von Mengen von Indices von zueinander konvexen Eckpunkten $P_o := \{P_0, ...\}; P_i \subseteq V_o$ angegeben.
 Zusätzlich ist die Äquivalenz zur kompakten Punktemenge $K_o$ gefordert. Diese ist nun implizit durch die Konvexität gegeben. $K_o$ ist konvex, wenn gilt $\forall p_0, p_1 \in K_o, \forall x \in [0,1] : p0 + x * (p_1 - p0) \in K_o $. In Mesh-Repräsentation $G_o$ sind nicht alle diese Punkte enthalten. Jedoch, wenn $K_o$ konvex so sind die Hüllen $\mathcal{H}(K_o) = \mathcal{G_o}$ ebenfalls konvex. Alle Punkte $K_o \backslash G_o$ können so durch die Konvexitätsdefinition impliziert werden. Die zusätzlich mit der Objektrepräsentation mitgelieferte Partitionierung erweitert also die verfügbare Information und schafft in dieser Hinsicht Äquivalenz zwischen Polygon-Meshes und kompakten Mengen und die Unterscheidung von Innen und Außen. Informationen zu verbundenen Ecken einer Polygon-Mesh $I_o$ werden dadurch in diesem Kontext ebenfalls redundant. Der Algorithmus kann demnach außschließlich unter Einbeziehung von Eckpunkten $V_o$ verfahren.\\
 Durch die Feststellung der Äquivalenz wurde ermittelt, dass eine Variante des GJK-Algorithmus auch an Polygon-Meshes durchgeführt werden kann.\\
 Es kann also eine Diskretion/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $V_o$  verwendet werden, was vorteilhafte Iterationslängen im Algorithmus zur Folge hat ($V_o \ll G_o \ll K_o$).
@@ -186,15 +188,17 @@ Es wird im Folgenden der Algorithmus beschrieben:
 	\item Finde neuen Punkt $s_{|s|}$ zur $(|s|+1)$-dimensionalen Erweiterung des Simplex den maximalen Punkt $v \in \mathcal{M}$ in der Suchrichtung $D$ über das Skalarprodukt $s_{|s|} = v \in \mathcal{M} : v \circ D = max\{D \circ v_i ; v_i \in  ßmathcal{M}\}$. Da $\mathcal{M}$ konvex, existiert dieses Maximum in jede Richtung \cite[p. 195]{gjk}.
 	\item $-s_{|s|} \circ D > 0 \Rightarrow O \notin \mathcal{M}$. Es könnte $d_{min} = distance(s, O)$ gesetzt werden. Dieser Schritt ist hauptsächlich für einen verfrühten Abbruch interessant, wenn nur ermittelt werden soll, ob ein Schnitt $K_{o_0} \cap K_{o_1} \neq \emptyset$ existiert, oder nicht.
 	\item Durch die Punkte $Simplex~s_{new} = s \cup {s_{|s|}}$ kann eine Menge von Simplices $\mathcal{P}(s_{new})$ beschrieben werden. Es soll das zum Ursprung nächste Simplex ausgewählt werden. Die Auswahl $\mathcal{P}(s_{new})$ kann weiter dadurch eingeschränkt werden, dass nur neue Simplices, die durch den neuen Punkt $s_{|s|}$ bekannt wurden überprüft werden müssen, da durch die Suche des Punkts in Suchrichtung $D$ an dieser Stelle eine Distanzverbesserung durch den neuen Punkt erwartet wird. Das Gegenereignis hierzu kann durch Konvexität von $\mathcal{M}$ und der Maximaleigenschaft der Punkte in $s$ ausgeschlossen werden, solange das nächste Simplex nicht bereits erreicht ist \cite{gjk-vid}.  Die reduzierte Menge $S_{check} \subset \mathcal{P}(s_{new}); S_{check} = \{ s \in \mathcal{P}(s_{new}) | s_{|s|} \in s \}$ wird demnach stattdessen überprüft und das neue nächste gefundene Simplex 
-	 $s \in s_{check} : distance(s, O) = min\{distance(s', O) | s' \in s_{check}\}$
-	 ermittelt.
-	\item Falls keine kleinere Distanz gefunden wurde, ist das nächste Simplex zum Ursprung gefunden. $d_{min} \leq distance(s, O) \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}$ (\textbf{RETURN})
+	 $s \in s_{near} : s_{near} = \{\hat{s} | distance(\hat{s}, O) = min\{distance(s', O) | s' \in s_{check}\}\}; |s| \leq |\hat{s}| \in s_{near}$
+	 ermittelt. Dabei haben die wenigerdimensionalen Simplices Vorrang bei Gleichheit.\\
+	 In der Implementierung wird das durch geometrische Raumaufteilungen realisiert. So wird beim höchstdimensionalen Simplex $\dot{s}\in s_{check}: |\dot{s}| > |\ddot{s}|; \forall \ddot{s} \in s_{check}; \dot{s}\neq\ddot{s}$ begonnen und sukzessive festgestellt, in welchem zugehörigen Raumsegement von niedrigerdimensionalen Teilsimplices $\mathcal{P}(\dot{s})$ sich der Ursprung befindet. So beispielsweise zu einer Kante $\vec{s_{|s|}v}, v\in \dot{s}$ drei Raumsegmente gegeben. Zu den Endpunkten der Kante $\bar{s_{|s|},v}$ jeweils $SEG_{v} = \{p | p \circ \vec{s_{|s|}v} > 0\}$, bzw.  $SEG_{s_{|s|}} = \{p | p \circ \vec{vs_{|s|}} > 0\}$ und für die Kante selbst $\mathbb{F}^3 \backslash (SEG_{s_{|s|}} \cup SEG_{v})$, die alle Punkte beinhaltet, zu denen ein orthogonaler Vektor zur Geraden $\bar{s_{|s|},v}$ angegeben werden kann. Dabei kann die Überprüfung von $SEG_v$ ausgeschlossen werden, da $\{v\} \notin s_{check}$.
+	 Die Zugehörigkeit des Ursprungs zu einem Segment kann durch Skalar- und Kreuzprodukte festgestellt werden. Genauere Angaben, sowie die Umsetzung von anderen Arten von Simlices (z.B. Dreiecke) behandelt die Quelle \cite{gjk-vid} ausführlicher.
+	\item Falls keine kleineren Distanz gefunden wurde, ist das nächste Simplex zum Ursprung gefunden. $d_{min} \leq distance(s, O) \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}$ (\textbf{RETURN})
 	\item Ist das nächste Simplex ein Tetraeder $|s| = 4 \Rightarrow O \in K_s \Rightarrow distance(\mathcal{M}, O) = 0$ (\textbf{RETURN})
 	\item $d_{min} = distance(s, O)$
 	\item Die neue Suchrichtung $D = D_{new}(s)$ wird orthogonal zum Simplex $s$ in Richtung des Ursprungs festgelegt. Die konkrete Berechnung hängt dabei von $|V'|$ ab. Ein Beispiel ist: $|s| = 2 \Rightarrow D(s) = (b-a)\times (O-a)\times (b-a);  \{a, b\} = s$, mit $\times$ als Kreuzprodukt zweier Vektoren.
 	\item Wiederhole ab 2.
 \end{enumerate}
-Rückgabewerte sind immer $d_min$ \& $s$.
+Rückgabewerte sind immer $d_{min]$ \& $s$.
 Es werden Implementierungsspezifika und aufgetretene Probleme geschildert:\\
 \begin{enumerate}
 \item Für die Berechnung von Minkowski-Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ wurde ein Generator implementiert, der zum Minkowski-Punkt die Indices der Verwendeten Eckpunkte der Ursprungsmodelle $V_{o_0}$ und $V_{o_1}$ mitführt. Damit können durch den Erhalt des nächsten Simpex $s$ die Beteiligten Merkmale/Simplices and den Ursprungsobjekten ermittelt werden.
@@ -207,15 +211,10 @@ Bei der Anpassung wurde zunächst mit Abbruchkriterien experimentiert um den im 
 \begin{enumerate}
 	\item Die hier als Status-Quo vorgestellte Brute-Force-Distanzberechnung in Schritt 4.~und anschließende Auswertung in Schritt 5..
 	\item Statt Schritt 5.:
-	 $$s_{|s|} \in s \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}\text{(\textbf{RETURN})}$$ : Neue Simplexpunkte $s_{|s|}$ sind nach Schritt 2.~ maximal in einer Suchrichtung $D$, die in Richtung des Ursprungs liegt. Ist das nächste Merkmal erreicht, so wird nach Schritt 4.~in eine Richtung gesucht, deren maximale Punkte bereits bekannt sein müssen. Daher ist ein mögliches Abbruchkriterium: Abbruch beim finden eines Support-Punktes, der bereits bekannt ist. $\mathcal{O}(3)$, da in Schritt 4.~immer gilt:$|s|\leq 3$
-	 \\TODO-------------------------------------
-	\item Ein neuer Support Punkt soll eine Erweiterung in die Suchrichtung darstellen. Seien $S$ die bekannten Support-Punkte und $P_{\#S}$ der neu gewonnene. Nehmen wir die Suchrichtung als Ebenennormale an, liegt das von den in $S$ enthaltenen Punkten gebildete Simplex in der dieser Ebene. Alle neuen Punkte, welche eine Erweiterung in Richtung des Ursprungs darstellen sollen, müssen in Richtung der Ebenennormale liegen. Dies ist festzustellen, in dem Vektoren $V := P_{\#S}-s_i ; s_i\in S$ auf ein positives Skalarprodukt mit der Suchrichtung überprüft werden. Abbruchkriterium: $\exists V : D \cdot V <= 0$. Idee: Wird ein koplanarer oder gar schon bekannte Support-Punkt gefunden ist das Skalarprodukt $0$ und der Abbruch wird eingeleitet, da keine Erweiterung mehr schaffbar ist.
+	 $$s_{|s|} \in s \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}\text{(\textbf{RETURN})}$$ 
+	 Neue Simplexpunkte $s_{|s|}$ sind nach Schritt 2.~ maximal in einer Suchrichtung $D$, die in Richtung des Ursprungs liegt. Ist das nächste Merkmal erreicht, so wird nach Schritt 4.~in eine Richtung gesucht, deren maximale Punkte bereits bekannt sein müssen. Daher ist ein mögliches Abbruchkriterium: Abbruch beim finden eines Support-Punktes, der bereits bekannt ist. $\mathcal{O}(3)$, da in Schritt 4.~immer gilt $|s|\leq 3$ und Suchrichtungen $D$ immer orthogonal gewählt werden.
+	\item Durch den neuen Punkt $s_{|s|}$ gezogene Kantenvektoren $\vec{s_{|s|}v}, v\in s$ sollen eine klare Erweiterung in Suchrichtung $D$ darstellen, was durch $D \circ \vec{s_{|s|}v} < 0$ ermittelbar ist. Diese Kriterium soll nur dann geprüft werden, wenn durch Schritt 3. bereits ermittelt wurde, dass der Ursprung außerhalb des Suchkörpers liegt und die Punkte in $s$ bereits auf der Seite des Suchkörpers liegen, an der sich der Ursprung angrenzt.
 \end{enumerate}
-Bei Versuchen mit den Abbruchkriterien (b) und (3) wurden jedoch Probleme erkennbar konvergierte der Algorithmus regelmäßig nicht. Es wurden folgende Fehler gefunden:
-
-\end{enumerate}
-
-
 
 \begin{figure}
 	\centering
@@ -224,10 +223,6 @@ Bei Versuchen mit den Abbruchkriterien (b) und (3) wurden jedoch Probleme erkenn
 	\label{fig:why_criteria}
 \end{figure}
 
-\begin{enumerate}
-	\item Falsche Annahme: Das näherste Merkmal der Markovsumme ist eindeutig.\\
-	Generierbare Simplices in der Markovsumme können überlappen (z.B. aber nicht ausschließlich mit anteilig gleichen Eckpunkten bei Dreiecken). Es können demnach mehrere nächste Simplices zum Ursprung existieren.\\
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.6\textwidth]{./res/parallel_features.png}
@@ -235,43 +230,64 @@ Bei Versuchen mit den Abbruchkriterien (b) und (3) wurden jedoch Probleme erkenn
 	\label{fig:parfeat}
 \end{figure}
 
-		Die Grafik \ref{fig:parfeat} zeigt ein solches Szenario. Oben im Bild, die rote und blaue Linie, geben die Ursprungsobjekte an. Der Ursprung ist in violett zu sehen. Die unten im Bild befindliche Linie ist die Markovsumme der roten und blauen Linie. An dieser zu sehen, in Grün, sind die generierten Eckpunkte. Die koplanarität erlaubt dem Algorithmus das Ignorieren des mittleren grünen Punktes. Demnach sind hier der mittlere Punkt und die Linie, welche die beiden äußeren Punkte verbindet exakt gleich weit vom Ursprung entfernt, genauso sind die Linien von jeweils einem Punkt von außen zur Mitte, und ein Dreieck aus allen grünen Punkten.
+Bei Versuchen mit den Abbruchkriterien (b) und (c) konvergierte der Algorithmus regelmäßig nicht. Es wurden falsche Annahmen getroffen:
+\begin{enumerate}
+\item Das nächste Simplex zum Ursprung ist eindeutig.\\
+Die Minkowski-Summe produziert keine Hüllenobjekte, nur konvexe Vertex-Meshes. Es können daraus mehrere nächste Simplices zum Ursprung generiert werden, wie die Abbildung \cite{fig:parfeat} zeigt. Das Problem kann dann auftreten, wenn Simplices in (denselben oder gepaarten) Ursprungsmerkmalen komplanar sind.
+\item Verwendete Funktionen sind ausreichend genau.\\
+Theoretisch sollten komplanare Merkmale dieselbe neue Suchrichtung $D$ in Schritt 8.~erzeugen. Neue Punkte $s_{|s|}$ sind dabei dann eindeutig (maximales Skalarprodukt im Konvexen). Das scheint durch Berechnungsungenauigkeiten, insbesondere im Kreuzprodukt, nicht der Fall zu sein. 
 
-	\item Falsche Annahme: Verwendete Funktionen sind ausreichend genau.\\
-		Theoretisch sollten (nahezu) koplanare Merkmale dieselbe neue Suchrichtung erzeugen. Daraufhin neu gefundene Support-Punkte sind deterministisch (Reihenfolge der Markovpunkte in der Maximumssuche ist immer gleich, Maximumssuche ebenfalls deterministisch). Ungenauigkeiten bei der Suchrichtungsermittlung arbeiten jedoch diesem Determinismus entgegen und erzeugte bei (unter floating Point präzision) nahezu gleichen Eingaben unterschiedliche Punkte, wenn eine auswahl von nahezu koplanaren Punkten existiert. Mehr noch: Alle neuen Punkte skalierten dabei regelmäßig auf Grund der Ungenauigkeit auch noch positiv mit der Suchrichtung was zur Folge hat das Abbruchkriterien 2 und 3 zu keiner konvergenz führten und den Worst Case einer Endlosschleife annehmen.\\
-	Die Ungenauigkeit wurde auf die Kondition des Kreuzproduktes zurückgeführt, welches hauptsächlich zur Ermittlung der orthogonalen Suchrichtung verwendet wird. Das ursprüglich als zu komplex angesehene Abbruchkriterium 1 arbeitet nicht mit der aus Kreuzprodukten erzeugten Suchrichtung, sonder direkt auf den bekannten Merkmalen, verwendet selbst keine Kreuzprodukte und wird daher die einzig verbleibende Option. Das Kriterium führte auch in allen Tests erfolgreich zur Konvergenz.
+%TODO condition of cross produkt
+\end{enumerate}
+Die Uneindeutigkeit der nächsten Simplices und Berechnungsungenauigkeiten führten im Algorithmus zu wiederholt denselben Belegungen von $s$ und somit zu Endlosschleifen.\\
+Nur Abbruchkriterium (a) arbeitet nicht mit dem Kreuzprodukt, führte in allen Tests immer erfolgreich zur Konvergenz und wird daher letztendlich verwendet.
+\end{enumerate}
+
 \end{enumerate}
 ~\\
-Weiter ist der Algorithmus bis jetzt nur ein statischer Intersektionstest. Um aus dem Schnittalgorithmus einen Intrusionsalgorithmus zu machen, wird eine Nullstellensuche auf die erhaltene Distanz angewandt.
-Das Wurzelsuchverfahren hat zudem den Vorteil, dass es unabhängig von der Bewegungsart der Objekte ist. Animation, Rotation oder beliebige Transformation ist prinzipiell denkbar, solange über eine stetige Distanzfunktion abstrahiert wird.\\
-Insbesondere im Falle der Rotation sind Überlegungen zu Startpunkten der Suche and der Distanzfunktionskurve anzustellen. Bei einer schnellen Rotation kollidieren Objekte unter Umständen mehrfach hintereinander, mit kollisionsfreien Episoden dazwischen. Bei Betrachtungen der Intrusion können Nullstellen sowohl beim Ein- als auch beim Austritt festgestellt werden.\\
-Die Distanzfunktion verhält sich bei rotierenden Körpern wie eine Schwingung. Es gilt das Nyquist-Shannon-Abtasttheorem. Um beispielsweise die erste Nullstelle/Kollision zu finden ist die Rotationsgeschwindigkeit eines Objektes von Bedeutung, um den Suchraum bedeutend einzugrenzen.\\
-Desweiteren ist an dieser Stelle festzustellen, dass das Verfahren wieder durch die Rotationsgeschwindigkeit beschränkt wird.
-\\
-Des weiteren bleibt ein Problem mit der Restriktion auf konvexe Objekte mit diesem Ansatz. 
-Nicht-konvexte Objekte können in konvexe Objekte aufgetrennt werden. Praktisch wird diese Trennung meist extra mit dem Modell angegeben. Dabei sind in der Industrie die Form des tatsächlichen Modells und den zur Kollision angebenen Formen oft nicht kongruent und stellen daher inakkurate Hitboxen dar.\\
-Automatisierte Methoden der Aufteilung sind komplex. Prinzipiell, für den Fall dass Objekte rigide sind, ist eine solche Aufteilung 1-mal Aufwand und daher Echtzeitfähig. Sind Objekte jedoch flexibel, z.B. durch Animation an Gelenken, müsste eine automatisierte Aufteilung bei jeder Änderung, u.U.~ mehrere male pro Tick auf ein Objekt angewendet werden. Das wäre Echtzeitfähig nicht tragbar. Deshalb werden in vielen Videospielen Gelenke ignoriert oder durch Kugeln approximiert.\\
-Eine Familie nicht-konvexer Objekte, welche aus konvexen Objekten aufgebaut ist, ist prinzipiell noch abdeckbar. Dabei ist wiederholtes Verwenden des GJK-Algorithmus für jedes Teilobjektepaar verschiedener Ursprungsobjekte vonnöten. \\
-Es lohnt sich, konvexe Teilobjektpaare durch andere Verfahren vorzufiltern und auszuschließen, wenn möglich.\\
-Möglicher Ansatz hierfür ist z.B.~ wieder AABB-Pruning (wir bereits aus L1 bekannt).
-\\
-Überprüfung der erfüllung gestellter Anforderungen aus L3:\\
+GJK löst so das Schnittproblem zu einem Zeitpunkt $t$. Über die Suche der ersten Nullstelle des GJK als Distanzfunktion während eines Ticks kann die Zeit einer Erstkollision bestimmt werden, um zusätzlich das Intrusionsproblem zu lösen.
+Ein Nullstellen-/Wurzelsuchverfahren hat zudem den Vorteil, dass es unabhängig von der Bewegungsart der Objekte ist. Animation, Rotation oder beliebige Transformation ist prinzipiell denkbar, solange die Bewegung und damit die Distanz stetig ist.\\
+Es sind prinzipiell viele Wurzelsuchverfahren bekannt. Viele werden jedoch durch den Umstand einer niemals negativen Distanz $\Rightarrow distance: \mathcal{P}(\mathbb{R}^3)^2 \mapsto \mathbb{R}^+_0$ verkompliziert. Eine negative Distanz, also eine Penetrationstiefe, berechenbar zu machen würde die Implementation des GJK-Algorithmus allerdings weiter verkomplizieren.\\
+
+
+Vor allem im Falle von rotierenden Objekten werden Hürden ersichtlich:
+Bei Rotierenden Objekten nimmt die Distanzfunktion die Form einer Schwingung an, wodurch das Nyquist-Shannon-Abtasttheorem gilt. Die korrekte Ermittlung der Erstkollision im Rahmen eines Ticks kann durch Aliasing besonders bei schnellen Rotationen prinzipiell verhindert werden. Es gilt also auch bei diesem Verfahren eine Einschränkung der Rotationsgeschwindigkeit oder Verlust des 100\%-igen Erfolgs des Verfahren. Es bestätigt sich hier wieder die bereits in Abschnitt~\ref{sec:linear_int} gemachte Einschätzung von Rotation als limitierenden Faktor. Anders als bei der linearen Interpolation kann bei diesem Verfahren jedoch besser auf die Limitation eingegangen werden. Unter Einbeziehung weiterer Information der kollidierenden Objekte, z.B. Rotationsgeschwindigkeit, Varianz können Wurzelsuchverfahren ausgewählt und ihre Parameter angepasst werden.\\
+Es wurde ein Verfahren implementiert, welches zunächst mit einer einstellbaren Abtastrate $r_{sample}$  pro Ticks nach einer Distanz $= 0$ sucht. Das erste zeitliche Auftreten eines solchen Ereignisses wird dann weiter zur Bisektion des durch Samples eingegrenzten Zeitabschnitts verwendet, um den bei der Intrusion geforderten Zeitpunkt mit einer bestimmten Genauigkeit $\epsilon_t$ festzustellen.\\
+
+Die Komplexität des Verfahrens hängt von den Komplexitäten der Teilalgorithmen ab:
+\begin{enumerate}
+\item die Anzahl der konvexen Partitionen der Objekte $\mathcal{O}(|P_{o_0}|*|P_{o_1}|)$
+\item der Komplexität des Wurzelsuchverfahrens:\\
+ Für das in diesem Projekt verwendete Verfahren ist dies $$\mathcal{O}(r_{sample} + \log_{2}(\frac{(t_1 - t_0)}{r_{sample}\epsilon_t} )$$
+\item der Komplexität von GJK:\\
+Ein Durchlauf der in Schritt 9.~angelegten Schleife bringt die Komplexität der Zwischenschritte mit sich. Die nicht-trivial Konstanten sind:
+\begin{enumerate}
+\item Schritt 2.: $\mathcal{O}(|\mathcal{M}(V_{o_0}, V_{o_1})|) = \mathcal{O}(|V_{o_0}|*|V_{o_1}|)$.
+Die Urquelle \cite[p.196, Mathindex 16, 17, 21]{gjk} beschreibt die Optimierung auf $\mathcal{O}(|V_{o_0}|+|V_{o_1}|)$. Diese ist in dieser Implementierung noch nicht enthalten.
+\item Schritt 4.: $\mathcal{O}(\mathcal{P}(s)) = \mathcal{O}(2^{|s|})$, aber $|s| \leq 4 \Rightarrow \mathcal{O}(2^4}) = \mathcal{O}(16})$. Außerdem ist 
+\end{enumerate}
+Die Komplexität innerhalb der Schleife hängt also hauptsächlich von der Beschaffenheit der Objekte, bzw.~ihrer Minkowski-Differenz ab.\\
+Wie viele Schleifendurchläufe benötigt werden kann theoretisch nur durch $|\mathcal{M}| = |V_{o_0}|*|V_{o_1}|$ eingegrenzt werden.
+\end{enumerate}
+Insgesamt entsteht in diesem Projekt die Komplexität 
+$$\mathcal{O}(|P_{o_0}|*|P_{o_1}| * r_{sample} + \log_{2}(\frac{(t_1 - t_0)}{r_{sample}\epsilon_t} * |V_{o_0}|*|V_{o_1}| )$$
+
+
+\subsubsection{Vergleiche, Fazit \& Ausblick}
+Die hier vorgestellten Verfahren der linearen Interpolation und GJK erreichen sehr Unterschiedliche Ziele mit unterschiedlichen Voraussetzungen und lassen sich daher nur schlecht vergleichen.\\
+Das vermehrte Potential zur Optimierung wird in GJK gesehen.
+Beispiele/Experimente für Optimierungen des GJK im Ausblick:
+\begin{enumerate}
+\item konvexe Partitionen könnten vorgefiltert werden, wie z.B. durch Behandlung als quasi eigene Entität in Abschnitt~\ref{sec:filter}. Die dort beschriebenen Möglichkeiten geben dabei Aufschluss über die hier verwendbaren Optionen.
+\item Implementierung einiger Details aus der Quelle \cite{gjk}. Es muss davon ausgegangen werden, dass ähnliche Details wie zum Beispiel die am Ende des Abschnitts~\ref{sec:gjk} beschriebene Optimierung des Schritts 2 im Algorithmus übersehen wurden. 
+\item partielle Ordnungen zwischen Eckpunkten, um die Suche in Schritt 2. noch weiter auf $\mathcal{O}(\log(|V_{o_0}|)+log(|V_{o_1}|)$ zu optimieren.
+\item dynamische Auswahl von besseren Wurzelsuchverfahrens (vgl.~\ref{gdc-physics}) anhand von Details zu Objekten (Rotationsgeschwindigkeit, Varianz von $\vec{v}; v\in V_o$, etc.)
+\end{enumerate}
+Unter diesen Umständen sollte GJK die lineare Interpolation auch in deren eingeschränkten Anwendungsbereich in Punkten Komplexität gleichziehen oder gar untertreffen:
 \begin{itemize}
-	\item Die Kollision wird ermittelt
-	\item Die Kollisionszeit wird in einem bestimmten Genauigkeitsrahmen während der Wurzelsuche bekannt.
-	\item Die beteiligten Merkmale können aus den ermittelten nähersten Supportpunkten zurückgerechnet werden. Dazu werden zu den Supportpunkten die Quellpunkte mitgeführt.
+\item Statisches konvexes Objekt $o_0$ wird von Projektil/Punktförmigen Objekt $o_1$ getroffen $\Rightarrow P_{o_o} = P_{o_1} = 1$
+\item Wurzelsuche durch Differenzierbarkeit der linearen Projektilbewegung $\mathcal{O}(1)$
 \end{itemize}
+$$\mathcal{O}(1*1*1*(\log(|V_{o_0}|)+log(|V_{o_1}|))) < \mathcal{O}(|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}| + |E_{o0}| * |E_{o1}|)$$
 
-Für das GJK-Wurzelverfahren wird ein Fazit gezogen:
-\begin{itemize}
-	\item abstrahiert erfolgreich das Intrusionsproblem durch die Distanz für beliebige stetige Bewegungen oder gar Objektveränderungen
-	\item fordert Aufteilung in konvexe Objekte
-	\item Wurzelsuche optimierbar oder erweiterbar durch weitere Verfahren (vgl. \cite{gdc-physics})
-	\item Verwendbar in vielen weiteren Kollisionsverfahren, in denen Distanz ermittelt werden muss
-\end{itemize}
-%TODO Complexity
-
-Weitere Anmerkungen zum GJK-Algorithmus.
-Der Kernpart des GJK-Algorithmus behandelt das Schnittproblem in beliebigen Dimensionen. Denkbar ist daher die Verwendung des GJK bei 4-dimensionalen Objekten, wie sie bei der linearen Interpolation behandelt wurden. Generell ist dieser Part des GJK im O-Kalkül sogar schneller als die $O(m*n)$ der linearen Interpolation. Die Informationen über beteiligte Features und vor allem, der konkrete Zeitpunkt der Kollision gehen dabei allerdings verloren. In bestimmten Szenarien\\
-Es gibt noch zahlreiche andere Algorithmen, welche den GJK-Algorithmus verwenden um Situationsbedingt bessere Ergebnisse zu erzielen (vgl.~\cite{gdc-physics}). GJK wird in diesem Projekt in ein vergleichsweise naives Verfahren eingabaut.\\
-
+Hinblicklich der Optimierungsmöglichkeiten mag sich weiterer Zeitaufwand durchaus lohnen.

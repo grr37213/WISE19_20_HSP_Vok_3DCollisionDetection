@@ -3,12 +3,25 @@ Eine Bounding-Box ist ein spezielles Bounding-Volume in Form eines Quaders.\\
 Eine in diesem Projekt extensiv verwendete, tiefere Spezialform der Bounding-Box ist die Axis-Alligned-Bounding-Box (AABB). Alle Kanten dieser Bounding-Box sind achsenparallel zu den Koordinatenachsen $\{(1,0,0), (0,1,0), (0,0,1)\}$ des 3D-Koordinatensystems.\\
 Hier relevante Eigenschaften dieser sind:
 \begin{itemize}
-	\item kleine Datenrepresentation $AABB := (AABB_{o, min}, AABB) \in \mathcal{S}^{3^2}$ möglich.
+\item kleine Datenrepresentation:
+		$$AABB_o \in \mathcal{S}^{3^2}; AABB_o = (BB_{min}, BB_{max}) = ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max}))$$.
 		 In ihnen werden Minimal- und Maximalpositionen der AABB festgehalten.
-	\item Schnelle Kollisionsüberprüfung zwischen AABBs durch Vergleiche der Extrema (Komplexität $= \mathcal{O}(1)$)
-	\item Ermittlung einer minimalen AABB für ein Objekt durch Suche der Minima/Maxima (Komplexität $\le \mathcal{O}(n); n $ ist die Anzahl der Objektmerkmale (z.B. Ecken bei Polygon-Meshes))\\
-		Die AABB muss sich an das eingeschlossene Objekt bei Bewegung anpassen. Standardmäßig durch Neuermittlung der AABB($\mathcal{O}(n)$). Optimierungen für verschiedene Arten von Bewegung möglich (Positionsänderung, Skalierung, etc.), aber manchmal schwierig (z.B. bei Rotation).
+		 Diese Positionen werden im Worldspace $\mathcal{S}^{3^2}$ angegeben, da AABBs hier die primäre vereinfachende Abstraktion sein sollen, die in der Simulation für Objekte verwendet wird. Die Angabe im Worldspace macht AABBs für Berechnungen im absoluten, zum Beispiel räumliche Partitionierung für Teile-und-Herrsche Algorithmen, direkt zugänglich.
+		 Die theoretische, kompakte Punktemenge 
+		 \begin{align*}
+		 \mathcal{AABB}: \mathcal{S}^{3^2} \mapsto \mathcal{F}^3;
+		 \mathcal{AABB} ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max})) = \\
+		 \{meter((x_{min} + x * (x_{max} - x_{min}), y_{min} + y * (y_{max} - y_{min}),\\
+		  z_{min} + z * (z_{max} - z_{min})); x, y, z \in [0,1] \} 
+		 \end{align*}
+		 ist dann ein Bounding-Volume $\mathcal{AABB}(AABB_o) \supset K_o$
+	\item Ermittlung einer minimalen AABB für ein Objekt durch Suche der Minima und Maxima der Ausdehnung eines Objektes in jeder Koordinatenachse:
+	 $x_{min} = x : (x, y, z) \in V_o , \forall (x', y', z') \in V_o: x \leq x'; y \& z, min \& max $ analog.
+	 Die Findung dieser Werte ist in $ \mathcal{O}(|V_o|) $.
+		Bei rotierenden Objekten ist auch eine minimale AABB zu diesem Objekt einer Bewegung ausgesetzt, standardmäßig durch Neuermittlung der AABB($\mathcal{O}(n)$ pro Tick). Optimierungen für verschiedene Arten von Bewegung möglich (Positionsänderung, Skalierung, etc.), aber manchmal schwierig bis unmöglich (z.B. bei Rotation).\\
+		Aus diesem Grund macht es auch Sinn, nicht-minimale AABBs zu wählen.
+	\item Schnelle Kollisionsüberprüfung zwischen AABBs durch Vergleiche der Extrema $\mathcal{O}(1)$
+	
 \end{itemize}
 
 Im Falle des Spiels Minecraft werden AABBs als finale Hitboxen verwendet (vgl. \ref{fig:mwhitbox, fig:mphitbox}), welche jedoch scheinbar dem Kriterium $K_o \subseteq B_o$ zuwiderlaufen. Es muss an dieser Stelle zwischen der mathematischen Korrektheit einer Bounding-Box gegenüber einem gegebenen physikalischen Modell und der Designentscheidung gemacht werden, dass das sichtbare Modell nicht oder nur marginal die Grundlage des physikalischen Modells ist. In Minecraft ist die AABB die finale Hitbox  $H_{o, [min]} = K_o$ und definiert dadurch das Modell $K_o$. Das Bounding-Box-Kriterium ist damit theoretisch erfüllt. Die Designentscheidung selbst soll an dieser Stelle nicht eingeschätzt werden.
-

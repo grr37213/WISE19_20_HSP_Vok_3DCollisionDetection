@@ -1,7 +1,7 @@
 \label{sec:hitbox}
 Hitbox $H_o \approx K_o$ ist eine Approximationen für ein Modell in einer Simulation. Sie abstrahieren das konkrete Modell dabei für einige oder gar alle physikalischen Berechnungskontexte. Prinzipiell sind exakte Modelle $K_o$, bzw.~$G_o$ ebenfalls Hitboxen.\\
 Der Term Hitbox suggeriert die Verwendung einer Box/eines Quaders zur Approximation. Das ist wahrscheinlich historisch bedingt. Der Term Hitbox ist allerdings auch für andere Formen etabliert.\\
-Die Diskrepanz zwischen Hitbox und Model $\mathcal{D}(H_o) = | H_o \cup K_o \backslash (H_o \cap K_o) |$ wirkt sich negativ auf den physikalischen Realismus aus, da so False Positives/Negatives entstehen.\\
+Die Diskrepanz zwischen Hitbox und Model $\mathcal{D}(H_o) = | H_o \cup K_o \backslash (H_o \cap K_o) |$ wirkt sich negativ auf den physikalischen Realismus aus, da so False Positives/Negatives  in z.B.~Kollisionsroutinen entstehen.\\
 Eine vereinfachte Darstellung eines Modells durch eine Hitbox mag jedoch Berechnungsvorteile bieten.\\
 Mehrere Hitboxen können zu einem Objekt angegeben sein $H_{o, [i]}$. Dafür können mehrere Gründe angegeben werden:
 \begin{enumerate}
