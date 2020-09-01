@@ -283,9 +283,10 @@ Beispiele/Experimente für Optimierungen des GJK im Ausblick:
 \end{enumerate}
 Unter diesen Umständen sollte GJK die lineare Interpolation auch in deren eingeschränkten Anwendungsbereich in Punkten Komplexität gleichziehen oder gar untertreffen:
 \begin{itemize}
-\item Statisches konvexes Objekt $o_0$ wird von Projektil/Punktförmigen Objekt $o_1$ getroffen $\Rightarrow P_{o_o} = P_{o_1} = 1$
-\item Wurzelsuche durch Differenzierbarkeit der linearen Projektilbewegung $\mathcal{O}(1)$
+\item Statisches konvexes Objekt $o_0$ wird von Projektil/Punktförmigen Objekt $o_1$ getroffen $\Rightarrow |P_{o_o}| = |P_{o_1}| = 1$
+\item Eingrenzung der Wurzelsuche durch Differenzierbarkeit der linearen Projektilbewegung durch Annäherung des Suchraums auf $t_{\alpha}, t_{\omega}$ in $\mathcal{O}(4)$ mit 4 Samples von $t_0, t_0+\epsilon_{t}, t_1, t_1 - \epsilon_{t}$ in schnellerer Zeit  möglich.
 \end{itemize}
-$$\mathcal{O}(1*1*1*(\log(|V_{o_0}|)+log(|V_{o_1}|))) < \mathcal{O}(|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}| + |E_{o0}| * |E_{o1}|)$$
+$$\mathcal{O}(1*1*4* r_{sample} + \log_{2}(\frac{(t_{\omega} - t_\alpha)}{r_{sample}\epsilon_t}*(\log(|V_{o_0}|)+log(|V_{o_1}|))) < \mathcal{O}(|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}| + |E_{o0}| * |E_{o1}|)$$
 
-Hinblicklich der Optimierungsmöglichkeiten mag sich weiterer Zeitaufwand durchaus lohnen.
+Hinsichtlich der Optimierungsmöglichkeiten mag sich weiterer Zeitaufwand daher durchaus lohnen.\\
+Der GJK ist theoretisch für $m\in\mathbb{N}$ Dimensionen definiert \cite{gjk}. Durch die Behandlung von Objekten während eines Ticks als 4-dimensionale kompakte Menge $\bigcup_{t \in \Upsilon_{\delta_i}} K_{o,t}$ könnte der zeitunabhängige Schnitt ermittelt werden um entsprechend vorzufiltern. Besonders im Kontext linearer Bewegungen als Vorfilterung zur linearen Interpolation wäre die Ermittlung der 4D Modelle für den vorgeschalteten GJK einfach $V_{o, t_0} \cup V_{o, t_1}$, also der Aufwand einer einzigen Transformation pro Objekt.
