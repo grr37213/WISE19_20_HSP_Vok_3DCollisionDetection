@@ -9,4 +9,6 @@
 main.pdf
 *.tks
 *.dvi
+*.bcf
+*.xml
 
