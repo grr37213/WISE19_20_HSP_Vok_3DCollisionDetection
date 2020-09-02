@@ -9,6 +9,9 @@
 %\usepackage{umlaut}
 \usepackage[german]{babel}
 
+\usepackage[style=numeric]{biblatex}
+\addbibresource{grr.bib}
+
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{subcaption}
@@ -44,6 +47,7 @@
 %--------------- Zeilen- und Absatzabstaende ----------------------%
 %\setlength{\parindent}{0em}
 %\setlength{\parskip}{\medskipamount}    % Abstand zwischen Abs"atzen
+
 
 \begin{document}
 
@@ -94,9 +98,13 @@
 \input{summary.tex}
 
 \newpage
+\printbibliography
 
-\addcontentsline{toc}{chapter}{Bibliography}
-\begin{thebibliography}{12}
+
+%\bibliographystyle{hieeetr}
+%\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliography{grr.bib}
+%\begin{thebibliography}{12}
 %\bibitem[HaKT1 98]{HaKT1 98} \footnote{In die 
 %Bibliographie sollte s"amtliche benutzte Literatur 
 %rein, auch nicht beim eigenen Vortrag angegebene, aber benutzte Papiere 
@@ -106,12 +114,11 @@
         %Anonymous Auction Protocols}; 1st IEEE Workshop on Dependable and 
         %Real-Time E-Commerce Systems, 1998.
 
-\input{main_bibliography.tex}
-\input{grr_bibliography.tex}
-\input{hel_bibliography.tex}
-\end{thebibliography}
-\bibliography{grr.bib}
-\bibliographystyle{aipauth4-1}
+%\input{main_bibliography.tex}
+%\input{grr_bibliography.tex}
+%\input{hel_bibliography.tex}
+%\end{thebibliography}
+
 \end{document}
 
 
