@@ -230,17 +230,65 @@ Bei der Anpassung wurde zunächst mit Abbruchkriterien experimentiert um den im 
 	\draw [red] (B) node[black, above left]{$s_0$} -- (A) node[black, above]{$s_{|s|}$};
 	\draw [green] (A) -- (C)  node[black, below]{$C$};
 	\draw (C) -- (B);
-	\draw [thick, ->] (-3,0) -- (0,0) node [midway,fill=white]{$\vec{D}$} node [below] {$O$};
+	\draw [thick, ->] (-3,0) -- (0,0) node [near end,fill=white]{$\vec{D}$} node [below] {$O$};
 	\draw [thick, blue, ->] (O) -- (A);
 	\end{tikzpicture}
-	\caption{Szenario für fehlerhaftes Abbruchkriterium aus \cite{gjk-vid} nicht am nächsten Merkmal zum Ursprung stoppt. Startpunkt $s_0$, maximaler Punkt in $\vec{D}$ ist $s_{|s|}$, stopp nach Schritt 3. mit (rot) $s = \{s_o, s_{|s|}\}$, da (blauer) Vektor $\vec{s_{|s|}}\circ\vec{D} < 0$. Tatsächliches nächstes Simplex zu $O$ ist aber (grün) $\overline{s_{|s|}C}$}
+	\caption{Szenario für fehlerhaftes Abbruchkriterium aus \cite{gjk-vid} nicht am nächsten Merkmal zum Ursprung stoppt. Startpunkt $s_0$, maximaler Punkt in $\vec{D}$ ist $s_{|s|}$, stopp nach Schritt 3. mit (rot) $s_{new} = \{s_o, s_{|s|}\}$, da (blauer) Vektor $\vec{s_{|s|}}\circ\vec{D} < 0$. Tatsächliches nächstes Simplex zu $O$ ist aber (grün) $\overline{s_{|s|}C}$.}
 	\label{fig:why_criteria}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.6\textwidth]{./res/parallel_features.png}
-	\caption{}
+	\begin{tikzpicture}
+
+
+
+\draw (-5.5,-1.5) rectangle (3,2);
+\draw[thick,->] (-5.5,-1.5) -- (3,-1.5) node[anchor=south east] {X};
+\draw[thick,->] (-5.5,-1.5) -- (-5.5,2) node[anchor=north west] {Y};
+
+\coordinate (VOaa) at (1,-0.5);
+\coordinate (VOab) at (1,0.5);
+\coordinate (VOba) at (2,-0.5);
+\coordinate (VObb) at (2,0.5);
+
+\coordinate (O) at (0,0);
+
+\coordinate (A) at (-1,0);
+\coordinate (B) at (-1,1);
+\coordinate (C) at (-1,-1);
+
+\draw [below](O) node[black]{$O$};
+\draw (VOaa) -- (VOab);
+\draw (VOba) -- (VObb);
+\draw [red] (A) -- (B) -- (C);
+
+\node at (O) {\textbullet};
+\node at (A) {\textbullet};
+\node at (B) {\textbullet};
+\node at (C) {\textbullet};
+\node at (VOaa) {\textbullet};
+\node at (VOab) {\textbullet};
+\node at (VOba) {\textbullet};
+\node at (VObb) {\textbullet};
+
+\node at (VOab)[above] {$K_{o_0}$};
+\node at (VObb)[above] {$K_{o_1}$};
+
+\node at (VOaa) [right]{$x_0$};
+\node at (VOab) [right]{$x_1$};
+\node at (VOba) [right]{$y_0$};
+\node at (VObb) [right]{$y_1$};
+
+\node at (B) [above, red]{$\mathcal{M}(K_{o_0}, K_{o_1})$};
+
+
+\node at (B) [left]{$z_0=x_0-y_0$};
+\node at (A) [left]{$z_1=x_0-y_1, z_2=x_1-y_0$};
+\node at (C) [left]{$z_3=x_1-y_1$};
+
+\end{tikzpicture}
+	\caption{Minkowski-Differenz (rot) $\mathcal{M}(K_{o_0}, K_{o_1})$ mit markierten Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ mit mehreren nächsten Simplices $\{ \{z_1\},\{z_2\},\{z_0, z_3\},\{z_0,z_1\},\{z_1,z_2\}, ...\}$ zum Ursprung, sogar inklusive zweier deckungsgleicher 1D Simplices mit kleinster Dimensionalität 1.}
 	\label{fig:parfeat}
 \end{figure}
 
