@@ -31,12 +31,6 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 Es mag weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die in dieser Arbeit in Betracht gezogenen dar.
 
 Für physikalische Verwendungszwecke insbesondere bei der rigiden Objektkollision erscheint Intrusion besonders interessant. In Simulationen mit rigiden Kollisionsobjekten ist typischerweise der Zustand des Schnitts zweier Objekte nicht erlaubt und muss daher aktiv durch eine Kollisionsreaktion verhindert werden. Durch die Ermittlung des ersten Zeitpunkts des Bruchs der Nicht-Überschneidungsbedingung kann die Kollisionsreaktion passend ermittelt werden.\\
-\begin{figure}
-	\centering
-	\includegraphics[width=0.6\textwidth]{./res/l3_col.png}
-	\caption{2D Kollisionsszenario mit alternativen Bewegungsbahnen eines Projektils an Kollisionskörpern}
-	\label{fig:l3col}
-\end{figure}
 Die Umsetzung der Auflösung von Kollisionen und Mehrfachkollisionen ist explizit aus diesem Projekt ausgeschlossen. Selbst jedoch bei der theoretischen Betrachtung von Mehrfachkollisionen während eines Ticks und Optionen zu deren Auflösung, bzw.~physikalischer Reaktion von Objekten , scheinen vorwiegend Erstkollisionen interessant zu sein. Man vergleiche hierzu Abbildung~\ref{fig:l3col}.\\
 An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkollisionen durch Intrusion interessanter sind sind und zuerst ermittelbar gemacht werden sollten.
 
@@ -124,10 +118,64 @@ Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser
 
 \subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
 \label{sec:gjk}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+
+\draw (-3.5,-2.5) rectangle (4.5,2.5);
+\draw[thick,->] (-3.5,-2.5) -- (4.5,-2.5) node[anchor=south east] {X};
+\draw[thick,->] (-3.5,-2.5) -- (-3.5,2.5) node[anchor=north west] {Y};
+
+
+\coordinate (O) at (0,0) ;
+\draw [below](O) node[black]{$O$};
+\draw (O) node[black]{\textbullet};
+
+\coordinate (Ta) at (3, 0);
+\coordinate (Tb) at (4, 1);
+\coordinate (Tc) at (4, -1);
+
+\draw[red] (Ta) -- node[above left]{$G_{o_1}$} (Tb) -- (Tc) -- cycle; 
+
+\coordinate (Qa) at (1, -1);
+\coordinate (Qb) at (1, 1);
+\coordinate (Qc) at (2, 1);
+\coordinate (Qd) at (2, -1);
+
+\draw[blue] (Qa) -- (Qb) -- node[above]{$G_{o_0}$} (Qc) -- (Qd) -- cycle; 
+
+\coordinate (QaTa) at (-2, -1);
+\coordinate (QbTa) at (-2, 1);
+\coordinate (QcTa) at (-1, 1);
+\coordinate (QdTa) at (-1, -1);
+\coordinate (QaTb) at (-3, -2);
+\coordinate (QbTb) at (-3, 0);
+\coordinate (QcTb) at (-2, 0);
+\coordinate (QdTb) at (-2, -2);
+\coordinate (QaTc) at (-3, 0);
+\coordinate (QbTc) at (-3, 2);
+\coordinate (QcTc) at (-2, 2);
+\coordinate (QdTc) at (-2, -0);
+
+\draw[red] (QaTa) -- (QaTb) -- (QaTc) -- cycle; 
+\draw[red] (QbTa) -- (QbTb) -- (QbTc) --  cycle; 
+\draw[red] (QcTa) -- (QcTb) -- (QcTc) -- cycle;
+\draw[red] (QdTa) -- (QdTb) -- (QdTc) -- cycle;
+
+\draw[blue] (QaTa) -- (QbTa) -- (QcTa) -- (QdTa) -- cycle; 
+\draw[blue] (QaTb) -- (QbTb) -- (QcTb) -- (QdTb) -- cycle; 
+\draw[blue] (QaTc) -- (QbTc) -- (QcTc) -- (QdTc) -- cycle; 
+
+\node at (-1.8, 1.5)[above right]{$\mathcal{M}(G_{o_0}, G_{o_1})$};
+
+\end{tikzpicture}
+\caption{Beispiel für eine Minkowski-Differenz $\mathcal{M}(G_{o_0}, G_{o_1})$ mit Ursprung $O$ und den als Mesh angegebenen Objekten $G_{o_0}$ und $G_{o_1}$.}
+\label{fig:gjk}
+\end{figure}
 GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1|~| k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-casey}.\\
-Im Folgenden wird Die Urquelle \cite{gjk} gibt den Algorithmus im mathematischen Kontext an. Die Umwandlung der Mathematik in eine gute Maschinenimplementierung wird nicht als trivial eingeschätzt. Es fehlen die nötigen Erfahrungswerte mit dem Algorithmus. Es wird daher weiteres Quellmaterial mit praktischem Fokus zu Rate gezogen, um die Implementierung umzusetzen \cite{gjk-casey}.
-Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ \cite[p.195]{gjk} ausgenutzt werden, von der die Relevanten wie folgt lauten:\\
-Sei $O = (0,0,0)$ der Koordinatenursprung.
+Die Urquelle \cite{gjk} beschreibt den Algorithmus umfassend mathematisch und ist daher aus unserer Sicht initial etwas schwere Kost. Es wird daher weiteres Quellmaterial \cite{gjk-casey} mit praktischerem Fokus zu Rate gezogen, um eine Implementierung umzusetzen und den Einstieg zu erleichtern.
+Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ \cite[p.195]{gjk} ausgenutzt werden. Ein Beispiel für die Minkowski-Differenz ist in Abbildung \ref{fig:gjk} zu sehen. Die hier relevanten Eigenschaften der Minkowski-Differenz lauten wie folgt:\\
 	\begin{enumerate}
 		\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex \cite[p.195]{gjk}.
 		\item $K_0 \cap K_1 \neq \emptyset \Rightarrow \exists a_o, b_o \in K_0 \cap K_1, a_0 \in K_0, b_0 \in K_1 : a_o = b_o \Rightarrow a_o - b_o = O \Rightarrow O \in \mathcal{M}(K_0, K_1)$
