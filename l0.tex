@@ -42,7 +42,7 @@ Theoretisch kann die Rate auch negative Werte annehmen. Die Simulationszeit wür
 \subsection{Raum}
 \label{sec:space}
 Der geforderte 3D Raum kann durch 3-dimensionale Vektoren $\in \mathcal{F}^3$ in der Einheit Meter beschrieben werden.\\
-Durch die Werteverteilung in $\mathcal{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung Genauigkeitsdefizite auf, die zur Verletzung von Genauigkeitsanforderung führen können. Mögliche Floating-Point-Werte liegen dabei dichter beieinander, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
+Durch die Werteverteilung in $\mathcal{F}$ treten jedoch bei großen Räumen für Positionen mit großer Entfernung zum Ursprung $O$ Genauigkeitsdefizite auf, die zur Verletzung von Genauigkeitsanforderung führen können. Mögliche Floating-Point-Werte liegen dabei dichter beieinander, je näher am Ursprung \cite{floatdistribution}. Ein Beispiel für die Auswirkungen dieses Sachverhalts in Simulationen kann in der Quelle \cite{floatdistributionexample} betrachtet werden.\\
 Physikalische Prozesse berechnet auf Basis von Positionen in $\mathcal{F}^3$ können daher inkonsistent in Abhängigkeit zum Ort im Raum sein.\\
 Das Problem wird hier durch einen neuen Längendatentypen $\mathcal{S} : \mathcal{I} \times \mathcal{F}$ gelöst, welcher den Raum zunächst gleichmäßig durch $\mathcal{I}$ aufteilt und indiziert und $\mathcal{F}$ als Offset innerhalb seines Raumteils verwendet. Es wird daher eine Größe der initialen Aufteilung $size_{grid}$ definiert.\\
 Die Umrechnung zu Metern ist dann: $$ meter: \mathcal{S} \mapsto \mathcal{F};  meter((i, f)) = i * size_{grid} + f * size_{grid}$$ 
@@ -61,16 +61,16 @@ Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, i
 
 \begin{enumerate}
 \item Worldspace $= \mathcal{S}^3$ absolute Positionen von Objekten
-\item Cameraspace $= \mathcal{F}^3$, Ursprung an der Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
+\item Cameraspace $= \mathcal{F}^3$, Ursprung $O$ ist die Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
 \item Viewspace $= \mathcal{F}^3$, Verzerrung durch die Kameralinse, um einen Blickwinkel auf einen Bildschirm anzupassen.
-\item Objektspace,$= \mathcal{F}^3$, Ursprung am vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
+\item Objektspace,$= \mathcal{F}^3$, Ursprung ist der vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
 \end{enumerate}
 
 Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
 
 \subsection{Objektform}
 \label{object_form}
-Die Form eines Objektes ist in einem hier rigiden, d.h. unveränderlichen Modell beschrieben, welche die Form relativ zum Ursprung ihres eigenen Objektraums angibt.
+Die Form eines Objektes ist in einem hier rigiden, d.h. unveränderlichen Modell beschrieben, welche die Form relativ zum Ursprung $O$ ihres eigenen Objektraums angibt.
 Für Modelle werden mathematisch oft als kompakte Punktemengen verwendet. Wir denotieren diese kompakten Modelle zugehörig zum Objekt $o$ als $ K_o \subseteq \mathcal{F}$.\\
 
 Durch die kompakte Mengendarstellung führen Rechenoperationen mit Objekten auf maschinell relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 

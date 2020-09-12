@@ -31,12 +31,6 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 Es mag weitere Forderungen an Kollisionsalgorithmen geben. Die obige Aufzählung stellt dabei die in dieser Arbeit in Betracht gezogenen dar.
 
 Für physikalische Verwendungszwecke insbesondere bei der rigiden Objektkollision erscheint Intrusion besonders interessant. In Simulationen mit rigiden Kollisionsobjekten ist typischerweise der Zustand des Schnitts zweier Objekte nicht erlaubt und muss daher aktiv durch eine Kollisionsreaktion verhindert werden. Durch die Ermittlung des ersten Zeitpunkts des Bruchs der Nicht-Überschneidungsbedingung kann die Kollisionsreaktion passend ermittelt werden.\\
-\begin{figure}
-	\centering
-	\includegraphics[width=0.6\textwidth]{./res/l3_col.png}
-	\caption{2D Kollisionsszenario mit alternativen Bewegungsbahnen eines Projektils an Kollisionskörpern}
-	\label{fig:l3col}
-\end{figure}
 Die Umsetzung der Auflösung von Kollisionen und Mehrfachkollisionen ist explizit aus diesem Projekt ausgeschlossen. Selbst jedoch bei der theoretischen Betrachtung von Mehrfachkollisionen während eines Ticks und Optionen zu deren Auflösung, bzw.~physikalischer Reaktion von Objekten , scheinen vorwiegend Erstkollisionen interessant zu sein. Man vergleiche hierzu Abbildung~\ref{fig:l3col}.\\
 An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkollisionen durch Intrusion interessanter sind sind und zuerst ermittelbar gemacht werden sollten.
 
@@ -124,10 +118,64 @@ Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser
 
 \subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
 \label{sec:gjk}
-GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1| | k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-blog}.\\
-Im Folgenden wird Die Urquelle \cite{gjk} gibt den Algorithmus im mathematischen Kontext an. Die Umwandlung der Mathematik in eine gute Maschinenimplementierung wird nicht als trivial eingeschätzt. Es fehlen die nötigen Erfahrungswerte mit dem Algorithmus. Es werden daher weitere Quellen mit praktischem Fokus zu Rate gezogen, um die Implementierung umzusetzen \cite{gjk-blog}\cite{gjk_vid}.
-Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ \cite[p.195]{gjk} ausgenutzt werden, von der die Relevanten wie folgt lauten:\\
-Sei $O = (0,0,0)$ der Koordinatenursprung.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+
+\draw (-3.5,-2.5) rectangle (4.5,2.5);
+\draw[thick,->] (-3.5,-2.5) -- (4.5,-2.5) node[anchor=south east] {X};
+\draw[thick,->] (-3.5,-2.5) -- (-3.5,2.5) node[anchor=north west] {Y};
+
+
+\coordinate (O) at (0,0) ;
+\draw [below](O) node[black]{$O$};
+\draw (O) node[black]{\textbullet};
+
+\coordinate (Ta) at (3, 0);
+\coordinate (Tb) at (4, 1);
+\coordinate (Tc) at (4, -1);
+
+\draw[red] (Ta) -- node[above left]{$G_{o_1}$} (Tb) -- (Tc) -- cycle; 
+
+\coordinate (Qa) at (1, -1);
+\coordinate (Qb) at (1, 1);
+\coordinate (Qc) at (2, 1);
+\coordinate (Qd) at (2, -1);
+
+\draw[blue] (Qa) -- (Qb) -- node[above]{$G_{o_0}$} (Qc) -- (Qd) -- cycle; 
+
+\coordinate (QaTa) at (-2, -1);
+\coordinate (QbTa) at (-2, 1);
+\coordinate (QcTa) at (-1, 1);
+\coordinate (QdTa) at (-1, -1);
+\coordinate (QaTb) at (-3, -2);
+\coordinate (QbTb) at (-3, 0);
+\coordinate (QcTb) at (-2, 0);
+\coordinate (QdTb) at (-2, -2);
+\coordinate (QaTc) at (-3, 0);
+\coordinate (QbTc) at (-3, 2);
+\coordinate (QcTc) at (-2, 2);
+\coordinate (QdTc) at (-2, -0);
+
+\draw[red] (QaTa) -- (QaTb) -- (QaTc) -- cycle; 
+\draw[red] (QbTa) -- (QbTb) -- (QbTc) --  cycle; 
+\draw[red] (QcTa) -- (QcTb) -- (QcTc) -- cycle;
+\draw[red] (QdTa) -- (QdTb) -- (QdTc) -- cycle;
+
+\draw[blue] (QaTa) -- (QbTa) -- (QcTa) -- (QdTa) -- cycle; 
+\draw[blue] (QaTb) -- (QbTb) -- (QcTb) -- (QdTb) -- cycle; 
+\draw[blue] (QaTc) -- (QbTc) -- (QcTc) -- (QdTc) -- cycle; 
+
+\node at (-1.8, 1.5)[above right]{$\mathcal{M}(G_{o_0}, G_{o_1})$};
+
+\end{tikzpicture}
+\caption{Beispiel für eine Minkowski-Differenz $\mathcal{M}(G_{o_0}, G_{o_1})$ mit Ursprung $O$ und den als Mesh angegebenen Objekten $G_{o_0}$ und $G_{o_1}$.}
+\label{fig:gjk}
+\end{figure}
+GJK ist ein Algorithmus, der zwischen kompakten, konvexen Mengen $K_0, K_1 \subseteq \mathbb{R}^3$ die minimale euklidische Distanz $distance(K_0, K_1) = min\{|k_0 - k_1|~| k_0\in K_0 ; k_1 \in K_1\}$ errechnet. Er wurde 1988 publiziert \cite{gjk} und scheint heute gerne in Videospielen verwendet zu werden. Beispiele sind dabei Blizzard Entertainments Diabolo 3 \cite{gdc-physics} und Valves Half-Life 2\cite{gjk-casey}.\\
+Die Urquelle \cite{gjk} beschreibt den Algorithmus umfassend mathematisch und ist daher aus unserer Sicht initial etwas schwere Kost. Es wird daher weiteres Quellmaterial \cite{gjk-casey} mit praktischerem Fokus zu Rate gezogen, um eine Implementierung umzusetzen und den Einstieg zu erleichtern.
+Im GJK-Algorithmus sollen Eigenschaften der sogenannten Minkowski-Differenz $\mathcal{M}:\mathcal{P}(\mathbb{R}^3)^2\mapsto \mathcal{P}(\mathbb{R}^3); \mathcal{M}(K_0, K_1) = \{a - b| a\in K_0 ; b\in K_1\}$ \cite[p.195]{gjk} ausgenutzt werden. Ein Beispiel für die Minkowski-Differenz ist in Abbildung \ref{fig:gjk} zu sehen. Die hier relevanten Eigenschaften der Minkowski-Differenz lauten wie folgt:\\
 	\begin{enumerate}
 		\item Die Minkowski-Differenz zweier konvexer Körper ist ebenfalls konvex \cite[p.195]{gjk}.
 		\item $K_0 \cap K_1 \neq \emptyset \Rightarrow \exists a_o, b_o \in K_0 \cap K_1, a_0 \in K_0, b_0 \in K_1 : a_o = b_o \Rightarrow a_o - b_o = O \Rightarrow O \in \mathcal{M}(K_0, K_1)$
@@ -178,34 +226,33 @@ Es wird im Folgenden der Algorithmus beschrieben:
 	\item Initialisiere mit
 	\begin{enumerate}
 		\item Zwei konvexen (Teil-)Objekten $o_0, o_1$
-		\item ihrer diskreten Minkowski-Differenz zu einem Zeitpunkt $\mathcal{M} = \mathcal{M}(V_{o_0}, V_{o_1})$
-		\item beliebigem Startpunkt $P_0 \in \mathcal{M}_d$
-		\item der Menge von maximal 4 indizierten Simplexeckpunkten $s = \{s_0 = P_0\}$
-		\item der Suchrichtung $D = -P_0$
+		\item ihrer diskreten Minkowski-Differenz zu einem Zeitpunkt $t$: $\mathcal{M} = \mathcal{M}(V_{o_0, t}, V_{o_1, t})$
+		\item beliebigem Startpunkt $s_0 \in \mathcal{M}$
+		\item der Menge von maximal 4 indizierten Simplexeckpunkten, wobei der Startpunkt bereits ein Simplex darstellt $s = \{s_0\}$
+		\item der Suchrichtung $\vec{D} = -s_0$
 		\item der minimalen gefundene Distanz $d_{min} = \infty$
 		\item der Fähigkeit, Abstände zwischen einem Simplex und dem Ursprung zu errechnen $distance: Simplex \times \mathcal{F}^3 \mapsto \mathcal{F} ; distance({}, X) = \infty$
 	\end{enumerate}	
-	\item Finde neuen Punkt $s_{|s|}$ zur $(|s|+1)$-dimensionalen Erweiterung des Simplex den maximalen Punkt $v \in \mathcal{M}$ in der Suchrichtung $D$ über das Skalarprodukt $s_{|s|} = v \in \mathcal{M} : v \circ D = max\{D \circ v_i ; v_i \in  ßmathcal{M}\}$. Da $\mathcal{M}$ konvex, existiert dieses Maximum in jede Richtung \cite[p. 195]{gjk}.
-	\item $-s_{|s|} \circ D > 0 \Rightarrow O \notin \mathcal{M}$. Es könnte $d_{min} = distance(s, O)$ gesetzt werden. Dieser Schritt ist hauptsächlich für einen verfrühten Abbruch interessant, wenn nur ermittelt werden soll, ob ein Schnitt $K_{o_0} \cap K_{o_1} \neq \emptyset$ existiert, oder nicht.
-	\item Durch die Punkte $Simplex~s_{new} = s \cup {s_{|s|}}$ kann eine Menge von Simplices $\mathcal{P}(s_{new})$ beschrieben werden. Es soll das zum Ursprung nächste Simplex ausgewählt werden. Die Auswahl $\mathcal{P}(s_{new})$ kann weiter dadurch eingeschränkt werden, dass nur neue Simplices, die durch den neuen Punkt $s_{|s|}$ bekannt wurden überprüft werden müssen, da durch die Suche des Punkts in Suchrichtung $D$ an dieser Stelle eine Distanzverbesserung durch den neuen Punkt erwartet wird. Das Gegenereignis hierzu kann durch Konvexität von $\mathcal{M}$ und der Maximaleigenschaft der Punkte in $s$ ausgeschlossen werden, solange das nächste Simplex nicht bereits erreicht ist \cite{gjk-vid}.  Die reduzierte Menge $S_{check} \subset \mathcal{P}(s_{new}); S_{check} = \{ s \in \mathcal{P}(s_{new}) | s_{|s|} \in s \}$ wird demnach stattdessen überprüft und das neue nächste gefundene Simplex 
+	\item Finde neuen Punkt $s_{|s|}$ zur $(|s|+1)$-dimensionalen Erweiterung des Simplex den maximalen Punkt $v \in \mathcal{M}$ in der Suchrichtung $\vec{D}$ über das Skalarprodukt $s_{|s|} = v \in \mathcal{M} : \vec{v} \circ \vec{D} = max\{\vec{D} \circ \vec{v_i}| v_i \in  \mathcal{M}\}$. Da $\mathcal{M}$ konvex, existiert dieses Maximum in jede Richtung \cite[p. 195]{gjk}.
+	\item $\vec{s_{|s|}} \circ \vec{D} < 0 \Rightarrow O \notin \mathcal{M}(K_{o_0, t}, K_{o_1, t})$. Es könnte $d_{min} = distance(s, O)$ gesetzt werden. Dieser Schritt ist hauptsächlich für einen verfrühten Abbruch interessant, wenn nur ermittelt werden soll, ob ein Schnitt $K_{o_0, t} \cap K_{o_1, t} \neq \emptyset$ existiert, oder nicht.
+	\item Durch die Punkte $Simplex~s_{new} = s \cup {s_{|s|}}$ kann eine Menge von Simplices $\mathcal{P}(s_{new})$ beschrieben werden. Es soll das zum Ursprung nächste Simplex ausgewählt werden. Die Auswahl $\mathcal{P}(s_{new})$ kann weiter dadurch eingeschränkt werden, dass nur neue Simplices, die durch den neuen Punkt $s_{|s|}$ bekannt wurden überprüft werden müssen, da durch die Suche des Punkts in Suchrichtung $\vec{D}$ an dieser Stelle eine Distanzverbesserung durch den neuen Punkt erwartet wird. Das Gegenereignis hierzu kann durch Konvexität von $\mathcal{M}$ und der Maximaleigenschaft der Punkte in $s$ ausgeschlossen werden, solange das nächste Simplex nicht bereits erreicht ist \cite{gjk-casey}.  Die reduzierte Menge $S_{check} \subset \mathcal{P}(s_{new}); S_{check} = \{ s \in \mathcal{P}(s_{new}) | s_{|s|} \in s \}$ wird demnach stattdessen überprüft und das neue nächste gefundene Simplex 
 	 $s \in s_{near} : s_{near} = \{\hat{s} | distance(\hat{s}, O) = min\{distance(s', O) | s' \in s_{check}\}\}; |s| \leq |\hat{s}| \in s_{near}$
 	 ermittelt. Dabei haben die wenigerdimensionalen Simplices Vorrang bei Gleichheit.\\
-	 In der Implementierung wird das durch geometrische Raumaufteilungen realisiert. So wird beim höchstdimensionalen Simplex $\dot{s}\in s_{check}: |\dot{s}| > |\ddot{s}|; \forall \ddot{s} \in s_{check}; \dot{s}\neq\ddot{s}$ begonnen und sukzessive festgestellt, in welchem zugehörigen Raumsegement von niedrigerdimensionalen Teilsimplices $\mathcal{P}(\dot{s})$ sich der Ursprung befindet. So beispielsweise zu einer Kante $\vec{s_{|s|}v}, v\in \dot{s}$ drei Raumsegmente gegeben. Zu den Endpunkten der Kante $\bar{s_{|s|},v}$ jeweils $SEG_{v} = \{p | p \circ \vec{s_{|s|}v} > 0\}$, bzw.  $SEG_{s_{|s|}} = \{p | p \circ \vec{vs_{|s|}} > 0\}$ und für die Kante selbst $\mathbb{F}^3 \backslash (SEG_{s_{|s|}} \cup SEG_{v})$, die alle Punkte beinhaltet, zu denen ein orthogonaler Vektor zur Geraden $\bar{s_{|s|},v}$ angegeben werden kann. Dabei kann die Überprüfung von $SEG_v$ ausgeschlossen werden, da $\{v\} \notin s_{check}$.
-	 Die Zugehörigkeit des Ursprungs zu einem Segment kann durch Skalar- und Kreuzprodukte festgestellt werden. Genauere Angaben, sowie die Umsetzung von anderen Arten von Simlices (z.B. Dreiecke) behandelt die Quelle \cite{gjk-vid} ausführlicher.
+	 In der Implementierung wird das durch geometrische Raumaufteilungen realisiert. So wird beim höchstdimensionalen Simplex $\dot{s}\in s_{check}: |\dot{s}| > |\ddot{s}|; \forall \ddot{s} \in s_{check}; \dot{s}\neq\ddot{s}$ begonnen und sukzessive festgestellt, in welchem zugehörigen Raumsegement von niedrigerdimensionalen Teilsimplices $\mathcal{P}(\dot{s})$ sich der Ursprung befindet. So beispielsweise zu einer Kante $\vec{s_{|s|}v}, v\in \dot{s}$ drei Raumsegmente gegeben. Zu den Endpunkten der Kante $\overline{s_{|s|},v}$ jeweils $SEG_{v} = \{p | p \circ \vec{s_{|s|}v} > 0\}$, bzw.  $SEG_{s_{|s|}} = \{p | p \circ \vec{vs_{|s|}} > 0\}$ und für die Kante selbst $\mathbb{F}^3 \backslash (SEG_{s_{|s|}} \cup SEG_{v})$, die alle Punkte beinhaltet, zu denen ein orthogonaler Vektor zur Geraden $\overline{s_{|s|},v}$ angegeben werden kann. Dabei kann die Überprüfung von $SEG_v$ ausgeschlossen werden, da $\{v\} \notin s_{check}$.
+	 Die Zugehörigkeit des Ursprungs zu einem Segment kann durch Skalar- und Kreuzprodukte festgestellt werden. Genauere Angaben, sowie die Umsetzung von anderen Arten von Simlices (z.B. Dreiecke) behandelt die Quelle \cite{gjk-casey} ausführlicher.
 	\item Falls keine kleineren Distanz gefunden wurde, ist das nächste Simplex zum Ursprung gefunden. $d_{min} \leq distance(s, O) \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}$ (\textbf{RETURN})
 	\item Ist das nächste Simplex ein Tetraeder $|s| = 4 \Rightarrow O \in K_s \Rightarrow distance(\mathcal{M}, O) = 0$ (\textbf{RETURN})
 	\item $d_{min} = distance(s, O)$
-	\item Die neue Suchrichtung $D = D_{new}(s)$ wird orthogonal zum Simplex $s$ in Richtung des Ursprungs festgelegt. Die konkrete Berechnung hängt dabei von $|V'|$ ab. Ein Beispiel ist: $|s| = 2 \Rightarrow D(s) = (b-a)\times (O-a)\times (b-a);  \{a, b\} = s$, mit $\times$ als Kreuzprodukt zweier Vektoren.
+	\item Die neue Suchrichtung $\vec{D} = D_{new}(s)$ wird orthogonal zum Simplex $s$ in Richtung des Ursprungs festgelegt. Die konkrete Berechnung hängt dabei von $|V'|$ ab. Ein Beispiel ist: $|s| = 2 \Rightarrow D_{new}(s) = (b-a)\times (O-a)\times (b-a);  \{a, b\} = s$, mit $\times$ als Kreuzprodukt zweier Vektoren.
 	\item Wiederhole ab 2.
 \end{enumerate}
 Rückgabewerte sind immer $d_{min}$ \& $s$.
 Es werden Implementierungsspezifika und aufgetretene Probleme geschildert:\\
 \begin{enumerate}
 \item Für die Berechnung von Minkowski-Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ wurde ein Generator implementiert, der zum Minkowski-Punkt die Indices der Verwendeten Eckpunkte der Ursprungsmodelle $V_{o_0}$ und $V_{o_1}$ mitführt. Damit können durch den Erhalt des nächsten Simpex $s$ die Beteiligten Merkmale/Simplices and den Ursprungsobjekten ermittelt werden.
-\item Die Quelle \cite{gjk-vid} ist zunächst primär für die Struktur des Implementierungsversuchs. Die dort gezeigte Implementierung funktioniert angeblich alleinig auf Basis der Abbruchkriterien in 3.~(verfrühter Abbruch) und 6.~ ohne 5..
+\item Die Quelle \cite{gjk-casey} ist zunächst primär für die Struktur des Implementierungsversuchs. Die dort gezeigte Implementierung funktioniert angeblich alleinig auf Basis der Abbruchkriterien in 3.~(verfrühter Abbruch) und 6.~ ohne 5..
 Die Grafik \ref{fig:why_criteria} zeigt dabei einen Widerspruch, dass das vorgeschlagene Abbruchkriterien in 3. und 6. nicht ausreicht um ein nächstes Simplex zum Ursprung zu erreichen und die minimale Distanz zu ermitteln.\\
-Dort zu sehen ist das schwarze Dreieck $\Delta ABC$ und der grüne Ursprung $O$. Angenommen der Algorithmus beginnt an Punkt $B$ und sucht in Richtung des Ursprungs $D = \vec{BO} = -\vec{B}$ so wird als nächster Simplexeckpunkt $s_{|s|} = A$ gewählt und somit $s_{new} = \bar{BA}$ gefunden. Das Abbruchkriterium prüft nun, ob der Ursprung noch hinter diesem maximalen Punkt in der Suchrichtung läge, was durch $ -\vec{A} \circ -\vec{B} > 0$ festgestellt wird. In dem in der Grafik gezeigten Szenario führte dies zum Abbruch. Das gefundene Simplex $\bar{AB}$ ist jedoch nicht das nächste am Ursprung. Das ist stattdessen die Linie $\bar{AC}$.\\
-Unter Umständen ist es die undokumentierte Intention der Quelle \cite{gjk-vid} nur eine Implementierung zu liefern, die keine minimale Distanz oder nächste Simplices ermittelt, sondern nur ob ein Schnitt existiert, oder nicht. Die Ausschreibungen der Quelle als Implementierung des GJK-Algorithmus ist daher etwas irreführend, erleichterte jedoch den Einstieg in die Materie.
+Unter Umständen ist es die undokumentierte Intention der Quelle \cite{gjk-casey} nur eine Implementierung zu liefern, die keine minimale Distanz oder nächste Simplices ermittelt, sondern nur ob ein Schnitt existiert, oder nicht. Die Ausschreibungen der Quelle als Implementierung des GJK-Algorithmus ist daher etwas irreführend, erleichterte jedoch den Einstieg in die Materie.
 \item Die ungenügende Implementierung wurde daraufhin auf die Anforderungen von Distanz- und Simplexfindung unter Zuhilfenahme von Quelle \cite{gjk} angepasst.
 Bei der Anpassung wurde zunächst mit Abbruchkriterien experimentiert um den im Schritt 4.~gezeigten Brute-Force-Aufwand der minimalen Distanzberechnungen zu vermeiden. Vorschläge sind:
 \begin{enumerate}
@@ -213,29 +260,92 @@ Bei der Anpassung wurde zunächst mit Abbruchkriterien experimentiert um den im 
 	\item Statt Schritt 5.:
 	 $$s_{|s|} \in s \Rightarrow distance(K_{o_0}, K_{o_1}) = distance(s, O) = d_{min}\text{(\textbf{RETURN})}$$ 
 	 Neue Simplexpunkte $s_{|s|}$ sind nach Schritt 2.~ maximal in einer Suchrichtung $D$, die in Richtung des Ursprungs liegt. Ist das nächste Merkmal erreicht, so wird nach Schritt 4.~in eine Richtung gesucht, deren maximale Punkte bereits bekannt sein müssen. Daher ist ein mögliches Abbruchkriterium: Abbruch beim finden eines Support-Punktes, der bereits bekannt ist. $\mathcal{O}(3)$, da in Schritt 4.~immer gilt $|s|\leq 3$ und Suchrichtungen $D$ immer orthogonal gewählt werden.
-	\item Durch den neuen Punkt $s_{|s|}$ gezogene Kantenvektoren $\vec{s_{|s|}v}, v\in s$ sollen eine klare Erweiterung in Suchrichtung $D$ darstellen, was durch $D \circ \vec{s_{|s|}v} < 0$ ermittelbar ist. Diese Kriterium soll nur dann geprüft werden, wenn durch Schritt 3. bereits ermittelt wurde, dass der Ursprung außerhalb des Suchkörpers liegt und die Punkte in $s$ bereits auf der Seite des Suchkörpers liegen, an der sich der Ursprung angrenzt.
+	\item Durch den neuen Punkt $s_{|s|}$ gezogene Kantenvektoren $\vec{s_{|s|}v}, v\in s$ sollen eine klare Erweiterung in Suchrichtung $\vec{D}$ darstellen, was durch $\vec{D} \circ \vec{s_{|s|}v} < 0$ ermittelbar ist. Diese Kriterium soll nur dann geprüft werden, wenn durch Schritt 3. bereits ermittelt wurde, dass der Ursprung außerhalb des Suchkörpers liegt und die Punkte in $s$ bereits auf der Seite des Suchkörpers liegen, an der sich der Ursprung angrenzt.
 \end{enumerate}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.6\textwidth]{./res/why_criteria.png}
-	\caption{Szenario, in dem das gezeigte Abbruchskriterium nicht am nähesten Merkmal zum Ursprung stoppt.}
+	\begin{tikzpicture}
+	\draw (-3.5,-1.5) rectangle (0.5,1.5);
+	\draw[thick,->] (-3.5,-1.5) -- (0.5,-1.5) node[anchor=south east] {X};
+	\draw[thick,->] (-3.5,-1.5) -- (-3.5,1.5) node[anchor=north west] {Y};
+
+	\coordinate (A) at (-1,1);
+	\coordinate (B) at (-3,0);
+	\coordinate (C) at (-2,-1);
+	\coordinate (O) at (0,0);
+
+	\draw [red] (B) node[black, above left]{$s_0$} -- (A) node[black, above]{$s_{|s|}$};
+	\draw [green] (A) -- (C)  node[black, below]{$C$};
+	\draw (C) -- (B);
+	\draw [thick, ->] (-3,0) -- (0,0) node [near end,fill=white]{$\vec{D}$} node [below] {$O$};
+	\draw [thick, blue, ->] (O) -- (A);
+	\end{tikzpicture}
+	\caption{Szenario für fehlerhaftes Abbruchkriterium aus \cite{gjk-casey} nicht am nächsten Merkmal zum Ursprung stoppt. Startpunkt $s_0$, maximaler Punkt in $\vec{D}$ ist $s_{|s|}$, stopp nach Schritt 3. mit (rot) $s_{new} = \{s_o, s_{|s|}\}$, da (blauer) Vektor $\vec{s_{|s|}}\circ\vec{D} < 0$. Tatsächliches nächstes Simplex zu $O$ ist aber (grün) $\overline{s_{|s|}C}$.}
 	\label{fig:why_criteria}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.6\textwidth]{./res/parallel_features.png}
-	\caption{Szenario, in dem das gezeigte Abbruchskriterium nicht am nähesten Merkmal zum Ursprung stoppt.}
+	\begin{tikzpicture}
+
+
+
+\draw (-5.5,-1.5) rectangle (3,2);
+\draw[thick,->] (-5.5,-1.5) -- (3,-1.5) node[anchor=south east] {X};
+\draw[thick,->] (-5.5,-1.5) -- (-5.5,2) node[anchor=north west] {Y};
+
+\coordinate (VOaa) at (1,-0.5);
+\coordinate (VOab) at (1,0.5);
+\coordinate (VOba) at (2,-0.5);
+\coordinate (VObb) at (2,0.5);
+
+\coordinate (O) at (0,0);
+
+\coordinate (A) at (-1,0);
+\coordinate (B) at (-1,1);
+\coordinate (C) at (-1,-1);
+
+\draw [below](O) node[black]{$O$};
+\draw (VOaa) -- (VOab);
+\draw (VOba) -- (VObb);
+\draw [red] (A) -- (B) -- (C);
+
+\node at (O) {\textbullet};
+\node at (A) {\textbullet};
+\node at (B) {\textbullet};
+\node at (C) {\textbullet};
+\node at (VOaa) {\textbullet};
+\node at (VOab) {\textbullet};
+\node at (VOba) {\textbullet};
+\node at (VObb) {\textbullet};
+
+\node at (VOab)[above] {$K_{o_0}$};
+\node at (VObb)[above] {$K_{o_1}$};
+
+\node at (VOaa) [right]{$x_0$};
+\node at (VOab) [right]{$x_1$};
+\node at (VOba) [right]{$y_0$};
+\node at (VObb) [right]{$y_1$};
+
+\node at (B) [above, red]{$\mathcal{M}(K_{o_0}, K_{o_1})$};
+
+
+\node at (B) [left]{$z_0=x_0-y_0$};
+\node at (A) [left]{$z_1=x_0-y_1, z_2=x_1-y_0$};
+\node at (C) [left]{$z_3=x_1-y_1$};
+
+\end{tikzpicture}
+	\caption{Minkowski-Differenz (rot) $\mathcal{M}(K_{o_0}, K_{o_1})$ mit markierten Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ mit mehreren nächsten Simplices $\{ \{z_1\},\{z_2\},\{z_0, z_3\},\{z_0,z_1\},\{z_1,z_2\}, ...\}$ zum Ursprung, sogar inklusive zweier deckungsgleicher 1D Simplices mit kleinster Dimensionalität 1.}
 	\label{fig:parfeat}
 \end{figure}
 
 Bei Versuchen mit den Abbruchkriterien (b) und (c) konvergierte der Algorithmus regelmäßig nicht. Es wurden falsche Annahmen getroffen:
 \begin{enumerate}
 \item Das nächste Simplex zum Ursprung ist eindeutig.\\
-Die Minkowski-Summe produziert keine Hüllenobjekte, nur konvexe Vertex-Meshes. Es können daraus mehrere nächste Simplices zum Ursprung generiert werden, wie die Abbildung \cite{fig:parfeat} zeigt. Das Problem kann dann auftreten, wenn Simplices in (denselben oder gepaarten) Ursprungsmerkmalen komplanar sind.
+Die Minkowski-Summe produziert keine Hüllenobjekte, nur konvexe Vertex-Meshes. Es können daraus mehrere nächste Simplices zum Ursprung generiert werden, wie die Abbildung \ref{fig:parfeat} zeigt. Das Problem kann dann auftreten, wenn Simplices in (denselben oder gepaarten) Ursprungsmerkmalen komplanar sind.
 \item Verwendete Funktionen sind ausreichend genau.\\
-Theoretisch sollten komplanare Merkmale dieselbe neue Suchrichtung $D$ in Schritt 8.~erzeugen. Neue Punkte $s_{|s|}$ sind dabei dann eindeutig (maximales Skalarprodukt im Konvexen). Das scheint durch Berechnungsungenauigkeiten, insbesondere im Kreuzprodukt, nicht der Fall zu sein. 
+Theoretisch sollten komplanare Merkmale dieselbe neue Suchrichtung $\vec{D}$ in Schritt 8.~erzeugen. Der neue Punkt $s_{|s|}$ ist dabei dann eindeutig (maximales Skalarprodukt im Konvexen). Das scheint durch Berechnungsungenauigkeiten, insbesondere im Kreuzprodukt, nicht der Fall zu sein. 
 \end{enumerate}
 
 Die Uneindeutigkeit der nächsten Simplices und Berechnungsungenauigkeiten führten im Algorithmus zu wiederholt denselben Belegungen von $s$ und somit zu Endlosschleifen.\\
@@ -249,7 +359,7 @@ Es sind prinzipiell viele Wurzelsuchverfahren bekannt. Viele werden jedoch durch
 
 
 Vor allem im Falle von rotierenden Objekten werden Hürden ersichtlich:
-Bei Rotierenden Objekten nimmt die Distanzfunktion die Form einer Schwingung an, wodurch das Nyquist-Shannon-Abtasttheorem gilt. Die korrekte Ermittlung der Erstkollision im Rahmen eines Ticks kann durch Aliasing besonders bei schnellen Rotationen prinzipiell verhindert werden. Es gilt also auch bei diesem Verfahren eine Einschränkung der Rotationsgeschwindigkeit oder Verlust des 100\%-igen Erfolgs des Verfahren. Es bestätigt sich hier wieder die bereits in Abschnitt~\ref{sec:linear_int} gemachte Einschätzung von Rotation als limitierenden Faktor. Anders als bei der linearen Interpolation kann bei diesem Verfahren jedoch besser auf die Limitation eingegangen werden. Unter Einbeziehung weiterer Information der kollidierenden Objekte, z.B. Rotationsgeschwindigkeit, Varianz können Wurzelsuchverfahren ausgewählt und ihre Parameter angepasst werden.\\
+Bei Rotierenden Objekten nimmt die Distanzfunktion die Form einer Schwingung an, wodurch das Nyquist-Shannon-Abtasttheorem gilt. Die korrekte Ermittlung der Erstkollision im Rahmen eines Ticks kann durch Aliasing besonders bei schnellen Rotationen prinzipiell verhindert werden. Es gilt also auch bei diesem Verfahren eine Einschränkung der Rotationsgeschwindigkeit oder Verlust des 100\%-igen Erfolgs des Verfahrens. Es bestätigt sich hier wieder die bereits in Abschnitt~\ref{sec:linear_int} gemachte Einschätzung von Rotation als limitierenden Faktor. Anders als bei der linearen Interpolation kann bei diesem Verfahren jedoch besser auf die Limitation eingegangen werden. Unter Einbeziehung weiterer Information der kollidierenden Objekte, z.B. Rotationsgeschwindigkeit, Varianz können Wurzelsuchverfahren ausgewählt und ihre Parameter angepasst werden.\\
 Es wurde ein Verfahren implementiert, welches zunächst mit einer einstellbaren Abtastrate $r_{sample}$  pro Ticks nach einer Distanz $= 0$ sucht. Das erste zeitliche Auftreten eines solchen Ereignisses wird dann weiter zur Bisektion des durch Samples eingegrenzten Zeitabschnitts verwendet, um den bei der Intrusion geforderten Zeitpunkt mit einer bestimmten Genauigkeit $\epsilon_t$ festzustellen.\\
 
 Die Komplexität des Verfahrens hängt von den Komplexitäten der Teilalgorithmen ab:
@@ -288,5 +398,6 @@ Unter diesen Umständen sollte GJK die lineare Interpolation auch in deren einge
 \end{itemize}
 $$\mathcal{O}(1*1*4* r_{sample} + \log_{2}(\frac{(t_{\omega} - t_\alpha)}{r_{sample}\epsilon_t}*(\log(|V_{o_0}|)+log(|V_{o_1}|))) < \mathcal{O}(|V_{o0}|* |A_{o1}| + |V_{o1}|*|A_{o0}| + |E_{o0}| * |E_{o1}|)$$
 
+Der GJK ist theoretisch für $m\in\mathbb{N}$ Dimensionen definiert \cite{gjk}. Durch die Behandlung von Objekten während eines Ticks als 4-dimensionale kompakte Menge $\bigcup_{t \in \Upsilon_{\delta_i}} K_{o,t}$ könnte der zeitunabhängige Schnitt ermittelt werden um entsprechend vorzufiltern. Besonders im Kontext linearer Bewegungen als Vorfilterung zur linearen Interpolation wäre die Ermittlung der 4D Modelle für den vorgeschalteten GJK einfach $V_{o, t_0} \cup V_{o, t_1}$, also der Aufwand einer einzigen Transformation pro Objekt.\\
+
 Hinsichtlich der Optimierungsmöglichkeiten mag sich weiterer Zeitaufwand daher durchaus lohnen.\\
-Der GJK ist theoretisch für $m\in\mathbb{N}$ Dimensionen definiert \cite{gjk}. Durch die Behandlung von Objekten während eines Ticks als 4-dimensionale kompakte Menge $\bigcup_{t \in \Upsilon_{\delta_i}} K_{o,t}$ könnte der zeitunabhängige Schnitt ermittelt werden um entsprechend vorzufiltern. Besonders im Kontext linearer Bewegungen als Vorfilterung zur linearen Interpolation wäre die Ermittlung der 4D Modelle für den vorgeschalteten GJK einfach $V_{o, t_0} \cup V_{o, t_1}$, also der Aufwand einer einzigen Transformation pro Objekt.
