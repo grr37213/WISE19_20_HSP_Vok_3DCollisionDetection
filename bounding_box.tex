@@ -1,4 +1,4 @@
-Ein Bounding-Volume zu einem Objekt $o$ ist eine kompakte Menge $B_o \supset K_{o}$. $B_o$ kann als Hitbox fungieren.\\
+Ein Bounding-Volume zu einem Objekt $o$ ist eine kompakte Menge $B_o \supseteq K_{o}$. $B_o$ kann als Hitbox fungieren.\\
 Eine Bounding-Box ist ein spezielles Bounding-Volume in Form eines Quaders.\\
 Eine in diesem Projekt extensiv verwendete, tiefere Spezialform der Bounding-Box ist die Axis-Alligned-Bounding-Box (AABB). Alle Kanten dieser Bounding-Box sind achsenparallel zu den Koordinatenachsen $\{(1,0,0), (0,1,0), (0,0,1)\}$ des 3D-Koordinatensystems.\\
 Hier relevante Eigenschaften dieser sind:
@@ -14,7 +14,7 @@ Hier relevante Eigenschaften dieser sind:
 		 \{meter((x_{min} + x * (x_{max} - x_{min}), y_{min} + y * (y_{max} - y_{min}),\\
 		  z_{min} + z * (z_{max} - z_{min}))| x, y, z \in [0,1] \} 
 		 \end{align*}
-		 ist dann ein Bounding-Volume $\mathcal{AABB}(AABB_o) \supset K_o$
+		 ist dann ein Bounding-Volume $\mathcal{AABB}(AABB_o) \supseteq K_o$
 	\item Ermittlung einer minimalen AABB für ein Objekt durch Suche der Minima und Maxima der Ausdehnung eines Objektes in jeder Koordinatenachse:
 	 $x_{min} = x : (x, y, z) \in V_o , \forall (x', y', z') \in V_o: x \leq x'; y \& z, min \& max $ analog.
 	 Die Findung dieser Werte ist in $ \mathcal{O}(|V_o|) $.
