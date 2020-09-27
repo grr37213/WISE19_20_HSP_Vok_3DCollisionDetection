@@ -116,7 +116,7 @@ Eine Idee ist die Suche nach einem Zeitpunkt vor der Überschneidung, durch beis
 
 Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser annehmen.
 
-\subsubsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
+\subsection{Gilbert-Johnson-Keerthi-Distanzalgorithmus (GJK)}
 \label{sec:gjk}
 
 \begin{figure}
@@ -202,14 +202,7 @@ Für die in dieser Projektarbeit verwendeten Testzwecke erscheint der Aufwand de
 Die konvexe Partitionierung des Objektes $o$ wird daher manuell und explizit bei Modellen durch die Angabe von Mengen von Indices von zueinander konvexen Eckpunkten $P_o := \{P_0, ...\}; P_i \subseteq V_o$ angegeben.
 Zusätzlich ist die Äquivalenz zur kompakten Punktemenge $K_o$ gefordert. Diese ist nun implizit durch die Konvexität gegeben. $K_o$ ist konvex, wenn gilt $\forall p_0, p_1 \in K_o, \forall x \in [0,1] : p0 + x * (p_1 - p0) \in K_o $. In Mesh-Repräsentation $G_o$ sind nicht alle diese Punkte enthalten. Jedoch, wenn $K_o$ konvex so sind die Hüllen $\mathcal{H}(K_o) = \mathcal{G_o}$ ebenfalls konvex. Alle Punkte $K_o \backslash G_o$ können so durch die Konvexitätsdefinition impliziert werden. Die zusätzlich mit der Objektrepräsentation mitgelieferte Partitionierung erweitert also die verfügbare Information und schafft in dieser Hinsicht Äquivalenz zwischen Polygon-Meshes und kompakten Mengen und die Unterscheidung von Innen und Außen. Informationen zu verbundenen Ecken einer Polygon-Mesh $I_o$ werden dadurch in diesem Kontext ebenfalls redundant. Der Algorithmus kann demnach außschließlich unter Einbeziehung von Eckpunkten $V_o$ verfahren.\\
 Durch die Feststellung der Äquivalenz wurde ermittelt, dass eine Variante des GJK-Algorithmus auch an Polygon-Meshes durchgeführt werden kann.\\
-Es kann also eine Diskretion/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $V_o$  verwendet werden, was vorteilhafte Iterationslängen im Algorithmus zur Folge hat ($V_o \ll G_o \ll K_o$).
-
-%%TODO refactor and actually provide the images
-Eine Illustation einer diskreten Minkowski-Differenz ist in den Abbildungen \ref{fig:minkov_col}, \ref{fig:minkov_col_solo} und \ref{fig:minkov_noncol}zu sehen. Zu sehen sind, in Rot und Blau, die 2 Objekte, welche sich in \ref{fig:minkov_col} überschneiden und in \ref{fig:minkov_noncol} nicht. Die Gebilde, deren Ecken grün sind und deren Kanten rot und blau sind sind die jeweiligen Minkowski-Differenzen.
-Die grünen Punkte sind alle Punkte, die durch die Anwendung der Minkowski-Differenz auf die Menge der Eckpunkte beider Körper ermittelbar sind.\\
-Die Kanten sind rot oder blau, je nachdem von welchem Ursprungskörper eine Kante Einfluss erhält. So ist die Beteiligung beider Körper an der Differenz besser zu erkennen. Theoretisch sind auch die Kanten zwischen jedem Punktepaar mit gemischten Einflüssen der beiden Ursprungsobjekte darstellbar, welche aus Darstellungsgründen nicht in der Grafik enthalten sind. Isoliert steht in Abbildung \ref{fig:minkov_col_solo} die Minkowski-Differenz aus Abbildung \ref{fig:minkov_col}.\\
-
-
+Es kann also eine Diskretion/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $V_o$  verwendet werden, was vorteilhafte Iterationslängen im Algorithmus zur Folge hat ($V_o \ll G_o \ll K_o$).\\
 Eigenschaften der Minkowski-Differenz müssen den Umstand der Diskretion respektierend ausgenutzt werden.\\
 
 \begin{enumerate}
@@ -381,7 +374,7 @@ Insgesamt entsteht in diesem Projekt die Komplexität
 $$\mathcal{O}(|P_{o_0}|*|P_{o_1}| * r_{sample} + \log_{2}(\frac{(t_1 - t_0)}{r_{sample}\epsilon_t} * |V_{o_0}|*|V_{o_1}| )$$
 
 
-\subsubsection{Vergleiche, Fazit \& Ausblick}
+\subsection{Vergleiche, Fazit \& Ausblick}
 Die hier vorgestellten Verfahren der linearen Interpolation und GJK erreichen sehr Unterschiedliche Ziele mit unterschiedlichen Voraussetzungen und lassen sich daher nur schlecht vergleichen.\\
 Das vermehrte Potential zur Optimierung wird in GJK gesehen.
 Beispiele/Experimente für Optimierungen des GJK im Ausblick:
