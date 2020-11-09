@@ -10,25 +10,26 @@ Objektpaare setzen sich aus 2 Objekten verschiedener Klassen zusammen (z.B. Proj
 In jeder Kategorie können mehrere Interaktionstypen enthalten sein. Jeder Typ wird hier einzeln betrachtet und ihm kann so ein eigener Vorfilterungsalgorithmus zugewiesen werden, der entsprechend zugeschnitten und problemspezifisch optimiert werden kann.
 Die Aufgabe des Vorfilterungsalgorithmus unterscheidet sich je nach Kategorie der Interaktion etwas:
 \begin{enumerate}
-\item Symmetrische Interaktionen: Aus Menge aus n Objekten werden alle diejenigen //TODO Mathe Format (maximal n²) Objektpaare ausgewählt, deren AABBs sich überschneiden (ein beliebiges der beiden Objekte muss dann über die Interaktion mit dem Partner informiert werden). Als untere Schranke kann man Omega(n+i) angeben, wobei i die Anzahl der tatsächlichen Überschneidungen ist. Die obere Schranke O(n²) erhält man durch naives Ausprobieren jeder Kombination.
-\item Asymmetrische Interaktionen: Aus 2 Mengen von m und s Objekten werden alle diejenigen Objektpaare mit jeweils einem Mitglied aus jeder Menge ausgewählt, deren AABBs sich überschneiden (das Objekt der Master-Klasse muss dann über seine Inkteraktion mit dem Partner aus der Slave-Klasse informiert werden). Als untere Schranke kann man Omega(m+s+i) angeben. Die obere Schranke O(m*s) erhält man durch naives Ausprobieren jeder Kombination.
+\item Symmetrische Interaktionen: Aus einer Menge von $n$ Objekten werden alle diejenigen (maximal $n^2$) Objektpaare ausgewählt, deren AABBs sich überschneiden (ein beliebiges der beiden Objekte muss dann über die Interaktion mit dem Partner informiert werden). Als untere Schranke kann man $\Omega (n+i)$ angeben, wobei $i$ die Anzahl der tatsächlichen Überschneidungen ist. Die obere Schranke $mathcal{O}(n^2)$ erhält man durch naives Ausprobieren jeder Kombination.
+\item Asymmetrische Interaktionen: Aus 2 Mengen von $m$ und $s$ Objekten werden alle diejenigen Objektpaare mit jeweils einem Mitglied aus jeder Menge ausgewählt, deren AABBs sich überschneiden (das Objekt der Master-Klasse muss dann über seine Inkteraktion mit dem Partner aus der Slave-Klasse informiert werden). Als untere Schranke kann man $\Omega(m+s+i)$ angeben. Die obere Schranke $mathcal{O}(m*s)$ erhält man durch naives Ausprobieren jeder Kombination.
 \end{enumerate}
 
 Für die Laufzeit bei praktischen Problemen sei angemerkt, dass die Konstante oft eben so wichtig zu betrachten ist wie die asymptotische Komplexität. \\
 
 Im folgenden werden 2 Algorithmen, die im Rahmen des Projekts implementiert wurden, näher beschrieben.
 
-//TODO format
-1. Boxsort
-//TODO
-Bei Boxsort //TODO litref wird eine binäre Baumstruktur aufgebaut, in der anschließend nach einem Raumbereich (einer AABB, der query box QB) gesucht werden kann, sodass alle damit überlappenden einsortierten AABBs gefunden werden. Aufgrund der Mehrdimensionalität und dem Einsortieren von Bereichen statt Punkten müssen erhebliche Änderungen an der Baum-Datenstruktur vorgenommen werden.\\
+
+\subsection{Box Sort}
+\label{sec:boxsort}
+//TODO boxsort box sort einheitlich\\
+Bei Box sort \cite{houthuys1987box} wird eine binäre Baumstruktur aufgebaut, in der anschließend nach einem Raumbereich (einer AABB, der query box QB) gesucht werden kann, sodass alle damit überlappenden einsortierten AABBs gefunden werden. Aufgrund der Mehrdimensionalität und dem Einsortieren von Bereichen statt Punkten müssen erhebliche Änderungen an der Baum-Datenstruktur vorgenommen werden.\\
 Ein Knoten enthält genau eine einsortierte AABB. Als Sortierschlüssel wird dort das niedrige Ende der einsortierten AABB in einer bestimmten Dimension gewählt, es gilt also //TODO Mathe key aus S. Ist das obere Ende der QB in dieser Dimension kleiner als der Schlüssel, kann die höhere Baumhälfte ausgeschlossen werden und muss nicht mehr durchsucht werden. Die Sortierdimension ist hier für jeden Knoten individuell wählbar.\\
 Um die untere Baumhälfte ausschließen zu können, müssen jedoch weitere Informationen vorliegen. Da die maximale Ausdehnung nach oben in der vorher festgelegten Koordinate nicht durch den Knoten festgelegt werden kann, muss jeder Knoten, der darunter liegt, berücksichtigt werden und der Maximalwert aller ermittelt werden. Dieser wird nach vollständigem Baumaufbau dann im Knoten vermerkt.\\
 Wird zu beiden Teilbäumen auch der jeweils andere Extremwert gespeichert, entsteht eine 1-Dimensionale AABB und beide Teilbäume können identisch behandelt werden. Dann kann für jeden individuell ein Überlappungstest bestimmen, ob sich QB mit dem Teilbaum überschneidet. So können unter bestimmten Umständen sogar beide Teilbäume ausgeschlossen werden. Ein Beispiel dafür sieht man in Abb.~\ref{fig:boxsortNode}.\\
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{./res/BoxsortNode.png}
+    \includegraphics[width=0.8\textwidth]{./res/BoxsortNode.png}
     \caption{2D-Beispiel für einen Knoten im Suchbaum. Relevant für die Sortierung ist bei diesem Knoten die x-Achse. Die Teilbäume werden nicht gezeigt, die darin enthaltenen AABBs werden in dunkelgrau nebeneinander dargestellt. Query Boxes sind oben in gelb dargestellt.}
     \label{fig:boxsortNode}
 \end{figure}
@@ -36,11 +37,11 @@ Wird zu beiden Teilbäumen auch der jeweils andere Extremwert gespeichert, entst
 Man sieht in Abb.~\ref{fig:boxsortNode}, dass QB1 sich komplett links der Bereiche der beiden Teilbäume befindet. Der Suchlauf endet für QB1 somit direkt bei dem dargestellten Knoten. Auch QB2 überschneidet sich mit keinem Bereich der Teilbäume, aber der Grund dafür ist diesmal die Lage in der Mitte von beiden. Solch eine Lage muss im Allgemeinen nicht zwangsläufig existieren, denn die Bereiche der beiden Teilbäume können auch überlappen. QB3 hingegen überlappt mit dem rechten Teilbaum. Für die Suche scheidet also nur der linke Teilbaum aus. Sie wird im rechten Teilbaum rekursiv fortgesetzt. Man kann auch query boxes konstruieren, sodass eine Überlappung mit beiden Teilbäumen auftritt. Dann muss die Suche in beiden rekursiv fortgesetzt werden.\\
 Der eigentliche Sortiervorgang zum Aufbau des Baums findet mit einer modifizierten Quicksort-Variante statt. Dabei wird das Pivot-Element zum Knoten und die restlichen Elemente werden entsprechend des Schlüssels in den beiden Teilbäumen zugeteilt. Bei der Zuteilung wird nebenbei die 1D-AABB des Teilbaums ermittelt, indem die Ausdehnung bei jedem Zuteilungsschritt ggf. vergrößert wird, um das aktuelle Element zu berücksichtigen.\\
 Als Heuristik für das Finden des Pivot-Elements wird der Median einer zufälligen Auswahl von bis zu 9 Elementen gewählt. Die Sortierdimension wird an der Wurzel auf die x-Achse festgelegt. Beim Einsortieren in die beiden Teilbäume wird eine Heuristik berechnet, die im jeweiligen Teilbaum die beste Sortierdimension abschätzt. Dafür wird für jede Dimension die durchschnittliche Größe der Objekte in dieser Dimension berechnet. Damit kann man die Dichte der Objekte in jeder Dimension abschätzen, wenn man den Gesamtbereich kennt, den die AABBs einnehmen. Gewählt wird die niedrigste Dichte.\\
-Im Gegensatz zum in //TODO ref beschriebenen Spatial Hashing müssen für den Boxsort-Algorithmus vor dem Start erst alle Objekte gesammelt werden. Im asymmetrischen Fall muss dann entschieden werden, aus welcher Menge der Objekte der Baum aufgebaut wird. Für den Benutzer stehen hier mehrere Modi zur Verfügung. Zur Auswahl stehen unter anderem die Möglichkeiten, die Anzahl der Elemente je Menge zu vergleichen und die größere oder kleinere zu verwenden, um den Baum aufzubauen. Der Grund dafür wird deutlich, wenn die Laufzeit im erwarteten Fall betrachtet wird. Wenn die Menge M m Elemente und die Menge N n Elemente enthält und der Baum aus N aufgebaut wird, dann ist dafür $mthcal{O}(n*log(n))$ Zeit nötig. Wenn eine ausreichende Verteilung im Raum vorliegt und die Größe von QB in der selben Größenordnung sind wie Elemente aus N ist, dann benötigt die Suche $mthcal{O}(log(n))$ Zeit //TODO Zitat Boxsort abstract. Insgesamt wird also für das Finden aller Überlappungen $mthcal{O}(n*log(n)+m*log(n))$ Zeit benötigt. Anhand dieser Form würde man vermuten, dass die Wahl immer auf M als größere Menge fallen sollte. In der Praxis ist vor den Termen $n*log(n)$ und $m*log(n)$ aber ein Vorfaktor, der nicht identisch ist. Messungen ergaben einen nahezu konstanten Vorfaktor beim Baumaufbau. Für den Abfrage-Durchlauf ist der Faktor jedoch stark abhängig von der konkreten Verteilung der eingegebenen AABBs. Messungen ergeben einen um den Faktor von ca. 3 verschiedenen Vorfaktor unter stark idealisierten Bedingungen, einen nahezu identischen unter moderaten Bedingungen und einen ca. 3-mal größeren unter erschwerten Bedingungen (Durchschnittliche Kollisionen pro Objekt>3). Den Benchmark-Ergebnissen in //TODO ref kann man jedoch entnehmen, dass wenn die beiden Mengen die gleiche Verteilung aufweisen, die Auswahl der Menge auf die Performance keinen signifikanten Einfluss hat. Um trotzdem offen für zukünftige problemspezifische Erkenntnisse zu sein, bleibt die Option, die größere oder die kleinere Menge zu wählen. Dazu kann ein Präferenz-Faktor angegeben werden, der vor der Entscheidung mit der Anzahl der Master-Elemente multipliziert wird. Als weitere Modi kann der Benutzer einstellen, dass nur eine der beiden Mengen für den Baum verwendet werden darf. Dies wird für Fälle gebraucht, wo die o.g. Bedingungen für die Komplexität der Suche im Baum nur für eine der beiden Mengen zutreffen.\\
-Im symmetrischen Fall wird jedes Objekt sowohl in den Baum einsortiert als auch als QB in dem Baum gesucht. Dabei muss die QB selbst aus den Ergebnissen wieder entfernt werden.\\
+Im Gegensatz zum in Abschnitt~\ref{sec:spatialHashing} beschriebenen Spatial Hashing müssen für den Boxsort-Algorithmus vor dem Start erst alle Objekte gesammelt werden. Im asymmetrischen Fall muss dann entschieden werden, aus welcher Menge der Objekte der Baum aufgebaut wird. Für den Benutzer stehen hier mehrere Modi zur Verfügung. Zur Auswahl stehen unter anderem die Möglichkeiten, die Anzahl der Elemente je Menge zu vergleichen und die größere oder kleinere zu verwenden, um den Baum aufzubauen. Der Grund dafür wird deutlich, wenn die Laufzeit im erwarteten Fall betrachtet wird. Wenn die Menge $M$ $m$ Elemente und die Menge $N$ $n$ Elemente enthält und der Baum aus $N$ aufgebaut wird, dann ist dafür $mathcal{O}(n*log(n))$ Zeit nötig. Wenn eine ausreichende Verteilung im Raum vorliegt und die Größe von QB in der selben Größenordnung sind wie Elemente aus $N$ ist, dann benötigt die Suche $mathcal{O}(log(n))$ Zeit \cite[//TODO]{houthuys1987box}. Insgesamt wird also für das Finden aller Überlappungen $mathcal{O}(n*log(n)+m*log(n))$ Zeit benötigt. Anhand dieser Form steht die Vermutung nahe, dass die Wahl immer auf $M$ als größere Menge fallen sollte. In der Praxis ist vor den Termen $n*log(n)$ und $m*log(n)$ aber ein Vorfaktor, der nicht identisch ist und deshalb auch beachtet werden muss. Messungen ergaben einen nahezu konstanten Vorfaktor beim Baumaufbau. Für den Abfrage-Durchlauf ist der Faktor jedoch stark abhängig von der konkreten Verteilung der eingegebenen AABBs. Messungen ergeben einen um den Faktor von ca. 3 geringeren Vorfaktor unter stark idealisierten Bedingungen, einen nahezu identischen unter moderaten Bedingungen und einen ca. 3-mal größeren unter erschwerten Bedingungen (Durchschnittliche Kollisionen pro Objekt>3). Den Benchmark-Ergebnissen in ~\ref{sec:benchmark} kann man entnehmen, dass wenn die beiden Mengen die gleiche Verteilung aufweisen die kleinere Menge meist die bessere Wahl ist, vor allem bei geringer Dichte der Objektverteilung. Um trotzdem offen für zukünftige problemspezifische Erkenntnisse zu sein, bleibt die Option, die größere oder die kleinere Menge zu wählen. Dazu kann ein Präferenz-Faktor angegeben werden, der vor der Entscheidung mit der Anzahl der Master-Elemente multipliziert wird. Als weitere Modi kann der Benutzer einstellen, dass nur eine der beiden Mengen für den Baum verwendet werden darf. Dies wird für Fälle gebraucht, wo die o.g. Bedingungen für die Komplexität der Suche im Baum nur für eine der beiden Mengen zutreffen.\\
+Im symmetrischen Fall wird jedes Objekt sowohl in den Baum einsortiert als auch als QB in dem Baum gesucht. Dabei muss die QB selbst aus den Ergebnissen wieder entfernt werden. Außerdem muss dafür gesorgt werden, dass bei einem interagierenden Objektpaar nur ein Aufruf erfolgt, obwohl beide Richtungen als Suchergebnis gefunden werden.\\
 
-//TODO format
-2. Spatial Hashing
+\subsection{Spatial Hashing}
+\label{sec:spatialHashing}
 Die Grundidee besteht hier dabei, den Raum in viele Bereiche (sog. chunks) aufzuteilen und Kollisionspaare nur innerhalb dieser Bereiche zu suchen. Sind 2 Objekte weit voneinander entfernt und somit nicht im selben chunk, ist eine Überschneidung der AABBs nicht möglich und muss deshalb auch nicht betrachtet werden. Ein Beispiel für 2 Dimensionen sieht man in Abb.~\ref{fig:spatialHashing}.
 
 \begin{figure}
@@ -50,13 +51,261 @@ Die Grundidee besteht hier dabei, den Raum in viele Bereiche (sog. chunks) aufzu
     \label{fig:spatialHashing}
 \end{figure}
 
-Man sieht in Abb.~\ref{fig:spatialHashing}, dass Objekte mit mehreren chunks überlappen können. Ein Objekt muss sich in jedem chunk anmelden, das sich mit seiner AABB überschneidet, zu sehen z.B. beim grünen Objekt, das sich in den 4 chunks rechts oben anmelden muss. Gibt es keine weiteren Objekte in den chunks, wo sich das Objekt angemeldet hat, müssen keine potentiellen Kollisionen berechnet werden. Ist dies für alle Objekte der Fall, ist die optimale Komplexität O(n) im symmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). Im asymmetrischen Fall können mehrere Objekte im selben chunk angemeldet sein, ohne dass eine Kollision auftritt, solange die Objekte alle vom selben Typ sind. In diesem Fall ist die optimale Komplexität von O(n+m) im asymmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). \\
-Werden mehrere Objekte, die für eine Kollision kompatibel sind, in einem chunk angemeldet, so müssen alle potentiellen Kollisionspaare überprüft werden (hier mit naivem //TODO Mathe O(n²) bzw. O(n*m) Algorithmus). Die Überprüfung kann entweder direkt bei der Anmeldung erfolgen (hier implementiert) oder erst nach Eintragung aller Objekte erfolgen, was die Auswahl an für die weitere Auflösung verwendbaren Algorithmen erhöht. \\
+Man sieht in Abb.~\ref{fig:spatialHashing}, dass Objekte mit mehreren chunks überlappen können. Ein Objekt muss sich in jedem chunk anmelden, das sich mit seiner AABB überschneidet, zu sehen z.B. beim grünen Objekt, das sich in den 4 chunks rechts oben anmelden muss. Gibt es keine weiteren Objekte in den chunks, wo sich das Objekt angemeldet hat, müssen keine potentiellen Kollisionen berechnet werden. Ist dies für alle Objekte der Fall, ist die optimale Komplexität $mathcal{O}(n)$ im symmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). Im asymmetrischen Fall können mehrere Objekte im selben chunk angemeldet sein, ohne dass eine Kollision auftritt, solange die Objekte alle vom selben Typ sind. In diesem Fall ist die optimale Komplexität von $mathcal{O}(n+m)$ im asymmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). \\
+Werden mehrere Objekte, die für eine Kollision kompatibel sind, in einem chunk angemeldet, so müssen alle potentiellen Kollisionspaare überprüft werden (hier mit naivem //TODO Mathe $mathcal{O}(n^2)$ bzw. $mathcal{O}(n*m)$ Algorithmus). Die Überprüfung kann entweder direkt bei der Anmeldung erfolgen (hier implementiert) oder erst nach Eintragung aller Objekte erfolgen, was die Auswahl an für die weitere Auflösung verwendbaren Algorithmen erhöhen würde. \\
 Ein potentielles Problem kann in Abb.~\ref{fig:spatialHashing} bei der Überschneidung des roten und blauen Objekts betrachtet werden. Erfolgt eine Überlappung in mehreren chunks, besteht die Gefahr der mehrfachen Behandlung von Kollisionen. Deshalb wird während der Partnerfindung ein Hashtable mit schon behandelten Objekten mitgeführt, womit effizient Duplikate vermieden werden. Auf diese Maßnahme kann verzichtet werden, wenn sich das Objekt nur in einem chunk befindet.\\
 Um das Anlegen vieler leerer chunks zu vermeiden und trotzdem schnellen Zugriff zu haben, wird ein Hashtable zur Verwaltung der chunks verwendet. Dazu wurde eine passende Hashfunktion gesucht und eingebunden, die plattformunabhängig aber dennoch mit sehr geringer Laufzeit $HASH: \mathcal{I}^3 \mapsto \mathcal{I}_{64}$ mit $\mathcal{I}_{64}$ als 64-Bit Integer einem Hashwert zuordnet. $i: (i, f)\in\mathcal{S}$
 //TODO mathe gedöhns richtig machen
-Der Idealfall für Spatial Hashing, wo es asymptotisch optimal wird, wurde oben schon beschrieben, in der Paxis tritt dies jedoch nur selten auf. Problematisch können dort z.B. große Objekte werden, denn die Anzahl chunks, wo eine Anmeldung erforderlich ist, und damit die Laufzeit, steigt dann linear mit dem Volumen. Ein weiterer Problemfall ist, wenn zu viele Objekte in einem chunk sind. Denn selbst wenn sie sich nicht überschneiden, ist dann eine //TODO O(n²) bzw. O(n*m) Auflösung erforderlich (n und m hier Anzahl Objekte im chunk). Ob dieser Algorithmus für den Einsatz sinnvoll ist, hängt also davon ab, ob diese Probleme bei dem bestimmten Interaktionstyp auftreten, wo er eingesetzt werden soll. \\
-3. Vergleich der Verfahren
+Der Idealfall für Spatial Hashing, wo es asymptotisch optimal wird, wurde oben schon beschrieben, in der Praxis tritt dies jedoch nur selten auf. Problematisch können dort z.B. große Objekte werden, denn die Anzahl chunks, wo eine Anmeldung erforderlich ist, und damit die Laufzeit, steigt dann linear mit dem Volumen. Ein weiterer Problemfall ist, wenn zu viele Objekte in einem chunk sind. Denn selbst wenn sie sich nicht überschneiden, ist dann eine $mathcal{O}(n^2)$ bzw. $mathcal{O}(n*m)$ Auflösung erforderlich ($n$ und $m$ hier Anzahl Objekte im chunk). Ob dieser Algorithmus für den Einsatz sinnvoll ist, hängt also davon ab, ob diese Probleme bei dem bestimmten Interaktionstyp auftreten, wo er eingesetzt werden soll.\\
+\subsection{Vergleich der Verfahren}
+\label{sec:benchmark}
 Um die Performance der Algorithmen bei verschiedenen Szenarien objektiv bewerten zu können, wurde im Rahmen des Projektes eine Benchmark-Umgebung implementiert. Getestet wurden verschiedene Szenarien mit verschiedenen Parametern. Gemeinsam haben alle Szenarien die Testparameter Problemgröße (Objektzahl) und absolute Größe der Objekte (aus $\mathcal{S}$).\\
-Das Standardszenario ist eine Gleichverteilung von Objekten im Raum. Ein zusätzlicher Testparameter hier ist die Dichte der Objekte, welche das Verhältnis der Durchschnittsgröße (längste Ausdehnung in einer Achse) zur Durchschnittsdistanz (der Mittelpunkte) darstellt. Die asymmetrische Variante hat zusätzlich noch das Verhältnis der Menge an Objekten beider Klassen als Testparameter.\\
-Ein weiteres rein asymmetrisches Szenario "Shotgun" modelliert eine Menge an Projektilen und Zielen. Die Ziele sind weiterhin gleichverteilt, die Projektile modellieren jedoch eine Schrotladung, bei der viele Projektile gemeinsam fliegen. Dies bedeutet, dass die AABBs sich weitgehend überlappen aber alle nur in einem Teilbereich erzeugt werden, der nicht dem Erzeugungsbereich der Ziele entspricht. Ein Testparameter beschreibt die erwartete Anzahl Ziele im Erzeugungsbereich der Projektile. Das Verhältnis zwische Zielen und Projektilen ist ein weiterer Parameter.
+Das Standardszenario ist eine Gleichverteilung von Objekten im Raum. Ein zusätzlicher Testparameter hier ist die Dichte der Objekte, welche das Verhältnis der Durchschnittsgröße (längste Ausdehnung in einer Achse) zur Durchschnittsdistanz (der Mittelpunkte) darstellt. Die asymmetrische Variante hat zusätzlich noch das Verhältnis der Menge an Objekten beider Klassen als Testparameter. Die Größe des Erzeugungsbereichs ist bei beiden Klassen identisch.\\
+Ein weiteres rein asymmetrisches Szenario "Shotgun" modelliert eine Menge an Projektilen und Zielen. Die Ziele sind weiterhin gleichverteilt, die Projektile modellieren jedoch eine Schrotladung, bei der viele Projektile gemeinsam fliegen. Dies bedeutet, dass die AABBs sich weitgehend überlappen (AABBs werden über den gesamten Raum ausgedehnt, durch den sich Objekte im Laufe eines Ticks bewegen). Sie werden aber alle nur in einem Teilbereich erzeugt, der nicht dem Erzeugungsbereich der Zielobjekte entspricht. Ein Testparameter beschreibt die erwartete Anzahl Ziele im Erzeugungsbereich der Projektile. Das Verhältnis zwischen der Menge der Zielobjekte und der Projektile ist ein weiterer Parameter.\\
+Die Benchmark-Umgebung setzt den Seed des verwendeten Zufallsgenerators abhängig von den Szenarioparametern, aber nicht abhängig vom verwendeten Algorithmus. So müssen verschiedene Algorithmen die exakt selben Probleme lösen. Um Störungen herauszufiltern, wird jedes Experiment einige Male wiederholt und der Median für die weitere Untersuchung verwendet. Um die Samplemenge zu erhöhen wurde eine Dummy-Parameter eingefügt, der den Seed ändert aber sonst keine Auswirkungen hat.\\
+Für die im Folgenden gezeigten Daten wurden alle Benchmarks auf einem PC mit Intel i7-4790K CPU bei 4,5GHz mit 2400MHz Dual-Channel RAM ausgeführt.\\
+Zunächst soll bei Boxsort die Wahl der Klasse für den Baum untersucht werden (in Abschnitt~\ref{sec:boxsort} theoretisch betrachtetes Problem). Zu diesem Zweck wird das Verhältnis der Ausführungszeiten der beiden Möglichkeiten betrachtet. Ist es größer als 1, bedeutet dies hier, dass es mehr Ausführungszeit benötigt hat, die Master-Klasse für den Baum zu verwenden, d.h. die Slave-Klasse ist die bessere Wahl für den Baum.\\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{./res/boxsortChoice-reference.png}
+    \caption{Einfluss der Wahl der Objektmenge für den Baumaufbau beim Box Sort, wenn gleich große Mengen getestet wurden, die beide statistisch gleichverteilt über den selben Raum sind.}
+    \label{fig:boxsortCoice-reference}
+\end{figure}
+
+Als Referenz soll zunächst die Wahl bei einer Gleichverteilung betrachtet werden, zunächst mit einer identischen Menge an Objekten beider Klassen. Abb.~\ref{fig:boxsortChoice-reference} zeigt, dass in diesem Referenzfall kein signifikanter Unterschied zwischen besteht und die sichtbaren Unterschiede wahrscheinlich vom Zufall stammen. Zu sehen ist, dass die stärkeren Abweichungen im Randbereich häufiger bei niedrigen Objektzahlen und damit auch niedrigen absoluten Laufzeiten auftreten.\\
+
+\begin{figure*}
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-A.png}
+		
+		\label{fig:boxsortChoice-uniform-A}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-B.png}
+
+		\label{fig:boxsortChoice-uniform-B}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-C.png}
+
+		\label{fig:boxsortChoice-uniform-C}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-D.png}
+
+		\label{fig:boxsortChoice-uniform-D}
+	\end{subfigure}
+
+	\caption{Untersuchung der Auswirkungen verschiedener Parameter auf das Verhältnis der Laufzeiten des Boxsort Algorithmus //TODO}
+	\label{fig:boxsortChoice-uniform}
+\end{figure*}
+
+Wenn die Objektzahl je Klasse nicht mehr identisch ist, können Vermutungen aus Abschnitt~\ref{sec:boxsort} untersucht werden. Mehrere Untersuchungen dazu werden in Abb.~\ref{fig:boxsortChoice-uniform} gezeigt. Abb.~\ref{fig:boxsortChoice-uniform} A zeigt alle Samples, gefärbt nach Anteil der Master-Objekte. Zu erkennen ist, dass bei den getesteten Parametern der Baum aus der kleineren Menge gebildet werden sollte. Um genauer zu betrachten, welche Parameterkombinationen zu welchem Unterschied führt, werden zunächst in Abb.~\ref{fig:boxsortChoice-uniform} B die Samples auf diejenigen beschränkt, wo der Anteil Master-Objekte 90\% beträgt. Die farbliche Aufteilung ist dort anhand der Dichte. Erkennbar ist, dass der Wertebereich stark von der Dichte abhängig ist, wobei die geringste Dichte die größte Streuung aufweist. Um dies weiter zu untersuchen, zeigt Abb.~\ref{fig:boxsortChoice-uniform} C davon nur die geringste getestete Dichte, farblich nach Objektzahl getrennt. Zu sehen is dort, dass die Unterschiede bei weniger Objekten gegen 0\% gehen, bei vielen Objekten gegen etwa +150\%. Die Beobachtung bei vielen Objekten passt zu den in Abschnitt~\ref{sec:boxsort} beobachteten Vorfaktoren, was auch bei vielen Objekten erfolgte. Für den Fall höherer Dichte scheinen die dort ermittelten Werte nicht mit den im Benchmark gemessenen Werten übereinzustimmen, die in Abb.~\ref{fig:boxsortChoice-uniform} D zu sehen sind. Dies weist auf einen weiteren versteckten Faktor hin. Man könnte weitere Tests für höhere Dichten durchführen, dort ist Box Sort jedoch keine sinnvolle Wahl mehr, da für praktische Objektzahlen dann selbst der naive Algorithmus noch schneller wäre. Dort wäre außerdem die absolute Laufzeit für Echtzeitanwendungen zu hoch.\\
+
+\begin{figure*}
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-A.png}
+		
+		\label{fig:boxsortChoice-shotgun-A}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-B.png}
+
+		\label{fig:boxsortChoice-shotgun-B}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-C.png}
+
+		\label{fig:boxsortChoice-shotgun-C}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-D.png}
+
+		\label{fig:boxsortChoice-shotgun-D}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-E.png}
+
+		\label{fig:boxsortChoice-shotgun-E}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-F.png}
+
+		\label{fig:boxsortChoice-shotgun-F}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/boxsortChoice-shotgun-G.png}
+
+		\label{fig:boxsortChoice-shotgun-G}
+	\end{subfigure}
+
+	\caption{Untersuchung der Auswirkungen verschiedener Parameter auf das Verhältnis der Laufzeiten des Boxsort Algorithmus //TODO}
+	\label{fig:boxsortChoice-shotgun}
+\end{figure*}
+
+Die Objekte sind jedoch nicht immer gleichverteilt. Als nächstes wird deshalb das Szenario "Shotgun" betrachtet. In Abb.~\ref{fig:boxsortChoice-uniform} A ist zu sehen, dass wie bei der Gleichverteilung meist die kleinere Menge verwendet werden sollte. Die Menge der Samples, wo dies nicht zutrifft ist jedoch größer als bei der Gleichverteilung. Abb.~\ref{fig:boxsortChoice-uniform} B zeigt nur die Samples, wo der Projektilanteil 90\% beträgt. Zu erkennen ist, dass eine höhere Objektanzahl die Abweichung verstärkt. In Abb.~\ref{fig:boxsortChoice-uniform} C sieht man\\
+
+\begin{figure*}
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-A.png}
+		
+		\label{fig:symmetricComparison-A}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-B.png}
+
+		\label{fig:symmetricComparison-B}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-C.png}
+
+		\label{fig:symmetricComparison-C}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-D.png}
+
+		\label{fig:symmetricComparison-D}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-E.png}
+
+		\label{fig:symmetricComparison-E}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/symmetricComparison-F.png}
+
+		\label{fig:symmetricComparison-F}
+	\end{subfigure}
+
+	\caption{Alle Benchmark-Daten für das gleichverteilte Szenario bei symmetrischen Interaktionen, aufgeteilt nach Dichte. Die Tabelle F zeigt die Anzahl Interaktionen bei jeweils einer Beispiel-Aufgabenstellung mit 1024 Objekten und verschiedenen Dichten.}
+	\label{fig:symmetricComparison}
+\end{figure*}
+
+In Abb.~\ref{fig:symmetricComparison} wird nun die Performance von allen Algorithmen verglichen, zunächst im Fall symmetrischer Interaktionen. Das einzige hierbei betrachtete Szenario ist eine Gleichverteilung der Objekte. Nahe liegt die Annahme, dass die Größe von Objekten in //TODO S keinen Einfluss auf den naiven Algorithmus und Box Sort haben, da diese nur mit relativen Größen und Vergleichen arbeiten. Während der Auswertung wurde jedoch festgestellt, dass dies nicht der Fall war. Vergleichsoperationen und Rechnungen in //TODO S verwendeten Branches, die von der Größe der Unterschiede zwischen den Operanden abhängen. Um diese Variable zu eliminieren wurden Techniken des Branchless Programming eingesetzt. Dies hat sich zudem als Optimierung um 0-50\% je nach Umständen herausgestellt und wurde somit beibehalten. Die Graphen von Box Sort und dem naiven Algorithmus behandeln die Samples mit verschiedenen Objektgrößen identisch. Sie sind als mehrere Linien im Diagramm eingetragen, genau wie zu jedem Parametersatz die 4 Samples, die sich nur im Seed für die Generierung der Aufgabenstellung unterscheiden. Dargestellt ist die Laufzeit in Abhängigkeit von der Objektanzahl. Die Samples, immer um Faktor 2 auseinander, werden linear interpoliert zu einem Graph verbunden. Zu sehen ist, dass Spatial Hashing empfindlich auf die Größe der Objekte relativ zur Größe der Chunks reagiert. Sind die Objekte z.B. durchschnittlich 10-mal größer als Chunks, ist die Performance besonders schlecht. Dies ist intuitiv verständlich, da sich jedes Objekt bei durchschnittlich 1000 Chunks anmelden und dort nach Interaktionspartnern suchen muss. Der naive Algorithmus zeigt wie zu erwarten kaum eine Abhängigkeit von der Dichte und hat die kleinste Konstante, was vor allem bei kleiner Menge and Objekten die beste Performance liefert. Box Sort hat eine konsistent gute Performance, sodass er nur bei extrem hoher Dichte oder geringer Menge an Objekten eine längere Laufzeit als der naive Algorithmus benötigt. Spatial Hashing hat in vielen Situationen vor allem bei größeren Objektmengen eine noch bessere Performance, ist aber weniger flexibel bei der Objektgröße. Neben dem offensichtlichen Problem bei großen Objekten ist auch eine zu kleine Objektgröße bei gegebener Dichte für Spatial Hashing nachteilig, da sich dann mehr Objekte innerhalb eines Chunks befinden und innerhalb eines Chunks der naive Algorithmus verwendet wird. Je nach Dichte ist eine andere Objektgröße ideal. Bei geringer Dichte überwiegt der Laufzeitanteil der Anmeldung in(und damit Erstellung von) Chunks, sodass dort möglichst kleine Objekte in weniger Chunks enthalten sind. Wenn die Dichte höher wird, nähert sich die ideale Objektgröße an die Chunkgröße an. Für extreme Dichten ist Spatial Hashing genau wie Box Sort ungeeignet.\\
+
+
+\begin{figure*}
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-A.png}
+		
+		\label{fig:asymComparison-A}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-B.png}
+
+		\label{fig:asymComparison-B}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-C.png}
+
+		\label{fig:asymComparison-C}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-D.png}
+
+		\label{fig:asymComparison-D}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-E.png}
+
+		\label{fig:asymComparison-E}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/asymComparison-F.png}
+
+		\label{fig:asymComparison-F}
+	\end{subfigure}
+
+	\caption{Alle Benchmark-Daten für das gleichverteilte Szenario bei asymmetrischen Interaktionen, aufgeteilt nach dem Anteil der Objekte, die der Master-Klasse angehören. Zum Vergleich wurde die gleiche Art Graph aus allen Daten bei symmetrischen Interaktionen erzeugt.}
+	\label{fig:asymComparison}
+\end{figure*}
+
+Die Szanarien mit asymmetrischen Interaktionen haben einen Parameter mehr, sodass eine kompaktere Version der Graphen benötigt wird, um effizient alle Daten darzustellen. Dazu wird eine Annahme über den Verwendungszweck gemacht, der für die meisten Games und viele Echtzeit-Simulationen zutrifft: Es steht eine bestimmte Zeit zur Verfügung, in der alle Berechnungen abgeschlossen sein müssen. Hier wurde also untersucht, für wie viele Objekte in 10ms alle Interaktionen berechnet werden können. Der Zeitrahmen ist dabei weniger strikt wie z.B. in professionellen Counter-Strike Matches aber strikter als in Games wie Minecraft. 10ms erscheint eher im strikten Bereich, aber es muss auch beachtet werden, dass die Ausführung dieses Algorithmus nicht das Einzige ist, was in einer Simulation Rechenzeit benötigt. Die maximale Objektanzahl wurde durch lineare Interpolation der getesteten Samples ermittelt. Für Fälle, wo die Anzahl außerhalb des getesteten Bereichs liegt (größer 32768 oder kleiner 128), wird stattdessen extrapoliert. Wenn ein Großteil der Samples außerhalb liegt, ist in der Legende "Extrapoliert" vermerkt.\\
+Abb.~\ref{fig:asymComparison} zeigt das gleichverteilte Szenario, unterteilt nach dem Anteil der Objekte, die der Master-Klasse angehören. Zum Vergleich wurden alle Daten des symmetrischen Falls des gleichverteilten Szenarios auf die gleiche Art ausgewertet (Abb.~\ref{fig:asymComparison} F). Die Dichte ist nun auf der x-Achse. Im Vergleich zum symmetrischen Fall ist die erreichte Anzahl beim naiven Algorithmus höher, da nicht alle Objekte mit allen anderen getestet werden müssen, sondern nur Paare mit jeweils einem Objekt aus einer Klasse //TODO (O(n*m)). Dies ist besonders deutlich bei einer 10\% - 90\% Aufteilung. Box Sort hat bei asymmetrischen Interaktionen ebenfalls einen Vorteil, der noch stärker ausgeprägt ist. Dies stammt von dem Problem bei symmetrischen Interaktionen, dass aufgrund der Funktionsweise alle Interaktionen in beide Richtungen gefunden werden und die eine Richtung herausgefiltert werden muss, die Effizienz ist dort also nur 50\%. Dies ist bei asymmetrischen Interaktionen nicht der Fall. Bei Spatial Hashing ist die Laufzeit zum Anmelden in und Anlegen von Chunks bei asymmetrischen Interaktionen nicht positiv beeinflusst. Deshalb ist selbst unter ansonsten idealen Umständen (geringe Dichte) die Performance gegenüber Box Sort nicht mehr überlegen.\\
+Abb.~\ref{fig:asymComparison} A und Abb.~\ref{fig:asymComparison} E bzw. Abb.~\ref{fig:asymComparison} B und Abb.~\ref{fig:asymComparison} D weisen starke Ähnlichkeiten zueinander auf. Dies ist nicht verwunderlich, da sie nur dem Tausch der Master-Objekte mit Slave-Objekten entsprechen. Die Graphen für Box Sort mit Baum aus Master-Objekten und Slave-Objekten sind entsprechend vertauscht. Eventuelle Unterschiede zwischen den jeweiligen Teilabbildungen könnten auf verschiedene Ergebnisse der Pseudozufälligen Aufgabengenerierung zurückzuführen sein. Geringfügige Unterschiede der Trends der Graphen könnten mit Caching in der CPU zusammenhängen, denn es werden zuerst alle Master-Objekte generiert, dann die Slave-Objekte, der Cache-Inhalt ist also beim Start der Algorithmen nicht ebenfalls vertauscht.\\
+Diese Symmetrie ist beim Shotgun-Szenario nicht vorhanden, da dort die beiden Mengen nicht die gleiche statistische Verteilung aufweisen. Abb.~\ref{fig:shotgunComparison} zeigt die Daten dieses Szenarios. Die x-Achse ist nun der Erwartungswert der Anzahl treffbarer Objekte in dem Bereich, wo Projektil-Objekte erzeugt werden. Es wurden 4 Werte getestet, jeweils um den Faktor 8 verschieden. Zu sehen ist eine viel höhere Abweichung der Samples auch bei Werten, die im Gleichverteilungs-Szenario keine solche aufweisen. Diese stammen wahrscheinlich daher, dass die konkret generierte Aufgabenstellung eine hohe Abweichung der Anzahl der Interaktionen aufweist. Dies ist wegen dem kompakten Bereich der Fall, worin alle Projektil-Objekte generiert werden. Nur eine geringe Anzahl treffbarer Objekte ist darin enthalten, was statistisch zu einer hohen Standardabweichung relativ zum Erwartungwert führt. Die Objekte in dem Bereich interagieren dann mit einem großen Teil aller Projektil-Objekte.\\
+Allgemein ist beim Shotgun-Szenario Box Sort wieder überlegen. Den Baum aus Projektil-Objekten aufzubauen hat hier einen Vorteil: die meisten treffbaren Objekte können wegen der Kompaktheit des Projektil-Erzeugungsbereichs schon beim root-Knoten ausgeschlossen werden.\\
+
+\begin{figure*}
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/shotgunComparison-A.png}
+		
+		\label{fig:shotgunComparison-A}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/shotgunComparison-B.png}
+
+		\label{fig:shotgunComparison-B}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/shotgunComparison-C.png}
+
+		\label{fig:shotgunComparison-C}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/shotgunComparison-D.png}
+
+		\label{fig:shotgunComparison-D}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.55\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{./res/shotgunComparison-E.png}
+
+		\label{fig:shotgunComparison-E}
+	\end{subfigure}
+
+	\caption{Alle Benchmark-Daten für das Shotgun-Szenario, aufgeteilt nach dem Anteil der Objekte, die der Projektil-Klasse angehören.}
+	\label{fig:shotgunComparison}
+\end{figure*}
+
