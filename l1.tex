@@ -1,4 +1,19 @@
-Da die exakte Berechnung einer Kollision signifikant viel Rechenleistung benötigt, ist eine Vorfilterung sinnvoll. Diese schließt einen Großteil der Objektpaare schon vorher aus. Eine Kollision kann z.B. nur dann passieren, wenn die Hüllobjekte der beiden Objekte ebenfalls kollidieren (wegen der Eigenschaft $\mathcal{AABB}(AABB_o) \supseteq K_o$). Hier wird als Hüllobjekt eine AABB verwendet. Bestimmte Arten der logischen Kollision benötigen außerdem keine genauere Berechnung, sodass die verbleibenden Objektpaare nach der Vorfilterung direkt eine logische Kollision eingehen. Um verschiedene Arten der Kollision behandeln zu können und die Objektpaare dem richtigen Algorithmus für die nächste Stufe zuführen zu können, wurde im Rahmen des Projekts eine Komponente erstellt, die dieses Problem mit austauschbarem Vorfilterungsalgorithmus löst. (Ungenügende Ansätze der Behandlung verschiedener Kollisionstypen unter Verwendung eines nicht austauschbaren Vorfilterungsalgorithmus haben schon vor dem Projektstart in der Codebasis existiert). \\
+%GRR read:
+% I mark my annotations with these GRR comments. Not in text.
+% To make the text readable in texmaker editor (comments are grey, text is a lighter grey, yay!) I recommend changing color settings of your editor to make comments brighter and a color
+% I also have taken the liberty of making some changes myself, when I
+% * was at least 95% sure I would not change a meaning
+% * only to improve meaning, and compactness
+% * to apply mathematics after already established conventions
+% All other things are added as comments, especially, when I am not sufficiently sure it would break established meaning
+% All comments are recommendations, do as you please.
+% Regards, Meph
+
+Da die exakte Berechnung einer Kollision zwischen zwei Objekten $o_0, o_1 \in \obj$ signifikant viel Rechenleistung benötigt, ist eine Vorfilterung der Möglichen Objektpaare sinnvoll, die die meisten Paare schon vorher ausschließt.\\
+Zu diesem Zweck werden zu jedem Objekt Hüllkörper angegeben, die die Objekte durch die Eigenschaft $B_o \supseteq K_o$ abstrahieren, da gilt $K_{o0} \cap K_{o1} \Rightarrow B_{o0} \cap B_{o1}$, d.h.~ die Menge aller Paare mit exakter Kollision ist in jedem Fall in der Menge aller Paare enthalten $ \{ (o_0, o_1) | B_{o0} \cap B_{o1} \} \supseteq \{ (o_0, o_1) | K_{o0} \cap K_{o1} \} $.
+Die weiteren Eigenschaften der Hüllkörper sollen den Filterungsprozess erheblich vereinfachen, da Kollisionen unter diesen u.U. leichter zu errechnen sind.Hier wird als Hüllkörper eine AABB verwendet, deren hier praktische Eigenschaften in Abschnitt \ref{sec:AABB} beschrieben sind.\\
+Für bestimmte Zwecke, meist logische Kollisionen (vgl. \ref{sec:usages}), ist diese abstrakte Kollision zwischen Hüllobjekten sogar schon ausreichend, um eine Reaktion einzuleiten.\\
+Um verschiedene Arten der Kollision behandeln zu können und die Objektpaare dem richtigen Algorithmus für die nächste Stufe zuführen zu können, wurde im Rahmen des Projekts eine Komponente erstellt, die dieses Problem mit austauschbarem Vorfilterungsalgorithmus löst. (Ungenügende Ansätze der Behandlung verschiedener Kollisionstypen unter Verwendung eines nicht austauschbaren Vorfilterungsalgorithmus haben schon vor dem Projektstart in der Codebasis existiert). \\
 Logische und physikalische Kollisionen werden als (lokale) Interaktionen zusammengefasst und werden in 2 Kategorien eingeteilt:
 \begin{enumerate}
 \item Symmetrische Interaktionen:\\
@@ -7,97 +22,250 @@ Beide Objekte des Objektpaares gehören der selben Klasse an (z.B: die Kollision
 Objektpaare setzen sich aus 2 Objekten verschiedener Klassen zusammen (z.B. Projektil und treffbares Objekt). Kollisionen innerhalb der selben Klasse treten hier nicht auf (Projektile interagieren nicht mit anderen Projektilen).
 \end{enumerate}
 
-In jeder Kategorie können mehrere Interaktionstypen enthalten sein. Jeder Typ wird hier einzeln betrachtet und ihm kann so ein eigener Vorfilterungsalgorithmus zugewiesen werden, der entsprechend zugeschnitten und problemspezifisch optimiert werden kann.
-Die Aufgabe des Vorfilterungsalgorithmus unterscheidet sich je nach Kategorie der Interaktion etwas:
+In jeder Kategorie
+%GRR auf was bezieht sich "Kategorie"? (symetrisch/asymetrisch), oder innerhalb, können mehrere Interaktionstypen
+%GRR wie zufor was ist ein Interaktionstyp? wie ist der definiert? spezifizität
+ enthalten sein. Jeder Typ
+%GRR ***
+ wird hier einzeln betrachtet und ihm kann so ein eigener Vorfilterungsalgorithmus zugewiesen werden, der entsprechend zugeschnitten und problemspezifisch optimiert werden kann.
+Die Aufgabe des Vorfilterungsalgorithmus unterscheidet sich je nach Kategorie
+%GRR definition schon voher benötigt
+ der Interaktion etwas:
 \begin{enumerate}
-\item Symmetrische Interaktionen: Aus einer Menge von $n$ Objekten werden alle diejenigen (maximal $n^2$) Objektpaare ausgewählt, deren AABBs sich überschneiden (ein beliebiges der beiden Objekte muss dann über die Interaktion mit dem Partner informiert werden). Als untere Schranke kann man $\Omega (n+i)$ angeben, wobei $i$ die Anzahl der tatsächlichen Überschneidungen ist. Die obere Schranke $mathcal{O}(n^2)$ erhält man durch naives Ausprobieren jeder Kombination.
-\item Asymmetrische Interaktionen: Aus 2 Mengen von $m$ und $s$ Objekten werden alle diejenigen Objektpaare mit jeweils einem Mitglied aus jeder Menge ausgewählt, deren AABBs sich überschneiden (das Objekt der Master-Klasse muss dann über seine Inkteraktion mit dem Partner aus der Slave-Klasse informiert werden). Als untere Schranke kann man $\Omega(m+s+i)$ angeben. Die obere Schranke $mathcal{O}(m*s)$ erhält man durch naives Ausprobieren jeder Kombination.
+\item Symmetrische Interaktionen: Aus einer Menge von Objekten $\obj$ werden Objektpaare ausgewählt, deren AABBs sich überschneiden
+(ein beliebiges der beiden Objekte muss dann über die Interaktion mit dem Partner informiert werden
+%GRR ich glaube das ist ein implementierungsdetail, das hier nur entweder nicht verständlich oder zu umständlich dargestellt werden kann
+). 
+Als untere Schranke kann man $\Omega (|\obj|+|C|)$ angeben, wobei $|C|$ die Anzahl der tatsächlichen Überschneidungen ist. Die obere Schranke $\mathcal{O}(|\obj|^2)$ erhält man durch naives Ausprobieren jeder Kombination.
+\item Asymmetrische Interaktionen: Mit 2 Mengen $\obj_M, \obj_S$ wird als Master- und Slavemenge werden alle Objektpaare mit jeweils einem Mitglied aus jeder Menge ausgewählt, deren AABBs sich überschneiden 
+%GRR master slave terminoligie der Mengen und Interpretationen unbedingt gefordert
+% es entstehen später diskrepanzen in der semantik von aussagen
+% u.U. nicht konform mit Änderungen => Diskussion
+(das Objekt der Master-Klasse muss dann über seine Inkteraktion mit dem Partner aus der Slave-Klasse informiert werden
+%GRR ???????? was ? warum ? das hier überhaupt wichtig?
+). 
+Als untere Schranke kann man $\Omega(|\obj_M|+|\obj_S|+|C|)$ angeben. Die obere Schranke $\mathcal{O}(|\obj_M|+|\obj_S|)$ erhält man durch naives Ausprobieren jeder Kombination.
 \end{enumerate}
 
 Für die Laufzeit bei praktischen Problemen sei angemerkt, dass die Konstante oft eben so wichtig zu betrachten ist wie die asymptotische Komplexität. \\
+%GRR Wer sagt das ? Wenn nur du das sagst, sollte das begründet werden!
 
-Im folgenden werden 2 Algorithmen, die im Rahmen des Projekts implementiert wurden, näher beschrieben.
+Im Folgenden werden 2 Algorithmen, die im Rahmen des Projekts implementiert werden, näher beschrieben.
 
 
 \subsection{Box Sort}
 \label{sec:boxsort}
 //TODO boxsort box sort einheitlich\\
-Bei Box sort \cite{houthuys1987box} wird eine binäre Baumstruktur aufgebaut, in der anschließend nach einem Raumbereich (einer AABB, der query box QB) gesucht werden kann, sodass alle damit überlappenden einsortierten AABBs gefunden werden. Aufgrund der Mehrdimensionalität und dem Einsortieren von Bereichen statt Punkten müssen erhebliche Änderungen an der Baum-Datenstruktur vorgenommen werden.\\
-Ein Knoten enthält genau eine einsortierte AABB. Als Sortierschlüssel wird dort das niedrige Ende der einsortierten AABB in einer bestimmten Dimension gewählt, es gilt also //TODO Mathe key aus S. Ist das obere Ende der QB in dieser Dimension kleiner als der Schlüssel, kann die höhere Baumhälfte ausgeschlossen werden und muss nicht mehr durchsucht werden. Die Sortierdimension ist hier für jeden Knoten individuell wählbar.\\
-Um die untere Baumhälfte ausschließen zu können, müssen jedoch weitere Informationen vorliegen. Da die maximale Ausdehnung nach oben in der vorher festgelegten Koordinate nicht durch den Knoten festgelegt werden kann, muss jeder Knoten, der darunter liegt, berücksichtigt werden und der Maximalwert aller ermittelt werden. Dieser wird nach vollständigem Baumaufbau dann im Knoten vermerkt.\\
-Wird zu beiden Teilbäumen auch der jeweils andere Extremwert gespeichert, entsteht eine 1-Dimensionale AABB und beide Teilbäume können identisch behandelt werden. Dann kann für jeden individuell ein Überlappungstest bestimmen, ob sich QB mit dem Teilbaum überschneidet. So können unter bestimmten Umständen sogar beide Teilbäume ausgeschlossen werden. Ein Beispiel dafür sieht man in Abb.~\ref{fig:boxsortNode}.\\
+%GRR todo
+Bei Box-Sort \cite{houthuys1987box}
+%GRR citation wrongly displayed, seemingly not in bibliography either
+ wird eine binäre Baumstruktur aufgebaut, in der anschließend nach einem Raumbereich (einer AABB, der Query-Box
+%GRR Query-Box so schreiben oder eindeutschen
+\newcommand{\qb}{\operatorname{QB}}
+ $\qb$) gesucht werden kann, sodass alle damit überlappenden einsortierten AABBs gefunden werden. Aufgrund der Mehrdimensionalität und dem Einsortieren von Bereichen statt Punkten müssen Anpassungen der Baum-Datenstruktur vorgenommen werden.\\
+Ein Knoten referenziert genau eine einsortierte AABB. Als Sortierschlüssel wird dort das niedrige Extremum der einsortierten AABB in einer bestimmten Dimension, $x_{min},y_{min}$ oder $z_{min}$  (Definition vgl. \ref{sec:aabb}) gewählt, es gilt also 
+//TODO Mathe
+%GRR todo
+ key aus S. 
+Ist das obere Ende der Query-Box in dieser Dimension kleiner als der Schlüssel, kann die höhere
+%GRR definiere terminologie "hoch" und "niedrig" in relation zu Baumstruktur
+ Baumhälfte ausgeschlossen werden und muss nicht mehr durchsucht werden. \\
+Die Sortierdimension ist hier für jeden Knoten individuell wählbar.\\
+% Ist das die einzige Option? Nein. Wieso wurde diese gewählt? Was macht das besonders? Was hofft man damit zu erreichen/vermeiden?
+Um die untere Baumhälfte ausschließen zu können, müssen jedoch weitere Informationen vorliegen.
+
+ Da die maximale Ausdehnung
+%GRR von was ? eines Knotens/einer AABB ? Welcher ?
+ nach oben in der vorher festgelegten Koordinate
+%GRR welche Koordinate? das ist die erste Erwähnung von Koordinate
+ nicht durch den Knoten festgelegt werden kann, muss jeder Knoten, der darunter liegt, berücksichtigt werden und der Maximalwert
+%GRR Maximalwert von was? Aller unterliegenden Knoten?
+  aller ermittelt werden. Dieser wird nach vollständigem Baumaufbau dann im Knoten vermerkt.\\
+%GRR Dieser Satz war sehr hart bis gar nicht verständlich, zu unspezifisch. Mach es mir einfacher!
+%GRR Würde das hier auch anders aufbauen
+% Zuerst erklären was vorliegt, ruhig wiederholen, um relevante sachen in den Vordergrund zu bringen
+% "Im Knoten ist das und das definiert, bzw. nicht definiert,liegen jene Informationen vor /nicht vor "
+%GRR an dieser Stelle würde sich langsam eine Listung,Klassendiagramm oder Grafik für einen Knoten lohnen
+% dann das Problem daran schildern
+% "daher kann die und die Aussage nicht getroffen werden"
+Wird zu beiden Teilbäumen auch der jeweils andere Extremwert gespeichert, entsteht eine eindimensionale AABB und beide Teilbäume können identisch behandelt werden. Dann kann für jeden
+%GRR Subjekt "Jeden" oder "jeden Teilbaum"
+ individuell ein Überlappungstest bestimmen, ob sich $\qb$ mit dem Teilbaum überschneidet. So können unter bestimmten Umständen sogar beide Teilbäume ausgeschlossen werden. Ein Beispiel dafür sieht man in Abb.~\ref{fig:boxsortNode}.\\
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{./res/BoxsortNode.png}
-    \caption{2D-Beispiel für einen Knoten im Suchbaum. Relevant für die Sortierung ist bei diesem Knoten die x-Achse. Die Teilbäume werden nicht gezeigt, die darin enthaltenen AABBs werden in dunkelgrau nebeneinander dargestellt. Query Boxes sind oben in gelb dargestellt.}
+    \caption{2D-Beispiel für einen Knoten (mittig, hellgrau) im Suchbaum bei Box-Sort. x-Achse zur Sortierung. Teilbäume nur durch darin enthaltene AABB(unten, dunkelgrau) dargestellt, Query Boxes (oben, gelb).}
     \label{fig:boxsortNode}
 \end{figure}
 
-Man sieht in Abb.~\ref{fig:boxsortNode}, dass QB1 sich komplett links der Bereiche der beiden Teilbäume befindet. Der Suchlauf endet für QB1 somit direkt bei dem dargestellten Knoten. Auch QB2 überschneidet sich mit keinem Bereich der Teilbäume, aber der Grund dafür ist diesmal die Lage in der Mitte von beiden. Solch eine Lage muss im Allgemeinen nicht zwangsläufig existieren, denn die Bereiche der beiden Teilbäume können auch überlappen. QB3 hingegen überlappt mit dem rechten Teilbaum. Für die Suche scheidet also nur der linke Teilbaum aus. Sie wird im rechten Teilbaum rekursiv fortgesetzt. Man kann auch query boxes konstruieren, sodass eine Überlappung mit beiden Teilbäumen auftritt. Dann muss die Suche in beiden rekursiv fortgesetzt werden.\\
-Der eigentliche Sortiervorgang zum Aufbau des Baums findet mit einer modifizierten Quicksort-Variante statt. Dabei wird das Pivot-Element zum Knoten und die restlichen Elemente werden entsprechend des Schlüssels in den beiden Teilbäumen zugeteilt. Bei der Zuteilung wird nebenbei die 1D-AABB des Teilbaums ermittelt, indem die Ausdehnung bei jedem Zuteilungsschritt ggf. vergrößert wird, um das aktuelle Element zu berücksichtigen.\\
-Als Heuristik für das Finden des Pivot-Elements wird der Median einer zufälligen Auswahl von bis zu 9 Elementen gewählt. Die Sortierdimension wird an der Wurzel auf die x-Achse festgelegt. Beim Einsortieren in die beiden Teilbäume wird eine Heuristik berechnet, die im jeweiligen Teilbaum die beste Sortierdimension abschätzt. Dafür wird für jede Dimension die durchschnittliche Größe der Objekte in dieser Dimension berechnet. Damit kann man die Dichte der Objekte in jeder Dimension abschätzen, wenn man den Gesamtbereich kennt, den die AABBs einnehmen. Gewählt wird die niedrigste Dichte.\\
-Im Gegensatz zum in Abschnitt~\ref{sec:spatialHashing} beschriebenen Spatial Hashing müssen für den Boxsort-Algorithmus vor dem Start erst alle Objekte gesammelt werden. Im asymmetrischen Fall muss dann entschieden werden, aus welcher Menge der Objekte der Baum aufgebaut wird. Für den Benutzer stehen hier mehrere Modi zur Verfügung. Zur Auswahl stehen unter anderem die Möglichkeiten, die Anzahl der Elemente je Menge zu vergleichen und die größere oder kleinere zu verwenden, um den Baum aufzubauen. Der Grund dafür wird deutlich, wenn die Laufzeit im erwarteten Fall betrachtet wird. Wenn die Menge $M$ $m$ Elemente und die Menge $N$ $n$ Elemente enthält und der Baum aus $N$ aufgebaut wird, dann ist dafür $mathcal{O}(n*log(n))$ Zeit nötig. Wenn eine ausreichende Verteilung im Raum vorliegt und die Größe von QB in der selben Größenordnung sind wie Elemente aus $N$ ist, dann benötigt die Suche $mathcal{O}(log(n))$ Zeit \cite[//TODO]{houthuys1987box}. Insgesamt wird also für das Finden aller Überlappungen $mathcal{O}(n*log(n)+m*log(n))$ Zeit benötigt. Anhand dieser Form steht die Vermutung nahe, dass die Wahl immer auf $M$ als größere Menge fallen sollte. In der Praxis ist vor den Termen $n*log(n)$ und $m*log(n)$ aber ein Vorfaktor, der nicht identisch ist und deshalb auch beachtet werden muss. Messungen ergaben einen nahezu konstanten Vorfaktor beim Baumaufbau. Für den Abfrage-Durchlauf ist der Faktor jedoch stark abhängig von der konkreten Verteilung der eingegebenen AABBs. Messungen ergeben einen um den Faktor von ca. 3 geringeren Vorfaktor unter stark idealisierten Bedingungen, einen nahezu identischen unter moderaten Bedingungen und einen ca. 3-mal größeren unter erschwerten Bedingungen (Durchschnittliche Kollisionen pro Objekt>3). Den Benchmark-Ergebnissen in ~\ref{sec:benchmark} kann man entnehmen, dass wenn die beiden Mengen die gleiche Verteilung aufweisen die kleinere Menge meist die bessere Wahl ist, vor allem bei geringer Dichte der Objektverteilung. Um trotzdem offen für zukünftige problemspezifische Erkenntnisse zu sein, bleibt die Option, die größere oder die kleinere Menge zu wählen. Dazu kann ein Präferenz-Faktor angegeben werden, der vor der Entscheidung mit der Anzahl der Master-Elemente multipliziert wird. Als weitere Modi kann der Benutzer einstellen, dass nur eine der beiden Mengen für den Baum verwendet werden darf. Dies wird für Fälle gebraucht, wo die o.g. Bedingungen für die Komplexität der Suche im Baum nur für eine der beiden Mengen zutreffen.\\
-Im symmetrischen Fall wird jedes Objekt sowohl in den Baum einsortiert als auch als QB in dem Baum gesucht. Dabei muss die QB selbst aus den Ergebnissen wieder entfernt werden. Außerdem muss dafür gesorgt werden, dass bei einem interagierenden Objektpaar nur ein Aufruf erfolgt, obwohl beide Richtungen als Suchergebnis gefunden werden.\\
+Man sieht in Abb.~\ref{fig:boxsortNode}, dass QB1 sich komplett links der Bereiche der beiden Teilbäume befindet. Der Suchlauf endet für QB1 somit direkt bei dem dargestellten Knoten
+%GRR welchem der 4 dargestellten knoten?
+. Auch QB2 überschneidet sich mit keinem Bereich der Teilbäume, befindet sich diesmal aber zwischen beiden. Solch eine Lage muss im Allgemeinen nicht zwangsläufig existieren, denn die Bereiche der beiden Teilbäume können auch überlappen.
+%GRR zu QB1 wurde an dieser stelle eine Konsequenz der Lage der QB genannt
+QB3 hingegen überlappt mit dem rechten Teilbaum. Für die Suche scheidet also nur der linke Teilbaum aus.
+%GRR OK, hier frage ich mich nun, wie der Algorithmus denn jetzt aufgerufen wird.
+% "Für die Suche scheidet also nur der linke Teilbaum aus." bezieht sich auf einen test mit allen dargestellten QBs oder nur mit einem ? Sollte es besser heißen : 
+% "Für die Suche scheidet in diesem Fall also nur der linke Teilbaum aus." Das würde sich auf das Teilbeispiel mit QB3 beschränken?
+ Diese wird im rechten Teilbaum rekursiv fortgesetzt. Man kann auch Query-Boxes konstruieren, sodass eine Überlappung mit beiden Teilbäumen auftritt. Dann muss die Suche in beiden rekursiv fortgesetzt werden.\\
+
+%GRR new subtopic from here , new paragraph, more newlines, consider \subsubsection{•} 
+ 
+Der eigentliche Sortiervorgang zum Aufbau des Baums wird mit einer Variante von Quicksort durchgeführt. Dabei wird das Pivot-Element zum Knoten und die restlichen Elemente werden entsprechend des Schlüssels in den beiden Teilbäumen zugeteilt.
+%GRR Vorschlag :
+%% Dabei wird ein Pivot-Element gewählt und zum Schlüssel eines Knotens erklärt, nachdem die übrigen Elemente dann binär in dessen Teilbäume einsortiert werden.
+ Bei der Zuteilung wird nebenbei die 1D-AABB des Teilbaums ermittelt, indem die Ausdehnung bei jedem Zuteilungsschritt ggf. vergrößert wird, um das aktuelle Element zu berücksichtigen.\\
+Als Heuristik für das Finden des Pivot-Elements wird der Median einer zufälligen Auswahl von bis zu 9 Elementen gewählt.
+%GRR gibts da einen speziellen Grund konkret dafür, oder ist das einfach eine einfache, aber trotzdem ausreichende Lösung an dieser Stelle?
+Die Sortierdimension wird an der Wurzel des gesamten Binärbaums auf die x-Achse festgelegt. Beim Einsortieren in die beiden Teilbäume wird eine Heuristik berechnet, die im jeweiligen Teilbaum die beste Sortierdimension abschätzt. Dafür wird für jede Dimension die durchschnittliche Größe der Objekte
+%GRR aller Objekte oder nur objekte im Teilbaum ?
+ in dieser Dimension berechnet. Damit kann man die Dichte der Objekte in jeder Dimension abschätzen, wenn man den Gesamtbereich kennt, den die AABBs einnehmen. Gewählt wird die niedrigste Dichte.\\ 
+%GRR aus welcher Menge an Dichten? bist jetzt ist nur von einer Objektdichte die Rede
+Im Gegensatz zum in Abschnitt~\ref{sec:spatialHashing}
+%GRR spacial hashing kommt nachher. Für den sequenziellen leser unvorteilhaft und unverständliche Referenz, "was soll ich jetzt zuerst lesen ?", wenn auch prinzipiell durch cross-referenzing formell nicht falsch.
+ beschriebenen Spatial Hashing müssen für den Boxsort-Algorithmus vor dem Start erst alle Objekte gesammelt werden. 
+Im asymmetrischen Fall muss dann entschieden werden, aus welcher Menge der Objekte der Baum aufgebaut wird.
+%GRR Vorschlag : 
+% Im asymmetrischen Fall wird der Baum aus der Mastermenge $\obj_M$ aufgebaut, die aus einer Menge von 2 Mengen ausgewählt werden muss.
+Für den Benutzer stehen hier mehrere Modi zur Verfügung. 
+Zur Auswahl stehen 
+Vergleiche der Anzahlen von Elementen in den Mengen.
+%GRR nicht viel auswahl ... möglicherweise auswahl zwischen Vergleichsrichtungen?
+% zweites element der auswahl kommt erst sehr viel später im Text. Bis dahin hab ich schon vergessen, dass das hier ne aufzählung ist. Suggestion : latex enumerate or itemize environment
+ Der Grund dafür wird deutlich, wenn die Laufzeit im erwarteten Fall betrachtet wird : $mathcal{O}(|\obj_M|*log(|\obj_M|))$. Wenn eine ausreichende Verteilung im Raum vorliegt und die Größe von QB in der selben Größenordnung ist wie Elemente aus $\obj_M$ ist, dann benötigt die Suche $mathcal{O}(log(|\obj_M|))$ Zeit \cite[//TODO]{houthuys1987box}
+ %GRR citation wrongly displayed and not in list
+. 
+Insgesamt wird also für das Finden aller Überlappungen $mathcal{O}(|\obj_M|*log(|\obj_M|)+|\obj_S|*log(|\obj_M|))$ Zeit benötigt. Anhand dieser Form steht die Vermutung nahe, dass die Wahl von $\obj_M$ immer auf die größere Menge fallen sollte, um das logarithmische Verhalten am gewinnbringendsten auszunutzen.
+In der Praxis ist vor den Termen $|\obj_M|*log(|\obj_M|)$ und $|\obj_S|*log(|\obj_M|)$ aber ein Vorfaktor, der nicht identisch
+%GRR nicht identisch zwischen welchen Szenarien?
+ ist und deshalb auch beachtet werden muss. Messungen ergaben einen nahezu konstanten Vorfaktor beim Baumaufbau. Für den Abfrage-Durchlauf
+%GRR ganz oben gibts ein TODO mit "Box-Sort einheitlich"
+% Ich gehe mal davon aus, dass der Ablauf da definiert werden sollte. Dabei sollte dann auch definiert werden, was der Abfrage-Durchlauf eigentlich genau ist, und wann er ausgeführt wird.
+  ist der Faktor jedoch stark abhängig von der konkreten Verteilung der eingegebenen AABBs. Messungen ergeben einen um den Faktor von ca.~3 geringeren Vorfaktor unter stark idealisierten Bedingungen
+%GRR grammar ? meaning?
+  , einen nahezu identischen unter moderaten Bedingungen und einen ca. 3-mal größeren unter erschwerten Bedingungen (Durchschnittliche Kollisionen pro Objekt>3). Den Benchmark-Ergebnissen in ~\ref{sec:benchmark}
+  %GRR benchmark kommt später ... entweder hier einfügen, oder diesen Teil der Analyse, bzw. die Analyse erst dann machen, wenn alle für die Aussage relevanten Daten vorliegen und dem Leser bekannt sind. So kann hier auch Redundanz vorgebeugt werden.
+   kann man entnehmen, dass wenn die beiden Mengen die gleiche Verteilung aufweisen die kleinere Menge meist die bessere Wahl ist, vor allem bei geringer Dichte der Objektverteilung. 
+   Um trotzdem offen für zukünftige problemspezifische Erkenntnisse zu sein, bleibt die Option, die größere oder die kleinere Menge zu wählen. Dazu
+%GRR Zusätzlich ? 
+ kann ein Präferenz-Faktor angegeben werden, der vor der Entscheidung mit der Anzahl der Master-Elemente multipliziert wird.
+ 
+ 
+Als weitere Modi kann der Benutzer einstellen, dass nur eine der beiden Mengen
+%GRR konkretisiert am Objekttyp?
+ für den Baum verwendet werden darf. Dies wird für Fälle gebraucht, wo die o.g. Bedingungen
+ für die Komplexität der Suche im Baum nur für eine der beiden Mengen zutreffen.\\
+ %GRR unverständlich : welche bedingung genau? verteilung? relative größe der mengen ? wie können diese Bedingungen nur auf eine der Mengen zutreffen?
+ 
+ 
+Im symmetrischen Fall wird jedes Objekt sowohl in den Baum einsortiert als auch als QB in dem Baum gesucht. Dabei muss das Ergebnis des Paares $(qb, qb) : qb\in\{AABB_o | o \in \obj\}$ aus den Ergebnissen nachträglich wieder entfernt werden. Außerdem muss dafür gesorgt werden, dass bei einem interagierenden Objektpaar nur ein Aufruf erfolgt, obwohl beide Richtungen als Suchergebnis gefunden werden.\\
 
 \subsection{Spatial Hashing}
 \label{sec:spatialHashing}
-Die Grundidee besteht hier dabei, den Raum in viele Bereiche (sog. chunks) aufzuteilen und Kollisionspaare nur innerhalb dieser Bereiche zu suchen. Sind 2 Objekte weit voneinander entfernt und somit nicht im selben chunk, ist eine Überschneidung der AABBs nicht möglich und muss deshalb auch nicht betrachtet werden. Ein Beispiel für 2 Dimensionen sieht man in Abb.~\ref{fig:spatialHashing}.
+Die Grundidee besteht hier dabei, den Raum in viele Bereiche
+%GRR wie sind die Bereiche gearted, aufgeteilt? cubisch, gleichmäßig, gegenseitig überschneidungsfrei? etc.
+% basically : define "Chunks", as this is first occurance of the term, a little more
+% I know, you know, almost every minecraft player knows, professors don't typically
+ (sog. Chunks) aufzuteilen und Kollisionspaare nur innerhalb dieser Teilbereiche zu suchen. Sind 2 Objekte
+%GRR Objekte oder AABBs ? denke AABBs hier besser, Objekte haben Geschwindigkeit
+% so könnte man geschickt umgehen, relative Geschwindigkeiten zu erklären....
+  weit voneinander entfernt und somit nicht im selben Chunk, ist eine Überschneidung der AABBs nicht möglich und muss deshalb auch nicht betrachtet werden. Ein Beispiel für 2 Dimensionen sieht man in Abb.~\ref{fig:spatialHashing}.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{./res/spatialHashingAABB.png}
-    \caption{2D-Beispiel von Spatial Hashing von AABBs (stark gefärbte Rechtecke). Die leicht gefärbten Bereiche sind chunks, die ein Objekt der entsprechenden Farbe(n) beinhalten.}
+    \caption{2D-Beispiel von Spatial Hashing von AABBs (stark gefärbte Rechtecke). Die leicht gefärbten Bereiche sind Chunks, die ein Objekt der entsprechenden Farbe(n) beinhalten.}
+   %GRR define Chunks
     \label{fig:spatialHashing}
 \end{figure}
 
-Man sieht in Abb.~\ref{fig:spatialHashing}, dass Objekte mit mehreren chunks überlappen können. Ein Objekt muss sich in jedem chunk anmelden, das sich mit seiner AABB überschneidet, zu sehen z.B. beim grünen Objekt, das sich in den 4 chunks rechts oben anmelden muss. Gibt es keine weiteren Objekte in den chunks, wo sich das Objekt angemeldet hat, müssen keine potentiellen Kollisionen berechnet werden. Ist dies für alle Objekte der Fall, ist die optimale Komplexität $mathcal{O}(n)$ im symmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). Im asymmetrischen Fall können mehrere Objekte im selben chunk angemeldet sein, ohne dass eine Kollision auftritt, solange die Objekte alle vom selben Typ sind. In diesem Fall ist die optimale Komplexität von $mathcal{O}(n+m)$ im asymmetrischen Fall erreicht (bei konstanter Maximalgröße von Objekten). \\
-Werden mehrere Objekte, die für eine Kollision kompatibel sind, in einem chunk angemeldet, so müssen alle potentiellen Kollisionspaare überprüft werden (hier mit naivem //TODO Mathe $mathcal{O}(n^2)$ bzw. $mathcal{O}(n*m)$ Algorithmus). Die Überprüfung kann entweder direkt bei der Anmeldung erfolgen (hier implementiert) oder erst nach Eintragung aller Objekte erfolgen, was die Auswahl an für die weitere Auflösung verwendbaren Algorithmen erhöhen würde. \\
-Ein potentielles Problem kann in Abb.~\ref{fig:spatialHashing} bei der Überschneidung des roten und blauen Objekts betrachtet werden. Erfolgt eine Überlappung in mehreren chunks, besteht die Gefahr der mehrfachen Behandlung von Kollisionen. Deshalb wird während der Partnerfindung ein Hashtable mit schon behandelten Objekten mitgeführt, womit effizient Duplikate vermieden werden. Auf diese Maßnahme kann verzichtet werden, wenn sich das Objekt nur in einem chunk befindet.\\
-Um das Anlegen vieler leerer chunks zu vermeiden und trotzdem schnellen Zugriff zu haben, wird ein Hashtable zur Verwaltung der chunks verwendet. Dazu wurde eine passende Hashfunktion gesucht und eingebunden, die plattformunabhängig aber dennoch mit sehr geringer Laufzeit $HASH: \mathcal{I}^3 \mapsto \mathcal{I}_{64}$ mit $\mathcal{I}_{64}$ als 64-Bit Integer einem Hashwert zuordnet. $i: (i, f)\in\mathcal{S}$
-//TODO mathe gedöhns richtig machen
-Der Idealfall für Spatial Hashing, wo es asymptotisch optimal wird, wurde oben schon beschrieben, in der Praxis tritt dies jedoch nur selten auf. Problematisch können dort z.B. große Objekte werden, denn die Anzahl chunks, wo eine Anmeldung erforderlich ist, und damit die Laufzeit, steigt dann linear mit dem Volumen. Ein weiterer Problemfall ist, wenn zu viele Objekte in einem chunk sind. Denn selbst wenn sie sich nicht überschneiden, ist dann eine $mathcal{O}(n^2)$ bzw. $mathcal{O}(n*m)$ Auflösung erforderlich ($n$ und $m$ hier Anzahl Objekte im chunk). Ob dieser Algorithmus für den Einsatz sinnvoll ist, hängt also davon ab, ob diese Probleme bei dem bestimmten Interaktionstyp auftreten, wo er eingesetzt werden soll.\\
+Man sieht in Abb.~\ref{fig:spatialHashing}, dass Objekte mit mehreren Chunks überlappen können. Ein Objekt muss sich in jedem Chunk anmelden, das sich mit seiner AABB überschneidet, zu sehen z.B. beim grünen Objekt, das sich in den 4 Chunks rechts oben anmelden muss. Gibt es keine weiteren Objekte in den Chunks, wo sich das Objekt angemeldet hat, müssen keine potentiellen Kollisionen berechnet werden.\\
+Im symmetrischen Fall, wenn dies für alle Objekte der Fall ist, ist die optimale Komplexität $mathcal{O}(|\obj|)$  bei konstanter Maximalgröße von Objekten erreicht.\\
+Im asymmetrischen Fall können mehrere Objekte im selben Chunk angemeldet sein, ohne dass eine Kollision auftreten muss, solange die Objekte alle vom selben Typ sind. Ist diese Bedingung für alle Chunks wahr ist die optimale Komplexität von $mathcal{O}(|\obj_M|+|\obj_S|)$ bei konstanter Maximalgröße von Objekten erreicht. \\
+%GRR curious question : wieso ist die konstante Maximalgröße wichtig, weil sonst die komplexität mit der maximialgröße des Objekts durch anmeldeaufwand steigt ?
+Werden mehrere Objekte, die für eine Kollision kompatibel sind, in einem Chunk angemeldet, so müssen alle potentiellen Kollisionspaare überprüft werden (hier mit naivem //TODO Mathe
+%GRR weis nicht ob nach meiner änderung dein TODO nicht schon erfüllt ist
+ $\mathcal{O}(|\obj|^2)$ bzw. $\mathcal{O}(|\obj_M|*|\obj_S|)$ Algorithmus). Die Überprüfung kann entweder direkt bei der Anmeldung erfolgen (hier implementiert) oder erst nach Eintragung aller Objekte erfolgen, was die Auswahl an für die weitere Auflösung verwendbaren Algorithmen erhöhen würde.\\
+ %GRR Auswahl weitere Auflösung Algorithmen ???? was ist gemeint?
+Ein potentielles Problem kann in Abb.~\ref{fig:spatialHashing} bei der Überschneidung des roten und blauen Objekts betrachtet werden. Erfolgt eine Überlappung in mehreren Chunks, besteht die Gefahr der mehrfachen Behandlung von Kollisionen. Deshalb wird während der Partnerfindung ein Hashtable mit schon behandelten Objekten mitgeführt, womit effizient Duplikate vermieden werden. Auf diese Maßnahme kann verzichtet werden, wenn sich das Objekt nur in einem Chunk befindet.\\
+Um das Anlegen vieler leerer Chunks zu vermeiden und trotzdem schnellen Zugriff zu haben, wird ein Hashtable zur Verwaltung der Chunks verwendet. Dazu wurde eine passende Hashfunktion gesucht und eingebunden, die plattformunabhängig aber dennoch mit sehr geringer Laufzeit $HASH: \mathcal{I}^3 \mapsto \mathcal{I}_{64}$ mit $\mathcal{I}_{64}$ als 64-Bit Integer einem Hashwert zuordnet. $i: (i, f)\in\mathcal{S}$
+//TODO mathe gedöhns richtig machen\\
+%GRR todo
+Der Idealfall an dem Spatial-Hashing asymptotisch optimal wird wurde bereits beschrieben.
+%GRR wieso wird es dann hier nochmal erwähnt?
+In der Praxis tritt dies jedoch nur selten auf. Problematisch können dort z.B. große Objekte
+%GRR Wieder : Objekte oder AABBs ... das Objekt kann winzig sein, die AABB aber endsfett
+ werden, denn die Anzahl Chunks, wo eine Anmeldung erforderlich ist, und damit die Laufzeit, steigt dann linear mit dem Volumen.
+%GRR grammar ... meaning?
+Ein weiterer Problemfall ist, wenn zu viele Objekte in einem Chunk sind. Denn selbst wenn sie sich nicht überschneiden, ist dann eine $\mathcal{O}(|\obj|^2)$ bzw. $\mathcal{O}(|\obj_M|*|\obj_S|)$ Auflösung erforderlich ($n$ und $m$ hier Anzahl Objekte im Chunk). Ob dieser Algorithmus für den Einsatz sinnvoll ist, hängt also davon ab, ob diese Probleme bei dem bestimmten Interaktionstyp auftreten, wo er eingesetzt werden soll.\\
+
+
 \subsection{Vergleich der Verfahren}
 \label{sec:benchmark}
-Um die Performance der Algorithmen bei verschiedenen Szenarien objektiv bewerten zu können, wurde im Rahmen des Projektes eine Benchmark-Umgebung implementiert. Getestet wurden verschiedene Szenarien mit verschiedenen Parametern. Gemeinsam haben alle Szenarien die Testparameter Problemgröße (Objektzahl) und absolute Größe der Objekte (aus $\mathcal{S}$).\\
-Das Standardszenario ist eine Gleichverteilung von Objekten im Raum. Ein zusätzlicher Testparameter hier ist die Dichte der Objekte, welche das Verhältnis der Durchschnittsgröße (längste Ausdehnung in einer Achse) zur Durchschnittsdistanz (der Mittelpunkte) darstellt. Die asymmetrische Variante hat zusätzlich noch das Verhältnis der Menge an Objekten beider Klassen als Testparameter. Die Größe des Erzeugungsbereichs ist bei beiden Klassen identisch.\\
-Ein weiteres rein asymmetrisches Szenario "Shotgun" modelliert eine Menge an Projektilen und Zielen. Die Ziele sind weiterhin gleichverteilt, die Projektile modellieren jedoch eine Schrotladung, bei der viele Projektile gemeinsam fliegen. Dies bedeutet, dass die AABBs sich weitgehend überlappen (AABBs werden über den gesamten Raum ausgedehnt, durch den sich Objekte im Laufe eines Ticks bewegen). Sie werden aber alle nur in einem Teilbereich erzeugt, der nicht dem Erzeugungsbereich der Zielobjekte entspricht. Ein Testparameter beschreibt die erwartete Anzahl Ziele im Erzeugungsbereich der Projektile. Das Verhältnis zwischen der Menge der Zielobjekte und der Projektile ist ein weiterer Parameter.\\
-Die Benchmark-Umgebung setzt den Seed des verwendeten Zufallsgenerators abhängig von den Szenarioparametern, aber nicht abhängig vom verwendeten Algorithmus. So müssen verschiedene Algorithmen die exakt selben Probleme lösen. Um Störungen herauszufiltern, wird jedes Experiment einige Male wiederholt und der Median für die weitere Untersuchung verwendet. Um die Samplemenge zu erhöhen wurde eine Dummy-Parameter eingefügt, der den Seed ändert aber sonst keine Auswirkungen hat.\\
+Um die Performanz der Algorithmen bei verschiedenen Szenarien objektiv bewerten zu können, wurde im Rahmen des Projektes eine Benchmark-Umgebung implementiert. Getestet wurden verschiedene Szenarien und Parameter. Gemeinsam haben alle Szenarien die Testparameter Problemgröße (Objektzahl) und absolute Größe der Objekte (aus $\mathcal{S}$).\\
+%GRR die absolute größe ist also ein spacelen, der wie zustande kommt? keine Vorstellung als Leser, wie eine für ein 3D-Objekt representative Größenvariable in ein 1D-Spacevec reinpasst
+
+Das Standardszenario ist eine Gleichverteilung von Objekten im Raum. 
+Ein zusätzlicher Testparameter hier ist die Dichte der Objekte, welche das Verhältnis der Durchschnittsgröße (längste Ausdehnung in einer Achse) zur Durchschnittsdistanz (der Mittelpunkte) darstellt. Die asymmetrische Variante hat zusätzlich noch das Verhältnis der Menge an Objekten beider Klassen als Testparameter. Die Größe des Erzeugungsbereichs ist bei beiden Klassen identisch.\\
+Ein weiteres rein asymmetrisches Szenario "Shotgun" modelliert eine Menge an Projektilen und Zielen. Die Ziele sind weiterhin gleichverteilt, die Projektile modellieren jedoch eine Schrotladung, bei der viele Projektile relativ nahe zusammen in eine sehr ähnliche Richtung fliegen. Dies bedeutet, dass die AABBs der Projektile sich weitgehend überlappen (AABBs werden über den gesamten Raum ausgedehnt, durch den sich Objekte im Laufe eines Ticks bewegen).
+%GRR das wäre vielleicht praktisch, mal irgendwo am anfang zu erwähnen, dass AABBs eben nicht nur \supseteq K_0 sind, sondern \supseteq \{K_{o,t} | t\in \Upsilon_{\delta i}\} oder referenziert diesen fakt aus der section \ref{sec:bounding_volume}.
+Sie werden aber alle nur in einem Teilbereich erzeugt, der nicht dem Erzeugungsbereich der Zielobjekte entspricht.
+%GRR Üblicherweise nicht, ist aber nicht auszuschließen, talking of point blank range
+Ein Testparameter beschreibt die erwartete Anzahl Ziele im Erzeugungsbereich der Projektile. Das Verhältnis zwischen der Menge der Zielobjekte und der Projektile ist ein weiterer Parameter.\\
+Die Benchmark-Umgebung setzt den Seed des verwendeten Zufallsgenerators abhängig von den Szenarioparametern, aber nicht abhängig vom verwendeten Algorithmus. So müssen verschiedene Algorithmen die exakt selben Probleme lösen. Um Messstörungen herauszufiltern, wird jedes Experiment einige Male wiederholt und der Median für die weitere Untersuchung verwendet. 
+Um die Probemenge zu erhöhen wurde ein Dummy-Parameter eingefügt, der den Seed ändert aber sonst keine Auswirkungen hat.
+%GRR Dummy parameter implementierungsdetail? parameter existiert um Seed zu ändern and to what end würde genügen und wäre interessanter\\
 Für die im Folgenden gezeigten Daten wurden alle Benchmarks auf einem PC mit Intel i7-4790K CPU bei 4,5GHz mit 2400MHz Dual-Channel RAM ausgeführt.\\
-Zunächst soll bei Boxsort die Wahl der Klasse für den Baum untersucht werden (in Abschnitt~\ref{sec:boxsort} theoretisch betrachtetes Problem). Zu diesem Zweck wird das Verhältnis der Ausführungszeiten der beiden Möglichkeiten betrachtet. Ist es größer als 1, bedeutet dies hier, dass es mehr Ausführungszeit benötigt hat, die Master-Klasse für den Baum zu verwenden, d.h. die Slave-Klasse ist die bessere Wahl für den Baum.\\
+Zunächst soll bei Boxsort die Wahl der Klasse
+%GRR welche klassifizierung ist konkret gemeint, wsl. Interaktionstyp? Definitionen!
+ für den Baum untersucht werden (in Abschnitt~\ref{sec:boxsort} theoretisch betrachtetes Problem). Zu diesem Zweck wird das Verhältnis der Ausführungszeiten beider Möglichkeiten
+%GRR ...
+ betrachtet. Ist es größer als 1, bedeutet dies hier, dass es mehr Ausführungszeit benötigt hat, die Master-Klasse
+%GRR Wer Master ist und wer nicht ist u.U. interpretierungssache? Terminologie?
+ für den Baum zu verwenden, d.h. die Slave-Klasse ist
+%GRR praktisch
+die bessere Wahl für den Baum.\\
 
 \begin{figure}
     \centering
     \includegraphics[width=1.0\textwidth]{./res/boxsortChoice-reference.png}
-    \caption{Einfluss der Wahl der Objektmenge für den Baumaufbau beim Box Sort, wenn gleich große Mengen getestet wurden, die beide statistisch gleichverteilt über den selben Raum sind.}
+    \caption{
+%GRR Diagrammtyp Histogramm ?
+    Einfluss der Wahl der Objektmenge für den Baumaufbau beim Box Sort, wenn gleich große Mengen
+%GRR welche Mengen sind gleich groß?    
+     getestet wurden, die beide statistisch gleichverteilt über den selben Raum sind.}
     \label{fig:boxsortCoice-reference}
 \end{figure}
 
+%GRR Unverständlich :  Objektanzahl, aber hier Asymmetrischer Fall? welche Objektanzahl ist gemeint
+%GRR Unverständlich : Samples. Von was ? sind das einzelne Tests?
+
 Als Referenz soll zunächst die Wahl bei einer Gleichverteilung betrachtet werden, zunächst mit einer identischen Menge an Objekten beider Klassen. Abb.~\ref{fig:boxsortChoice-reference} zeigt, dass in diesem Referenzfall kein signifikanter Unterschied zwischen besteht und die sichtbaren Unterschiede wahrscheinlich vom Zufall stammen. Zu sehen ist, dass die stärkeren Abweichungen im Randbereich häufiger bei niedrigen Objektzahlen und damit auch niedrigen absoluten Laufzeiten auftreten.\\
 
+
 \begin{figure*}
-	\begin{subfigure}[t]{0.55\textwidth}
+	\begin{subfigure}[t]{0.50\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-A.png}
 		
 		\label{fig:boxsortChoice-uniform-A}
 	\end{subfigure}
-~
-	\begin{subfigure}[t]{0.55\textwidth}
+\hfill
+	\begin{subfigure}[t]{0.50\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-B.png}
 
 		\label{fig:boxsortChoice-uniform-B}
 	\end{subfigure}
-~
-	\begin{subfigure}[t]{0.55\textwidth}
+\vskip\baselineskip
+	\begin{subfigure}[t]{0.50\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-C.png}
 
 		\label{fig:boxsortChoice-uniform-C}
 	\end{subfigure}
-~
-	\begin{subfigure}[t]{0.55\textwidth}
+\hfill
+	\begin{subfigure}[t]{0.50\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{./res/boxsortChoice-uniform-D.png}
 
@@ -105,10 +273,14 @@ Als Referenz soll zunächst die Wahl bei einer Gleichverteilung betrachtet werde
 	\end{subfigure}
 
 	\caption{Untersuchung der Auswirkungen verschiedener Parameter auf das Verhältnis der Laufzeiten des Boxsort Algorithmus //TODO}
+%GRR todo
 	\label{fig:boxsortChoice-uniform}
 \end{figure*}
 
-Wenn die Objektzahl je Klasse nicht mehr identisch ist, können Vermutungen aus Abschnitt~\ref{sec:boxsort} untersucht werden. Mehrere Untersuchungen dazu werden in Abb.~\ref{fig:boxsortChoice-uniform} gezeigt. Abb.~\ref{fig:boxsortChoice-uniform} A zeigt alle Samples, gefärbt nach Anteil der Master-Objekte. Zu erkennen ist, dass bei den getesteten Parametern der Baum aus der kleineren Menge gebildet werden sollte. Um genauer zu betrachten, welche Parameterkombinationen zu welchem Unterschied führt, werden zunächst in Abb.~\ref{fig:boxsortChoice-uniform} B die Samples auf diejenigen beschränkt, wo der Anteil Master-Objekte 90\% beträgt. Die farbliche Aufteilung ist dort anhand der Dichte. Erkennbar ist, dass der Wertebereich stark von der Dichte abhängig ist, wobei die geringste Dichte die größte Streuung aufweist. Um dies weiter zu untersuchen, zeigt Abb.~\ref{fig:boxsortChoice-uniform} C davon nur die geringste getestete Dichte, farblich nach Objektzahl getrennt. Zu sehen is dort, dass die Unterschiede bei weniger Objekten gegen 0\% gehen, bei vielen Objekten gegen etwa +150\%. Die Beobachtung bei vielen Objekten passt zu den in Abschnitt~\ref{sec:boxsort} beobachteten Vorfaktoren, was auch bei vielen Objekten erfolgte. Für den Fall höherer Dichte scheinen die dort ermittelten Werte nicht mit den im Benchmark gemessenen Werten übereinzustimmen, die in Abb.~\ref{fig:boxsortChoice-uniform} D zu sehen sind. Dies weist auf einen weiteren versteckten Faktor hin. Man könnte weitere Tests für höhere Dichten durchführen, dort ist Box Sort jedoch keine sinnvolle Wahl mehr, da für praktische Objektzahlen dann selbst der naive Algorithmus noch schneller wäre. Dort wäre außerdem die absolute Laufzeit für Echtzeitanwendungen zu hoch.\\
+
+Wenn die Objektzahl je Klasse nicht mehr identisch ist, können Vermutungen aus Abschnitt~\ref{sec:boxsort} untersucht werden.
+%GRR genauer referenzieren, fusionieren oder nochmal darlegen.
+Mehrere Untersuchungen dazu werden in Abb.~\ref{fig:boxsortChoice-uniform} gezeigt. Abb.~\ref{fig:boxsortChoice-uniform} A zeigt alle Samples, gefärbt nach Anteil der Master-Objekte. Zu erkennen ist, dass bei den getesteten Parametern der Baum aus der kleineren Menge gebildet werden sollte. Um genauer zu betrachten, welche Parameterkombinationen zu welchem Unterschied führt, werden zunächst in Abb.~\ref{fig:boxsortChoice-uniform} B die Samples auf diejenigen beschränkt, wo der Anteil Master-Objekte 90\% beträgt. Die farbliche Aufteilung ist dort anhand der Dichte. Erkennbar ist, dass der Wertebereich stark von der Dichte abhängig ist, wobei die geringste Dichte die größte Streuung aufweist. Um dies weiter zu untersuchen, zeigt Abb.~\ref{fig:boxsortChoice-uniform} C davon nur die geringste getestete Dichte, farblich nach Objektzahl getrennt. Zu sehen ist dort, dass die Unterschiede bei weniger Objekten gegen 0\% gehen, bei vielen Objekten gegen etwa +150\%. Die Beobachtung bei vielen Objekten passt zu den in Abschnitt~\ref{sec:boxsort} beobachteten Vorfaktoren, was auch bei vielen Objekten erfolgte. Für den Fall höherer Dichte scheinen die dort ermittelten Werte nicht mit den im Benchmark gemessenen Werten übereinzustimmen, die in Abb.~\ref{fig:boxsortChoice-uniform} D zu sehen sind. Dies weist auf einen weiteren versteckten Faktor hin. Man könnte weitere Tests für höhere Dichten durchführen, dort ist Box Sort jedoch keine sinnvolle Wahl mehr, da für praktische Objektzahlen dann selbst der naive Algorithmus noch schneller wäre. Dort wäre außerdem die absolute Laufzeit für Echtzeitanwendungen zu hoch.\\
 
 \begin{figure*}
 	\begin{subfigure}[t]{0.55\textwidth}
@@ -308,4 +480,12 @@ Allgemein ist beim Shotgun-Szenario Box Sort wieder überlegen. Den Baum aus Pro
 	\caption{Alle Benchmark-Daten für das Shotgun-Szenario, aufgeteilt nach dem Anteil der Objekte, die der Projektil-Klasse angehören.}
 	\label{fig:shotgunComparison}
 \end{figure*}
+
+
+%GRR Recommendations:
+% * pack die Benchmarks zu ihren Themen dazu, passt besser, und du kannst einfacher spezifisch zurückrefernzieren, was da vorher theoretisch mal behauptet wurde, was jetzt stimmt, etc, etc.
+% für mich als leser ist weniger lücke, besserer cache
+% * mach am Schluss dediziert einen Vergleich zwischen den Verfahren, wobei du auf die jeweiligen benchmarkergebnisse refenzierst. so sind die benchmarks in ihrer schublade, und das eigentliche ergebnis deiner benchmarks, nämlich der vergleich der Algorithmen, ist dedizierter plaziert, was ja, denke ich, deiner intention ensprechen sollte
+% * bitch in deinem Fazit auf jeden fall, wie viel aufwand die benchmarks waren, da sie ja dann ggf. nichtmehr ein extrakapitel sind und das dann weniger auffällt, erwähne auch gerne, wie sehr du dich da in der bearbeitungszeit verschätzt hast
+% spezifizität würde ich mir mehr wünschen. an stellen ist nur sehr schwer eindeutig auszumachen was du meinst und ich muss sachen annehmen um zu verstehen, die aber falsch sein können, etc. Dazu gehören vor allem Definitionen von Begriffen. Wenn du vor hast einen Begriff mehrfach zu verwenden kann mann dafür auch einen dedizierten satz opfern. Wenn der Begriff dann definiert ist, bitte keinen Deckungsgleichen begriff einführen. Ich hab an stellen die Einschätzung, dass einige nicht definierte Begriffe, die zur variablen Wortwahl beitragen sollen, so zwischen absätzen ihre Semantik ändern.
 
