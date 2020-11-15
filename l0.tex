@@ -22,7 +22,7 @@ Die Simulation läuft gezeitet ab. Es existieren dabei zwei relevante zeitliche 
 	\begin{itemize}
 	\item Zwischen den beiden Zeitbasen besteht eine totale, nicht-injektive, surjektive Abbildung $\mathcal{T}:T_r \twoheadrightarrow T_s$
 	\item Die Simulationszeit ist dadurch relativ zur Realzeit definiert $T_s:=\langle\mathcal{T}\rangle$
-	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeittate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
+	\item Um die Kontinuität der Zeit herzustellen wird weiter eine Zeitrate $r_t:T_r\mapsto\mathcal{F}$ definiert, welche das relative verstreichen der Zeit in der Simulation steuert. 
 	$$\forall t_{r0},  t_{r1} \in T_r ; t_{diff}=t_{r1}-t_{r0} :\mathcal{T}(t_{r1}) = \mathcal{T}(t_{r0}) + t_{diff}*r_t(t_{r1})$$ unter der Vorraussetzung, dass die Rate während aller Zeiten zwischen $t_{r0}$ und $t_{r1}$ gleich bleibt $\forall t \in [ t_{r0},t_{r1}]: r_t( t_{r0}) = r_t(t)$. Wird die Eigenschaft des Zeitflusses in der festgelegten Rate verletzt, werden die aktuellen Echtzeitanforderungen verletzt. \\
 	Soll die Rate also geändert werden muss dies zu festgelegten Umschaltpunkten geschehen, welche die Simulationszeit in Zeitbereiche trennen, zwischen denen keine Berechnungsvorgänge zuverlässig durchführbar sind.\\
 Beispiele für Raten sind 
@@ -51,7 +51,7 @@ Typischerweise gilt $f \in [0;1[$, um eine eindeutige Repräsentation für einen
 Diese Darstellung hat folgende weitere Vorteile
 \begin{itemize}
 \item Einfache Implementierung
-\item Schnelle Indizierung der durch $\mathcal{I}$ indizierten Raumanteile für raumaufteilende Teile-und-Herrsche-Algorithmen
+\item Schnelle Indizierung der durch $\mathcal{I}$ indizierten Raumanteile für raumaufteilende Algorithmen
 \end{itemize}
 
 Absolute Positionen im Raum werden demnach mit Vektoren $s\in\mathcal{S}^3$ dargestellt. Für Berechnungen von Interaktionen zwischen Objekten werden Positionen zunächst relativiert, d.h. Positionen $p \in \mathcal{S}$ sollen zu $p_0$ relativ gesetzt werden, dann sind die relativen Positionen $p' = p - p_0$. Diese werden dann in in die für lokale Interaktionen sinnhafte  Einheit Meter $\mathcal{F}^3$ umgewandelt, um darauf Berechnungen durchzuführen. Man geht dabei davon aus, das relative Strecken zwischen Objekten kurz genug sind, sodass die Genauigkeitsänderung in $\mathcal{F}$ vernachlässigbar ist.\\
