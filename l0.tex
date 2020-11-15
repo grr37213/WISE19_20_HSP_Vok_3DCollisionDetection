@@ -60,10 +60,10 @@ Effektiv ist dabei die Eigenschaft $\mathcal{F}\subset\mathcal{S}$ nicht geforde
 Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, in denen Objekte durch Relativierung, Längenumrechnung und Transformation dargestellt werden.
 
 \begin{enumerate}
-\item Worldspace $= \mathcal{S}^3$ absolute Positionen von Objekten
+\item Worldspace $= \mathcal{S}^3$, absolute Positionen von Objekten
 \item Cameraspace $= \mathcal{F}^3$, Ursprung $O$ ist die Position der Kamera zum Rendern einer Szene, Objekte werden zur Kamera relativiert.
 \item Viewspace $= \mathcal{F}^3$, Verzerrung durch die Kameralinse, um einen Blickwinkel auf einen Bildschirm anzupassen.
-\item Objektspace,$= \mathcal{F}^3$, Ursprung ist der vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt relativiert.
+\item Objectspace $= \mathcal{F}^3$, Ursprung ist der vom Modell definierten Mittelpunkt eines Objektes (Massenmittelpunkt), zur Verarbeitung von physikalischen Objektinteraktionen wird ein Objekt zu einem anderen Objekt durch Transformation in dessen Objectspace relativiert.
 \end{enumerate}
 
 Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
@@ -71,14 +71,14 @@ Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigk
 \subsection{Objektform}
 \label{object_form}
 Die Form eines Objektes ist in einem hier rigiden, d.h. unveränderlichen Modell beschrieben, welche die Form relativ zum Ursprung $O$ ihres eigenen Objektraums angibt.
-Für Modelle werden mathematisch oft als kompakte Punktemengen verwendet. Wir denotieren diese kompakten Modelle zugehörig zum Objekt $o$ als $ K_o \subseteq \mathcal{F}$.\\
+Für Modelle werden mathematisch oft kompakte Punktemengen verwendet. Wir denotieren diese kompakten Modelle zugehörig zum Objekt $o$ als $ K_o \subseteq \mathcal{F}$.\\
 
 Durch die kompakte Mengendarstellung führen Rechenoperationen mit Objekten auf maschinell relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
 Für das Objekt $o$ ist eine Polygon-Mesh $M_o := (V_o, I_o); V \subseteq \mathcal{F}^3, I \subseteq [0, |V|-1]_\mathbb{N}^3 )$ beschreibt ein Polytop durch seine Eckpunkte $V_o$(Ecken, eng. \textit{vertices}), die durch 3-Gruppierungen ihrer Indices $I_o$ zu Dreiecksflächen verbunden sind.\\
 Aus der Definition der Polygon-Mesh gehen implizit weitere Definitionen hervor:
 
 \begin{enumerate}
-\item Kanten (eng. \textit{edges}) $E_o = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V_o;(a, b, c) \in I\} $\\
+\item Kanten (eng. \textit{edges}) $E_o = \{(v_a, v_b), (v_b, v_c),(v_c, v_a) | \{v_0, ...\} = V_o;(a, b, c) \in I\} $
 , welche jeweils die Punkte $\mathcal{E}:E_o\mapsto\mathcal{F}^3; \mathcal{E}((v_a, v_b)) = \{v_a + (v_b-v_a)* k; k \in [0,1]\} $ im Raum einnehmen.
 \item Flächen (eng. \textit{areas})$ A_o = \{(v_a, v_b, v_c) | \{v_0, ... \} = V(o, t); (a, b, c) \in I\} $,\\
 welche jeweils die Punkte $\mathcal{A}:A_o\mapsto\mathcal{F}^3; \mathcal{A}((v_a, v_b, v_c)) = \{v_a + (v_b-v_a)* k + (v_c-v_a)*l; (k+l) \in [0,1]\} $ im Raum einnehmen.
@@ -116,17 +116,19 @@ An dieser Stelle wird festgelegt: Während eines Ticks ändern sich diese konsta
 \end{enumerate}
 beschränkt.
 
-Während eines Ticks $\delta_i$ kann demnach eine Transformationsmatrix $Q: OBJ \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}$ für alle für jedes Objekt zu jedem Zeitpunkt des Ticks angegeben werden, die die einem Objekt via Modell zugeordneten Punkte, seien dies $V_o, K_o$ usw., die relativ zum jeweiligen Objektspace angegeben sind nun in die entsprechende Position im Worldspace transformieren kann. Transformationsmatrizen sind typischerweise im Kontext der Computergrafik und Simulation von 3D-Räumen $4\times 4$ gewählt, um z.B. auch Translation zu realisieren \cite[ch. 4.4.1, p.76]{fourcrossfour}. Wir beschreiben dazu die 
+Durch die Kenntnis des räumlichen Objektzustandes zu Beginn eines Ticks, können durch die zeitlichen Änderungsgrößen nun sämtliche Zustände während des Ticks errechnet werden.
+Dies wird unter Zuhilfenahme von Transformationsmatrizen $Q: OBJ \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}$ bewerkstelligt. Mit der Hilfe der Matrizen können die einem Objekt zugeordneten Punkte, seien dies $V_o, K_o$ usw., zu ihrer neuen Position zum gegebenen Zeitpunkt transformiert werden. Transformationsmatrizen sind typischerweise im Kontext der Computergrafik und Simulation von 3D-Räumen $4\times 4$ gewählt, um z.B. auch Translation zu realisieren \cite[ch. 4.4.1, p.76]{fourcrossfour}. Wir beschreiben dazu die 
 Translationsmatrix, die aus einer Position, und die Rotationsmatrix, die aus einer Rotationsanweisung hervorgeht $Q_{trans}, Q_{rot}:\mathcal{F}^3 \mapsto \mathcal{F}^{4\times 4}$. Beide dieser Funktionen, insbesondere $Q_{trans}$ sind für $\mathcal{F}^3$ anstatt für $\mathcal{S}^3$ definiert, denn es wird erwartet, dass für die Berechnung zu einem relativ nahen Punkt $P \in\mathcal{S}^3$ relativiert und daraufhin in $\mathcal{F}^3$ durch die Funktion $meter$ umgewandelt wird.\\
 Sei $o \in OBJ; pos = pos(o, \delta_i); v = v(o, \delta_i); rot = rot(o, \delta_i); \omega = \omega(o, \delta_i)$, dann gilt
 $Q(o, t) = Q_{trans}(meter(pos + v * (t-t_0))) * Q_{rot}(rot + \omega * (t - t_0))$.\\
-Bei der Relativierung von Objekten ,welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix 
+Praktisch wird im Projekt hier keine Translationsmatrix direkt verwendet. Stattdessen wird Translation durch schlichte Vektoraddition realisiert (Es gilt typischerweise $\forall p \in\mathbb{R}^3, move \in \mathbb{R}^3 : p * Q_{trans}(move) = p + move$). Der Grund hierfür liegt im Codedesign.\\
+Bei der Relativierung von Objekten ,welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix kann wie folgt beschrieben werden:
 \begin{align}
 R: OBJ^2 \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}; R(o_1, o_0, t) = Q(o_1 - o_0, t) = \\
 Q_{trans}( meter(  pos(o_1, t)-pos(o_0, t) ) + meter(v(o_1, t)-v(o_0, t)) * (t-t_0) ) \\
 * Q_{rot}((rot(o_1, t)-rot(o_0, t)) + (\omega(o_1, t)-\omega(o_0, t)) * (t-t_0))= I_4
 \end{align}
-. Ein Vorteil besteht dabei, dass bei Relativierung eines Objektes zu sich selbst dabei die Identitätsmatrix $I_4 = R(o_0, o_0, t) \forall t$ entsteht. Auf entsprechenden Modellpunkten von $o_0$ muss dann keine Operation ausgeführt werden, da $\forall p\in \mathbb{F}^3: p*I_4=p$. Dadurch kann bei der Berechnung einer Interaktion, bei der u.U.~ viele Modellpunkte Transformiert werden müssen, die Hälfte der Transformationen gespart werden.\\
+Ein Vorteil besteht dabei, dass bei Relativierung eines Objektes zu sich selbst dabei die Identitätsmatrix $I_4 = R(o_0, o_0, t) \forall t$ entsteht. Auf entsprechenden Modellpunkten von $o_0$ muss dann keine Operation ausgeführt werden, da $\forall p\in \mathbb{F}^3: p*I_4=p$. Dadurch kann bei der Berechnung einer Interaktion zwischen zwei Objekten, bei der u.U.~ viele Modellpunkte Transformiert werden müssen, die Hälfte der Transformationen gespart werden, indem direkt zu einem der beiden Objectspaces relativiert wird.\\
 Zur Vereinfachung wird für alle Punktmengen $X_o$ zu einem Objekt $o$ die Notation $X_{o, t} = X_o * Q(o, t)$ und für relative Transformationen $X_{o_1, t, o_0} = X_{o_1} * R(o_1, o_0, t)$ verwendet, sodass z.B. die Transformierte Menge der Eckpunkte von $o$ zu Tickzeitpunkt $t$ als $V_{o,t}$ beschrieben werden kann.
 
 \subsection{Projektleistung}
