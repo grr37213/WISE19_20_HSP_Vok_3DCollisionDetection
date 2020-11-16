@@ -122,7 +122,7 @@ Translationsmatrix, die aus einer Position, und die Rotationsmatrix, die aus ein
 Sei $o \in OBJ; pos = pos(o, \delta_i); v = v(o, \delta_i); rot = rot(o, \delta_i); \omega = \omega(o, \delta_i)$, dann gilt
 $Q(o, t) = Q_{trans}(meter(pos + v * (t-t_0))) * Q_{rot}(rot + \omega * (t - t_0))$.\\
 Praktisch wird im Projekt hier keine Translationsmatrix direkt verwendet. Stattdessen wird Translation durch schlichte Vektoraddition realisiert (Es gilt typischerweise $\forall p \in\mathbb{R}^3, move \in \mathbb{R}^3 : p * Q_{trans}(move) = p + move$). Der Grund hierfür liegt im Codedesign.\\
-Bei der Relativierung von Objekten ,welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix kann wie folgt beschrieben werden:
+Bei der Relativierung von Objekten, welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix kann wie folgt beschrieben werden:
 \begin{align}
 R: OBJ^2 \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}; R(o_1, o_0, t) = Q(o_1 - o_0, t) = \\
 Q_{trans}( meter(  pos(o_1, t)-pos(o_0, t) ) + meter(v(o_1, t)-v(o_0, t)) * (t-t_0) ) \\
@@ -132,6 +132,6 @@ Ein Vorteil besteht dabei, dass bei Relativierung eines Objektes zu sich selbst 
 Zur Vereinfachung wird für alle Punktmengen $X_o$ zu einem Objekt $o$ die Notation $X_{o, t} = X_o * Q(o, t)$ und für relative Transformationen $X_{o_1, t, o_0} = X_{o_1} * R(o_1, o_0, t)$ verwendet, sodass z.B. die Transformierte Menge der Eckpunkte von $o$ zu Tickzeitpunkt $t$ als $V_{o,t}$ beschrieben werden kann.
 
 \subsection{Projektleistung}
-Im Rahmen des Projektes wurden Schnittstellen für~\ref{sec:objects_rep}, angelegt um entsprechenden Zugriff auf die Information von Ecken, Kanten und Flächen während Interaktionsroutinen zu erhalten. Außerdem wurden physikalische Entitäten im Code Repräsentiert, die die für die paarweise Kollisionsberechnung benötigten Attribute für Rotation und Rotationsgeschwindigkeit als Erweiterung zur herkömmlichen Entität beinhalten, die diese nicht besitzt. Alle anderen Teile des bisher behandelten Kontext von Zeit, Raum Objektrepräsentation und Objektbewegung enthalten im Rahmens dieses Projektes maximal marginale Neuleistung.
+Im Rahmen des Projektes wurden Schnittstellen für~\ref{sec:objects_rep}, angelegt um entsprechenden Zugriff auf die Information von Ecken, Kanten und Flächen während Interaktionsroutinen zu erhalten. Außerdem wurden physikalische Entitäten im Code repräsentiert, die die für die paarweise Kollisionsberechnung benötigten Attribute für Rotation und Rotationsgeschwindigkeit als Erweiterung zur herkömmlichen Entität beinhalten, die diese nicht besitzt. Alle anderen Teile des bisher behandelten Kontext von Zeit, Raum Objektrepräsentation und Objektbewegung enthalten im Rahmens dieses Projektes maximal marginale Neuleistung.
 
 
