@@ -348,12 +348,11 @@ Allgemein ist beim Shotgun-Szenario Box Sort wieder überlegen. Den Baum aus Pro
 	\label{fig:shotgunComparison}
 \end{figure*}
 
-//TODO filterung selbst naiv hat riesige vorteile
+\subsection{Fazit und Ausblick}
+Als Fazit kann man sagen, dass beide Algorithmen für die Praxis tauglich sind, mit Boxsort als robuster Mittelweg und  Spatial Hashing (mit richtiger Konfiguration) für bessere Performance bei bestimmten Anwendungen. Games sollten also diese oder andere ähnlich performante Verfahren zur Kollisionsvorfilterung verwenden. Dies ist bei vielen aktuell am Markt befindlichen Spielen leider nicht der Fall, was bei einer hohen Objektanzahl selbst ohne Kollisionen zu einer schlechten Performance führt. Dies ist meist bei Indie-Games der Fall, auch weil dort typischerweise weniger Limits existieren, die den Spieler davon abhalten, ein solches Problem erst zu erzeugen. Hier wird vermutet, dass einer der Gründe für eine fehlende Implementierung solcher besseren Algorithmen ist, dass von Entwicklern meist nur mit dem Durchschnittsspieler gerechnet wird, für den die Probleme meist nicht auftreten. Ein weiterer könnte sein, dass sich der Aufwand monetär nicht lohnt, da man als Spieler die Probleme meist erst dann hat, wenn man bereits das Spiel und eventuelle Erweiterungen gekauft hat.\\
 
-//TODO Ausblick platzieren
-
-Ausblick:
 Da dieses Projekt aus privatem Interesse entstanden ist, wäre es nicht unrealistisch anzunehmen, dass an den Vorfilterungsalgorithmen in Zukunft weiter gearbeitet wird. Beim Spatial Hashing ist ein für die Praxis relevantes Problem, dass aktuell die Größe von Chunks an die Größe der Einheitslänge in $\mathcal{S}$ gebunden ist. Man könnte einen Parameter einfügen, der sie um genzzahlige Faktoren größer (aber nicht kleiner) werden ließe, ohne die durch die Bindung gewonnene Performance stark zu beeinflussen. Der Wertebereich der Eingabe der Hashfunktion wäre dann nicht beeinflusst. Es könnte außerdem untersucht werden, warum die Performance beim Spatial Hashing bei geringer Objektanzahl so schlecht ist. Bei Box Sort könnte man u.a. die Medianfindung analysieren, um die Performance eventuell zu verbessern. Auch eine Implementierung des Baums, die stärker das Cache-Verhalten ausnutzt, wäre denkbar.\\
 Für hohe absolute Geschwindigkeiten könnten AABBs mit Geschwindigkeit implementiert werden, so könnte man eventuell auch einen ganzen Knoten im Baum von Boxsort mit einer Geschwindigkeit versehen. Eine Art hierarchische Baumstruktur könnte auch bei der Kollision von 2 konkreten Objekten hilfreich sein, um Teile des Objekts mit AABBs zu versehen und sie so verfrüht von der rechenintensiven Kollisionsberechnung auszuschließen.\\
 
+//TODO filterung selbst naiv hat riesige vorteile 650ms ohne vorfilterung 6ms mit both boxsort oder naiv
 //TODO 2.6 rework
