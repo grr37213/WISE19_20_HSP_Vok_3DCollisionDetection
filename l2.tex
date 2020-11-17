@@ -407,3 +407,5 @@ $$\mathcal{O}(1*1*4* r_{sample} + \log_{2}(\frac{(t_{\omega} - t_\alpha)}{r_{sam
 Der GJK ist theoretisch für $m\in\mathbb{N}$ Dimensionen definiert \cite{gjk}. Durch die Behandlung von Objekten während eines Ticks als 4-dimensionale kompakte Menge $\bigcup_{t \in \Upsilon_{\delta_i}} K_{o,t}$ könnte der zeitunabhängige Schnitt ermittelt werden um entsprechend vorzufiltern. Besonders im Kontext linearer Bewegungen als Vorfilterung zur linearen Interpolation wäre die Ermittlung der 4D Modelle für den vorgeschalteten GJK einfach $V_{o, t_0} \cup V_{o, t_1}$, also der Aufwand einer einzigen Transformation pro Objekt.\\
 
 Hinsichtlich der Optimierungsmöglichkeiten mag sich weiterer Zeitaufwand daher durchaus lohnen.\\
+
+Ohne die Bemühungen in Abschnitt \ref{sec:l1}, so zeigen Tests, wäre die GJK-Routine alleine für Echtzeitfähigkeit nicht ausreichend. Wir messen 1.4FPS für ca.~60 Objekte. Dies gilt zum derzeitigen Stand und schätzungsweise auch für die zu erwartende Optimierungsfähigkeit des Verfahrens in der Zukunft.
