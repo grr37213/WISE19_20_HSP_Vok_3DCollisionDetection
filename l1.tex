@@ -1,4 +1,4 @@
-
+\label{sec:l1}
 Da die exakte Berechnung einer Kollision zwischen zwei Objekten $o_0, o_1 \in \obj$ signifikant viel Rechenleistung benötigt (siehe Abschnitt \ref{sec:ausblick}), ist eine Vorfilterung der möglichen Objektpaare sinnvoll, die die meisten Paare schon vorher ausschließt.\\
 Zu diesem Zweck werden zu jedem Objekt Hüllkörper angegeben, die die Objekte durch die Eigenschaft $B_o \supseteq K_o$ abstrahieren, da gilt $K_{o0} \cap K_{o1} \Rightarrow B_{o0} \cap B_{o1}$, d.h.~ die Menge aller Paare mit exakter Kollision ist in jedem Fall in der Menge aller Paare enthalten $ \{ (o_0, o_1) | B_{o0} \cap B_{o1} \} \supseteq \{ (o_0, o_1) | K_{o0} \cap K_{o1} \} $.
 Die weiteren Eigenschaften der Hüllkörper sollen den Filterungsprozess erheblich vereinfachen, da Kollisionen unter diesen u.U. leichter zu errechnen sind. Hier wird als Hüllkörper eine AABB verwendet, deren hier praktische Eigenschaften in Abschnitt \ref{sec:AABB} beschrieben sind.\\

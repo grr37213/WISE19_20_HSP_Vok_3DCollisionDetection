@@ -2,8 +2,9 @@
 
 Implementierungstechnisch schränkt eine Rechenmaschine die mathematischen Zahlenräume ein:
 \begin{itemize}
-\item Die Reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen, welche hier im weiteren mit $\mathcal{F} \subset \mathbb{R}$ bezeichnet werden
-\item Integern $\mathbb{Z}$ sind maschinell in ihrer Darstellungsgröße beschränkt. Diese beschränkte Menge an Integern wird $\mathcal{I} \subset \mathbb{Z}$ genannt
+\item Die Reelen Zahlen $\mathbb{R}$ beschränken sich auf Floating-Point-Datentypen. Wir verwenden hier hauptsächlich 32-Bit IEEE Floats mit einfacher Genauigkeit.
+Die Menge an so repräsentierbaren Zahlen soll hier im weiteren mit $\mathcal{F} \subset \mathbb{R}$ bezeichnet werden.
+\item Integern $\mathbb{Z}$ sind hier maschinell in ihrer Darstellungsgröße durch maximal 64-Bit beschränkt. Diese beschränkte Menge an Integern wird $\mathcal{I} \subset \mathbb{Z}$ genannt. Die exakte Größe des Integers kann jedoch je nach Verwendungszweck variieren.
 \end{itemize}
 
 
@@ -72,12 +73,12 @@ Implementierungstechnisch bestehen verschiedene Räume je nach Anwendungsfall, i
 
 Auf diese Weise gelingt es selbst extreme absolute Entfernungen und Geschwindigkeiten im relativen akkurat zu behandeln.
 
-Während ein Datentyp für $\mathcal{S}^3$ bereits zum Start des Projektes vorhanden war, wurde der Datentyp für $\mathcal{F}^3$ von einem selbst Definierten zu dem aus einer Bibliothek für lineare Algebra, GLM %TODO cite
+Während ein Datentyp für $\mathcal{S}^3$ bereits zum Start des Projektes vorhanden war, wurde der Datentyp für $\mathcal{F}^3$ von einem selbst Definierten zu dem aus einer Bibliothek für lineare Algebra, GLM (Quelle: \url{https://glm.g-truc.net/})
 , geändert, um Zugriff auf komplexe mathematische Operationen in korrekter Implementierung zu erlangen.
 
 \subsection{Entitäten}
 \label{sec:entity}
-Entitäten sind der atomare Inhalt der Simulation. Es handelt sich dabei um eine Abstraktion für \glqq Etwas\grqq  in der Simulation. In der Realität suchen Physiker immer weiter \glqq Das [sie] erkenne[n], was die Welt im Innersten zusammenhält, ..\grqq [- J.W.v. Goethe, Faust, \glqq Nacht\grqq, Vers. 382]. Was in der Realität eine offene Frage ist, obwohl seit den Zeiten von Goethe in der Quantenphysik durchaus Fortschritte gemacht worden sind, muss für die Simulation jedoch eindeutig beantwortet werden, um eine quantifizierbare Menge an Instanzen eines Konzepts zu haben, die dann Simuliert werden können.\\
+Entitäten sind der atomare Inhalt der Simulation. Es handelt sich dabei um eine Abstraktion für \glqq Etwas\grqq ~in der Simulation. In der Realität suchen Physiker immer weiter \glqq Das [sie] erkenne[n], was die Welt im Innersten zusammenhält, ..\grqq [J.W.v. Goethe, \glqq Faust, Erster Teil\grqq, Vers. 382]. Was in der Realität eine offene Frage ist, obwohl seit den Zeiten von Goethe in der Quantenphysik durchaus Fortschritte gemacht worden sind, muss für die Simulation jedoch eindeutig beantwortet werden, um eine quantifizierbare Menge an Instanzen eines Konzepts zu haben, die dann Simuliert werden können.\\
 Quantenmechanische Prozesse sind, um die Illusion einer realen Welt aus der Perspektive eines Menschen herzustellen, um einiges zu rechenaufwändig für unsere Anforderungen. Man setzt die Abstraktion der atomaren Simulationseinheit also höher an, was praktisch zu vielen Spezialisierungen führt. Die gemeinsame Basis dieser Spezialisierungen wird hier \textit{Entity}( dt. Entität ) genannt.\\
 
 Verschiedenartige Beispiele:
@@ -88,7 +89,7 @@ Verschiedenartige Beispiele:
 \end{enumerate}
 Die Abstraktion der Entität dient demnach als Schnittstelle für die Simulation, um Zeit (während eines Ticks) auf atomare Bestandteile der Simulation anzuwenden, und als Implementierungsplattform für die verschiedenen Anwendungsanforderungen der Simulation, bzw.~dem Verhalten des Simulationsinhalts.\\
 
-Vor Projektbeginn hat die Abstraktion durch Entitäten bereits existiert, die Implementierung wurde jedoch für das Projekt etwas angepasst. Eine größere Änderung stellt jedoch die Trennung der Verwaltung von Entitäten von dem Interaktionsalgorithmus dar, die am Anfang des Projekts als Vorbereitung für die Implementierung von mehreren austauschbaren Algorithmen (für Abschnitt \ref{sec:l1} erfolgte.
+Vor Projektbeginn hat die Abstraktion durch Entitäten bereits existiert, die Implementierung wurde jedoch für das Projekt etwas angepasst. Eine größere Änderung stellt jedoch die Trennung der Verwaltung von Entitäten von dem Interaktionsalgorithmus dar, die am Anfang des Projekts als Vorbereitung für die Implementierung von mehreren austauschbaren Algorithmen (für Abschnitt \ref{sec:l1}) erfolgte.
 
 \subsection{Objektform}
 \label{object_form}
@@ -145,7 +146,7 @@ Dies wird unter Zuhilfenahme von Transformationsmatrizen $Q: OBJ \times \Upsilon
 Translationsmatrix, die aus einer Position, und die Rotationsmatrix, die aus einer Rotationsanweisung hervorgeht $Q_{trans}, Q_{rot}:\mathcal{F}^3 \mapsto \mathcal{F}^{4\times 4}$. Beide dieser Funktionen, insbesondere $Q_{trans}$ sind für $\mathcal{F}^3$ anstatt für $\mathcal{S}^3$ definiert, denn es wird erwartet, dass für die Berechnung zu einem relativ nahen Punkt $P \in\mathcal{S}^3$ relativiert und daraufhin in $\mathcal{F}^3$ durch die Funktion $meter$ umgewandelt wird.\\
 Sei $o \in OBJ; pos = pos(o, \delta_i); v = v(o, \delta_i); rot = rot(o, \delta_i); \omega = \omega(o, \delta_i)$, dann gilt
 $Q(o, t) = Q_{trans}(meter(pos + v * (t-t_0))) * Q_{rot}(rot + \omega * (t - t_0))$.\\
-Praktisch wird im Projekt hier keine Translationsmatrix direkt verwendet. Stattdessen wird Translation durch schlichte Vektoraddition realisiert (Es gilt typischerweise $\forall p \in\mathbb{R}^3, move \in \mathbb{R}^3 : p * Q_{trans}(move) = p + move$). Der Grund hierfür liegt im Codedesign.\\
+Praktisch wird im Projekt hier keine Translationsmatrix direkt verwendet. Stattdessen wird Translation durch schlichte Vektoraddition realisiert (Es gilt typischerweise $\forall p \in\mathbb{R}^3, move \in \mathbb{R}^3 : p * Q_{trans}(move) = p + move$). Der Grund hierfür liegt im Codedesign und der Verwendung von $\mathcal{S}^3$ als Datentyp.\\
 Bei der Relativierung von Objekten, welche hier als $o_1 - o_0$ denotiert wird, werden die Beschreibungskriterien beider Objekte mit denen eines Objektes $o_0$ jeweils subtrahiert. Die relative Transformationsmatrix kann wie folgt beschrieben werden:
 \begin{align}
 R: OBJ^2 \times \Upsilon_{\delta_i} \mapsto \mathcal{F}^{4\times 4}; R(o_1, o_0, t) = Q(o_1 - o_0, t) = \\
@@ -155,7 +156,7 @@ Q_{trans}( meter(  pos(o_1, t)-pos(o_0, t) ) + meter(v(o_1, t)-v(o_0, t)) * (t-t
 Ein Vorteil besteht dabei, dass bei Relativierung eines Objektes zu sich selbst dabei die Identitätsmatrix $I_4 = R(o_0, o_0, t) \forall t$ entsteht. Auf entsprechenden Modellpunkten von $o_0$ muss dann keine Operation ausgeführt werden, da $\forall p\in \mathbb{F}^3: p*I_4=p$. Dadurch kann bei der Berechnung einer Interaktion zwischen zwei Objekten, bei der u.U.~ viele Modellpunkte Transformiert werden müssen, die Hälfte der Transformationen gespart werden, indem direkt zu einem der beiden Objectspaces relativiert wird.\\
 Zur Vereinfachung wird für alle Punktmengen $X_o$ zu einem Objekt $o$ die Notation $X_{o, t} = X_o * Q(o, t)$ und für relative Transformationen $X_{o_1, t, o_0} = X_{o_1} * R(o_1, o_0, t)$ verwendet, sodass z.B. die Transformierte Menge der Eckpunkte von $o$ zu Tickzeitpunkt $t$ als $V_{o,t}$ beschrieben werden kann.
 
-Wir schreiben schon zu Beginn des Projektes die Position einer jeden Entität zu. Entitäten, die ein dreidimensionales Objekt darstellen, verwalten daher Rotation eigenständig. Solche Typen an Entitäten wurden im Rahmen dieses Projektes erstellt, die genaue Arithmetik dazu recherchiert und versucht in ein performantes Design zu packen. Insbesondere wurden dabei Bemühungen gemacht, durch Rotation veränderte Vertexpositionen relativ zum Ursprung des eigenen Objectspace nicht unnötig doppelt auszurechnen, was zu einer Lazy-Computing-Struktur führte.
+Wir schreiben schon zu Beginn des Projektes einer jeden Entität eine Position zu. Entitäten, die ein dreidimensionales Objekt darstellen, müssen Rotation eigenständig verwalten. Solche Typen an Entitäten wurden im Rahmen dieses Projektes erstellt, die genaue Arithmetik dazu recherchiert und versucht in ein performantes Design zu packen. Insbesondere wurden dabei Bemühungen gemacht, durch Rotation veränderte Vertexpositionen relativ zum Ursprung des eigenen Objectspace nicht unnötig doppelt auszurechnen, was zu einer Lazy-Computing-Struktur führte.
 
 \subsection{Hitbox}
 \input{hitbox.tex}
