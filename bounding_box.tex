@@ -7,8 +7,8 @@ Eine in diesem Projekt extensiv verwendete, tiefere Spezialform der Bounding-Box
 Hier relevante Eigenschaften dieser sind:
 \begin{itemize}
 \item kleine Datenrepresentation:
-		$$AABB_o \in \mathcal{S}^{3^2}; AABB_o = (BB_{min}, BB_{max}) = ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max}))$$.
-		 In ihnen werden Minimal- und Maximalpositionen der AABB festgehalten.
+		$$AABB_o \in \mathcal{S}^{3^2}; AABB_o = (BB_{min}, BB_{max}) = ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max}))$$
+		 Es werden nur absolute Minimal- und Maximalpositionen der AABB festgehalten.
 		 Diese Positionen werden im Worldspace $\mathcal{S}^{3^2}$ angegeben, da AABBs hier die primäre vereinfachende Abstraktion sein sollen, die in der Simulation für Objekte verwendet wird. Die Angabe im Worldspace macht AABBs für Berechnungen im absoluten, zum Beispiel räumliche Partitionierung für Teile-und-Herrsche Algorithmen, direkt zugänglich.
 		 Die theoretische, kompakte Punktemenge 
 		 \begin{align*}
