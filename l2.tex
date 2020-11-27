@@ -2,7 +2,7 @@
 Die paarweise Kollisionserkennung bezieht sich auf die Kollision von konkret zwei 3D-Modellen. In diesem Schritt ist die Genauigkeit der Kollision bei steigender Modellkomplexität im Fokus.
 Ziel ist es die Diskrepanzen zwischen der grafischen Anzeige von Modellen und der physikalischen Simulation zu deckeln.
 \subsection{Input}
-Aus dem vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|OBJ|^2$ Objektpaare $C_{guess}\subseteq OBJ^2$ erhalten, für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $C_{definitive}\subseteq OBJ^2$ in der Menge der vermuteten Kollisionspaare  vollständig enthalten ist $C_{definitive}\subseteq C_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verloren gehen. 
+Aus dem im Gesamtprozess vorhergehenden Schritt der Kollisionspaarermittlung werden für den Schritt der paarweisen Kollisionserkennung bis zu  $|OBJ|^2$ Objektpaare $C_{guess}\subseteq OBJ^2$ erhalten, für die eine Kollisionsvermutung während eines Ticks gilt. Man geht weiter davon aus, dass die Menge der tatsächlichen Kollisionen $C_{definitive}\subseteq OBJ^2$ in der Menge der vermuteten Kollisionspaare  vollständig enthalten ist $C_{definitive}\subseteq C_{guess}$, d.h. keine tatsächlichen Kollisionspaare im Paarermittlungsprozess verloren gehen. 
 
 \subsection{Output}
 Es ist eine Aufgabe dieses Schritts, die Reduzierung von $C_{guess}$ auf $C_{defintive}$ zu vollenden.\\
@@ -23,7 +23,7 @@ Elemente der Aufzählung haben unterschiedliche Anforderungen hinsichtlich benö
 		\end{enumerate}
 		ein Eindringen eines Objektes in ein anderes stattfindet, d.h. ein Zustandsübergang von Nicht-Kollision zu Kollision stattfindet.
 		Der durchsuchte Zeitraum ist dabei eine kontinuierliche Schlusspartition der Ticksequenz $\Upsilon_{part} = \langle t_{searchstart}, ..., t_1 \rangle : (\Upsilon_{\delta i}\backslash \Upsilon_{part}) \smallfrown \Upsilon_{part} = \Upsilon_{\delta i} $ ($\smallfrown$ ist Konkatenation von Sequenzen) zu der relativ bei Zeitpunkt $j \in \Upsilon_{part} \subseteq \Upsilon_{\delta i}$ eine Erstkollision auftritt.\\
-		So können nach dem Finden der Erstkollision prinzipiell durch das Verschieben von $t_{searchstart}$ noch weitere Erstkollisionen während des Ticks $\delta_i$ ermittelt werden.
+		So können nach dem Finden der Erstkollision prinzipiell durch das Verschieben von $t_{searchstart}$ noch weitere Kollisionen als Quasi-Erstkollisionen während der restlichen Zeit im Ticks $\delta_i$ ermittelt werden.
 		$$\exists j \in [1, |\Upsilon_{part}|-1], t_c= \Upsilon_{part}(j):$$
 		$$ G_{o_0, t_c}\cap G_{o_1, t_c} \neq \emptyset \wedge \forall j' < j: 
 		G_{o_0, \Upsilon_{part}(j')}\cap G_{o_1, \Upsilon_{part}(j')} = \emptyset$$
@@ -215,9 +215,9 @@ Eigenschaften der Minkowski-Differenz müssen den Umstand der Diskretion respekt
 
 \begin{enumerate}
 		\item Die diskrete Minkowski-Differenz ist ebenfalls konvex.	
-		\item Ein Simplex ist eine durch eine Anzahl $n\in\mathbb{N}$ Eckpunkte $s\in\mathcal{M}(V_{o_0}, V_{o_1})^n$ aufgespannte $n$-dimensionale geometrische, inhärent konvexe Form (hier: Punkt für $n=1$, Gerade $n=2$, Dreieck $n=3$, Tetraeder $n=4$). Durch die Konvexität ist die entsprechende kompakte Menge $K_s$ implizit definiert.
-		\item Für das nächste Simplex $s_{nearest} \in \mathcal{M}(V_{o_0}, V_{o_1})$ zum Ursprung $O$ gilt außerdem $distance(O, s_{nearest}) = distance(K_{o_0}, K_{o_1})$ \cite[p. 195]{gjk}. 
-		\item $O \in \mathcal{M}(K_{o_0}, K_{o_1}) \nRightarrow O \in \mathcal{M}(V_{o_0}, V_{o_1})$. Jedoch kann eine äquivalente Beziehung gefunden werden: $O \in \mathcal{M}(K_{o_0}, K_{o_1}) \equiv \exists Simplex~s \in \mathcal{M}(V_{o_0}, V_{o_1}) : O \in K_s$, das den Ursprung enthält/umschließt.
+		\item Ein Simplex ist eine durch eine Anzahl $n\in\mathbb{N}$ Eckpunkte $s\subseteq\mathcal{M}(V_{o_0}, V_{o_1})^n$ aufgespannte $n$-dimensionale geometrische, inhärent konvexe Form (hier: Punkt für $n=1$, Gerade $n=2$, Dreieck $n=3$, Tetraeder $n=4$). Durch die Konvexität ist die entsprechende kompakte Menge $K_s$ implizit definiert.
+		\item Für das nächste Simplex $s_{nearest} \in \mathcal{M}(V_{o_0}, V_{o_1})$ zum Ursprung $O$ gilt außerdem $distance(O, K_{s_{nearest}}) = distance(K_{o_0}, K_{o_1})$ \cite[p. 195]{gjk}. 
+		\item $O \in \mathcal{M}(K_{o_0}, K_{o_1}) \nRightarrow O \in \mathcal{M}(V_{o_0}, V_{o_1})$. Jedoch kann eine äquivalente Beziehung gefunden werden: $O \in \mathcal{M}(K_{o_0}, K_{o_1}) \equiv \exists Simplex~s \subseteq \mathcal{M}(V_{o_0}, V_{o_1}) : O \in K_s$, das den Ursprung enthält/umschließt.
 
 \end{enumerate}
 Die diskrete Minkowski-Differenz wird trivial über zwei Schleifen implementiert($\mathcal{O}(V_0 * V_1)$). Es wird sich außerdem an dieser Stelle für ein Generator-Muster entschieden, um die Ermittlung der Differenz austauschbar zu machen.
@@ -337,7 +337,7 @@ Bei der Anpassung wurde zunächst mit Abbruchkriterien experimentiert um den im 
 \node at (C) [left]{$z_3=x_1-y_1$};
 
 \end{tikzpicture}
-	\caption{Minkowski-Differenz (rot) $\mathcal{M}(K_{o_0}, K_{o_1})$ mit markierten Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ mit mehreren nächsten Simplices $\{ \{z_1\},\{z_2\},\{z_0, z_3\},\{z_0,z_1\},\{z_1,z_2\}, ...\}$ zum Ursprung, sogar inklusive zweier deckungsgleicher 1D Simplices mit kleinster Dimensionalität 1.}
+	\caption{Minkowski-Differenz (rot) $\mathcal{M}(K_{o_0}, K_{o_1})$ mit markierten Punkten $\mathcal{M}(V_{o_0}, V_{o_1})$ mit mehreren nächsten Simplices $\{ \{z_1\},\{z_2\},\{z_0, z_3\},\{z_0,z_1\},\{z_1,z_2\}, ...\}$ zum Ursprung, sogar inklusive zweier deckungsgleicher punktförmiger Simplices mit kleinster Dimensionalität 0.}
 	\label{fig:parfeat}
 \end{figure}
 
@@ -391,11 +391,11 @@ Die hier vorgestellten Verfahren der linearen Interpolation und GJK erreichen se
 Das vermehrte Potential zur Optimierung wird in GJK gesehen.
 Beispiele/Experimente für Optimierungen des GJK im Ausblick:
 \begin{enumerate}
-\item konvexe Partitionen könnten vorgefiltert werden, wie z.B. durch Behandlung als quasi eigene Entität in Abschnitt~\ref{sec:filter}. Die dort beschriebenen Möglichkeiten geben dabei Aufschluss über die hier verwendbaren Optionen.
+\item konvexe Partitionen könnten vorgefiltert werden, wie z.B. durch Behandlung als quasi eigene Entität in Abschnitt~\ref{sec:l1}. Die dort beschriebenen Möglichkeiten geben dabei Aufschluss über die hier verwendbaren Optionen.
 \item Die Urquelle \cite[p.196, Mathindex 16, 17, 21]{gjk} beschreibt die Möglichkeit der Optimierung der Suche eines maximalen Punktes in einer Richtung (Algorithmus Schritt 2) von $\mathcal{O}(|V_{o_0}|*|V_{o_1}|)$die Optimierung auf $\mathcal{O}(|V_{o_0}|+|V_{o_1}|)$. Diese wurde initial übersehen und daher nicht in den Designprozess mit einbezogen. Die Optimierung würde die direkte Eingabe von Ursprungsobjekten (Partitionen) $o_0, o_1$ in den Algorithmus erfordern. Die Entscheidung, einen Generator für Minkowski-Punkte als Eingabe für den GJK-Algorithmus zu verwenden, erweist sich hier als unvorteilhaft, da die involvierten Prozesse nun strukturelle Hindernisse zur trivialen Umsetzung dieser Optimierung erzeugen.
 Es muss davon ausgegangen werden, dass einige weitere solche Details aus der Quelle \cite{gjk} übersehen wurden. 
 \item partielle Ordnungen zwischen Eckpunkten, um die Suche in Schritt 2. noch weiter auf $\mathcal{O}(\log(|V_{o_0}|)+log(|V_{o_1}|)$ zu optimieren.
-\item dynamische Auswahl von besseren Wurzelsuchverfahrens (vgl.~\ref{gdc-physics}) anhand von Details zu Objekten (Rotationsgeschwindigkeit, Varianz von $\vec{v}; v\in V_o$, etc.)
+\item dynamische Auswahl von besseren Wurzelsuchverfahrens (vgl.~\cite{gdc-physics}) anhand von Details zu Objekten (Rotationsgeschwindigkeit, Varianz von $\vec{v}; v\in V_o$, etc.)
 \end{enumerate}
 Unter diesen Umständen sollte GJK die lineare Interpolation auch in deren eingeschränkten Anwendungsbereich in Punkten Komplexität gleichziehen oder gar untertreffen:
 \begin{itemize}
