@@ -36,9 +36,6 @@ Die Umsetzung der Auflösung von Kollisionen und Mehrfachkollisionen ist explizi
 An dieser Stelle wird demnach die Annahme getroffen, dass zunächst nur Erstkollisionen durch Intrusion interessanter sind sind und zuerst ermittelbar gemacht werden sollten.
 
 
-%%TODO look if one can fit that under his hat somewhere, would be rad 
-%\\
-
 
 \subsection{Intrusionsermittlung durch lineare Interpolation der Objektbewegung}
 \label{sec:linear_int}
@@ -60,7 +57,7 @@ $$\{l_p|p\in G_o\} = \{G_{o, t}| t \in \Upsilon_{\delta_i}\}$$
 Dies ermöglicht die Ermittlung von Kollisionen von Objekten $o_0, o_1$ durch lineare Interpolation der Zeit.\\
 Die Eigenschaft der Linearität hat dabei noch den weiteren entscheidenden Vorteil, dass bei einer Relativierung der Objekte wechselseitig zueinander, eine Operation der einer Transformation in Form einer Translation gleichkommt, die Linearität weiterhin gewahrt bleibt. Zum Vergleich: Mit aktiver Rotation beschreiben Objekte relativ zueinander Kurvenflugbahnen.\\
 Essenziell zu überprüfende Merkmalspaare $\in \{Area, Edge, Vertex\}^2$ sind:
-%TODO formatting clips left
+%FIXMEMAYBE formatting clips left
 		\begin{itemize}
 			\item [$\{Vertex, Area\}$] Eine Ecke durchschlägt eine Fläche.\\
 				$\Rightarrow$ Zu überprüfende Paare: $(V_{o_0}\times A_{o_1})\times (V_{o_1}\times A_{o_0})$
@@ -114,8 +111,6 @@ Diese Anpassung bringt eigene Probleme mit sich:
 \item Nach der Rotationstransformation können Objekte sich in einem gegenseitigen Schnittzustand $D(o_0, t_1)\cap D(o_1, t_1) \neq \emptyset$ befinden, da an dieser Stelle keine Intrusion erkannt werden kann. Der Zustand könnte durch einen Linearen-Interpolationsalgorithmus zwar erkannt werden, jedoch sind bis dato im Projekt keine Möglichkeiten enthalten, vernünftig auf diesen Fall zu reagieren.
 Eine Idee ist die Suche nach einem Zeitpunkt vor der Überschneidung, durch beispielsweise Bisektion (binäre Suche) des Drehungsausschlags. Es erscheint jedoch, dass der wiederholte Aufwand durch Transformation und Ausführen des Interpolationsalgorithmus in der gegebenen Zeit ebenfalls keine qualitativ hochwertigen Ergebnisse erzielt. Der Schnittzustand wird zudem in der rigiden Körperkollision als fehlerhafter Zustand angesehen, den die Kollisionsroutine eigentlich verhindern soll.
 \end{enumerate}
-
-%%TODO glitchpic
 
 Es wird also weiter nach Lösungen gesucht, die sich dem Rotationsproblem besser annehmen.
 
