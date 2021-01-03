@@ -1,7 +1,7 @@
 \documentclass[11pt,twoside,a4paper]{article}
 
 \usepackage{a4wide,amsmath,amssymb}
-
+\renewcommand{\theequation}{M\thesection.\arabic{equation}}
 % Mann will direkt Umlaute eingeben können statt \"a, \"o, \"u usw.
 % Entweder:
 \usepackage[utf8]{inputenc}
@@ -54,21 +54,20 @@
 
 
 \newcommand{\obj}{\operatorname{OBJ}}
+\newcommand{\pos}{\operatorname{pos}}
+\newcommand{\rot}{\operatorname{rot}}
+\newcommand{\gridsize}{s_{\mathit{grid}}}
+\newcommand{\tometer}{\mathit{meter}}
+\newcommand{\calAABB}{\mathcal{AABB}}
+\newcommand{\AABB}{\mathit{AABB}}
 
 
 \begin{document}
 
-\title{HSP-Projektarbeit im Master Informatik \\
-\small Kollisionsdetektion in in Echtzeit gerenderten 3D-Simulationen mit Fokus auf die Verwendung in Videospielen}
-\author{Robert Graf, Lukas Hermann\\
-
-  Ostbayerische Technische Hochschule Regensburg\\
-  \\
-  Projektbetreuung: Prof. Dr. Klaus Volbert
-}
-  
-\date{WS\, 2020/2021 (Version vom \today)}
-
+\title{Beschreibung und Spezifikation einer 3D-Simulation \\
+\small mit Fokus auf die Umsetzung von Videospielen}
+\author{Robert Graf}
+\date{Version vom \today}
 
 \maketitle
 
@@ -76,28 +75,38 @@
 \tableofcontents
 \newpage
 
-\input{abstract.tex}
-
 \section{Einleitung}
 \input{introduction.tex}
 
-\subsection{Verwendungszwecke}
-\input{usages.tex}
+\section{Spezifikationen}
+\input{l0.tex}
+\input{l01.tex}
 
-\subsection{Problemdefinition}
-\input{problem_definition.tex}
+\section{Nachwort}
+Diese Beschreibung und Spezifikation ist keine finale Version und mag in der Zukunft Änderungen und Neuinhalte erfahren.
 
-
-\section{Suchraumverkleinerung/Kollisionspaarermittlung}
-\input{l1.tex}
-\section{Paarweise Modellkollisionen}
-\input{l2.tex}
-
-\section{Zusammenfassung}
-\input{summary.tex}
 
 \newpage
 \printbibliography
+
+
+%\bibliographystyle{hieeetr}
+%\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliography{grr.bib}
+%\begin{thebibliography}{12}
+%\bibitem[HaKT1 98]{HaKT1 98} \footnote{In die 
+%Bibliographie sollte s"amtliche benutzte Literatur 
+%rein, auch nicht beim eigenen Vortrag angegebene, aber benutzte Papiere 
+%und B\"ucher. Gleichzeitig sollte aber alles in der Literaturliste angegebene
+%mindestens einmal im Artikel zitiert werden, sonst nicht auflisten.}
+        %Michael Harkavy, J. D. Tygar, Hiroaki Kikuchi: {\sl Multi-round 
+        %Anonymous Auction Protocols}; 1st IEEE Workshop on Dependable and 
+        %Real-Time E-Commerce Systems, 1998.
+
+%\input{main_bibliography.tex}
+%\input{grr_bibliography.tex}
+%\input{hel_bibliography.tex}
+%\end{thebibliography}
 
 \end{document}
 

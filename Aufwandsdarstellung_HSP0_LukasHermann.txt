@@ -1,0 +1,53 @@
+Aufwandseinschätzung für HSP-Projekt im Master : Kollisionsdetektion in in Echtzeit gerenderten 3D-Simulationen mit Fokus auf die Verwendung in Videospielen 
+Lukas Hermann
+Zeitraum; Arbeitszeit; an was wurde gearbeitet?
+
+
+18.08.2019-17.09.2019 15h Vorbereitende Arbeiten: Installation, Refactoring, SFML+GLM Updates, ...
+
+21.08-08.09.2019 5h gemeinsame Planung+Diskussion
+
+21.-22.09.2019 3h gemeinsame Planung+Diskussion über Kollisionsberechnung durch lineare Interpolation 
+
+25.09.-16.02.2020 36h Vorbereitende Arbeiten an der bestehenden Codebase, Ermöglichung mehrerer Interaktionsalgorithmen, Trennung von Terrain/Entityverwaltung/Interaktionsalgorithmen
+
+4.-30.11.2019 4h gemeinsame Planung; Austausch über Recherche; Diskussion
+
+20.02.-07.04.2020 30h Box Sort Recherche, Implementierung, Tests
+
+23.02.-03.04.2020 3h Diskussion
+
+14.-20.04.2020 10h Spatial Hashing Recherche, Implementierung, Bugfixes
+
+20.04.-30.05.2020 26.5h Implementierung Benchmark-System, Entwurf von Szenarien
+
+31.05.-22.06.2020 8h Debugging Benchmark-System
+
+01.-05.07.2020 6h Debugging: memory leak + performance bug
+
+24.06.-12.9.2020 17h Bericht
+
+
+nach 12.9.2020:
+
+~30h Benchmark-Auswertung (Python-Code Implementierung)
+~15h Debugging+Lösung anderer Probleme, die durch Benchmarks aufgedeckt wurden.
+~20h Bericht
+~5h gemeinsame Arbeiten/Diskussion (hauptsächlich über Bericht)
+
+
+
+
+Zusammenfassung:
+Vorbereitende Arbeiten: 51h
+gemeinsame Planung+Diskussion: ~20h
+Box Sort: 30h
+Spatial Hashing: 10h
+Benchmark-System (C++): 26.5h
+Debugging: ~29h
+Benchmark-Auswertung (Python): ~30h
+Bericht: ~37h
+
+gesamt: ~233.5h
+
+
