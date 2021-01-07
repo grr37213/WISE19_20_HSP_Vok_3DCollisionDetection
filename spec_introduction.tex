@@ -1,10 +1,14 @@
 
-Dieses Dokument dient als Spezifikation für ein 3D-Simulationsprogramm, welches für die Umsetzung diverser Videospielideen konzipiert ist.
-Es sollen ausgewählte Aspekte der Simulation deklarativ beschrieben und/oder spezifiziert werden, ohne eine spezifische Umsetzung zu sehr einzuschränken.
+Die folgenden Abschnitte dienen als Beschreibung und Spezifikation für ein 3D-Simulationsprogramm, welches für die Umsetzung diverser Videospielideen konzipiert ist.
+Es sollen ausgewählte Aspekte der Simulation deklarativ beschrieben und/oder möglichst unmissverständlich spezifiziert werden, ohne eine konkrete Umsetzung zu sehr einzuschränken.
 Das Dokument kann ebenfalls detaillierte Informationen zur derzeitigen Umsetzung bestimmter Aspekte der Simulation liefern.
-Weiter dient es als Leitfaden, in dem relevantes Kontextwissen gesammelt und referenziert ist.
 
-\section{Problemdefinition}
+Einige Begriffe im Kontext von Videospielen sind in der wissenschaftlichen Literatur nur wenig vertreten, jedoch in der Szene fest etabliert. Diese sollen hier ebenfalls eindeutig definiert werden, um ggf.~ defizite verfügbarer Quellen auszugleichen.
+
+\subsection{Problemdefinition}
+Die Erstellung einer 3D-Simulation umfasst die Kreation eines beschränkten Universums. Diese grandiose aber treffende Erkenntnis hilft, die grundlegenden Konzepte der Simulation zu identifizieren. Im folgenden sollen solche, aber auch technologische Konzepte für die Simulation spezifiziert werden.\\
+Da mathematische Notation nicht standardisiert ist, wird sich dabei an definierte mathematische Konzepte der mathematischen Z-Spezifikationssprache angelehnt. Bei Unklarheit bezüglich der mathematischen Syntax in diesem Dokument kann die Quelle \cite{Z} zu Rate gezogen werden. 
+
 Die 3D-Simulation umfasst hier die Echtzeitsimulation von Entitäten in einem 3D-Kontext. Darin enthalten sind ebenfalls die Aufgaben der Video- und Audioanzeige des Inhalts der Simulation und die Steuerung von bestimmten Inhalten in Echtzeit.\\
 Die konkreten Ausmaße des Problems der Erstellung dieser Simulation ist von den Features der zu simulierenden Entitäten abhängig.
 
@@ -24,3 +28,6 @@ Von einem Benutzer Steuerbare Entitäten, welche diverse Aktionen ausführen kö
 \item Terrain
 \item diverse benutzbare Gegenstände/Items und Inventare (Werkzeuge/Waffen)
 \end{enumerate}
+
+
+

@@ -1,22 +1,17 @@
 \label{ref:problem_def}
-Der Begriff Kollisionserkennung (\textit{eng. collision detection}) scheint, je nach Anwendungsfall, ein spezifisches Problem zu sein und beschreibt eine Sammlung verschiedener Teilprobleme.\\
-Wir beschränken uns für die Zwecke dieses Projektes auf Folgende:
+Ein hoher Prozentsatz von Quellen zum Begriff der Kollisionserkennung (eng. \textit{collision detection}) scheinen sich auf die Kollision von zwei konkreten Objekten oft idealisierter Form zu konzentrieren \cites[ch.12]{fourcrossfour}{gjk}{gdc-physics}.
+Im Kontext einer 3D-Simulation ist das Problem jedoch weiter für nahezu beliebige Mengen von Objekten zu lösen.\\
+Zu unseren Zwecken soll dieser Umstand in das Problem der Kollisionserkennung mit aufgenommen werden. Wir behandeln demnach die folgenden Teilprobleme:
 \begin{enumerate}
-\item Die Ermittlung der Menge von Objektpaaren $C \subseteq OBJ^2$ aus einer Menge von sich bewegenden Objekten $OBJ$ in einem Raum, welche sich innerhalb eines Zeitraums, hier einem Tick $\delta_i$, überschneiden.
-$$C = \{(o_0, o_1) | o_0, o_1 \in OBJ; t\in \Upsilon_{\delta_i}; G_{o_0, t} \cap G_{o_1, t} \neq \emptyset\}$$
-\item Die Ermittlung von Informationen über den Hergang einer Kollision.
+\item \label{prob1}Die Ermittlung der Menge von Objektpaaren $C \subseteq \obj^2$ aus einer Menge von sich bewegenden Objekten $\obj$ in ihrer kompakten Darstellung $K_{o,t}$, welche sich innerhalb eines Zeitraums, hier einem Simulationsschritt(Tick), d.h. einer Sequenz von Zeitpunkten $\Upsilon_{\delta_i} = \langle t_0 , ... , t_1 \rangle$ zu irgendeinem Zeitpunkt überschneiden.
+$$C = \{(o_0, o_1) | o_0, o_1 \in \obj; t\in \Upsilon_{\delta_i}; K_{o_0, t} \cap K_{o_1, t} \neq \emptyset\}$$
+\item \label{prob2}Die Ermittlung von Informationen über den Hergang einer Kollision.
 Die genauen Anforderungen, welche Informationen ermittelt werden müssen, gehen aus den Verwendungszwecken hervor (vgl.~\ref{sec:usages}). 
 \end{enumerate}
 
-Während mögliche Anforderungen von Verwendungszwecken zwar betrachtet werden müssen, sollen die Verwendungszwecke selbst in diesem Projekt konkret nicht realisiert werden.
-
-Wir schätzen an dieser Stelle modellgenaue Kollisionen als schwierig ein. In Teilproblem 1 entsteht daraus das Problem einer schnell steigenden Komplexität, da die Anzahl der möglichen Kollisionspaare quadratisch wächst $|C|\leq |OBJ|^2$.\\
-Das Teilproblem 1 wird daher in zwei separaten Schritten behandelt.
+Objektmodelle sollen die geometrische Diversität von Polyedern ausschöpfen können und können sehr komplex werde. Wir schätzen daher Kollisionen auf Basis ihrer exakten geometrischen Modelle berechnungstechnisch als schwierig ein.\\
+In Teilproblem \ref{prob1} entsteht daraus das Problem einer schnell steigenden Komplexität, da die Anzahl der möglichen Kollisionspaare quadratisch wächst $|C|\leq |OBJ|^2$ und wird daher in zwei separaten Schritten behandelt:
 \begin{itemize}
-\item[1.1] Elegante und effiziente Vorfilterung von Objekten $OBJ$, um die modellgenaue Überprüfung von großen Mengen von Objektpaaren in $C$ zu vermeiden.
-\item[1.2] Die abstrakte Behandlung des modellgenauen Kollisionsproblems bei genau zwei Objekten. Dabei werden Algorithmen gewählt, welche die für Teilproblem 2 benötigten Informationen mitliefern.
+\item[1.1] Effiziente Vorfilterung von Objektpaaren, bei der die modellgenaue Überprüfung der Kollision zunächst vermieden werden soll.
+\item[1.2] Die Behandlung des modellgenauen Kollisionsproblems bei genau zwei Objekten. Dabei werden Algorithmen gewählt, welche die in Teilproblem \ref{prob2} geforderten Informationen mitliefern.
 \end{itemize}
-
-Für beide dieser Schritte sollen im Folgenden Algorithmen beschrieben werden.\\
-\\
-\input{physical_realism.tex}

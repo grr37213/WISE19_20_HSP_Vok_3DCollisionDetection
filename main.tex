@@ -1,6 +1,7 @@
 \documentclass[11pt,twoside,a4paper]{article}
 
 \usepackage{a4wide,amsmath,amssymb}
+\renewcommand{\theequation}{M.\thesection.\arabic{equation}}
 
 % Mann will direkt Umlaute eingeben können statt \"a, \"o, \"u usw.
 % Entweder:
@@ -17,43 +18,26 @@
 \usepackage{subcaption}
 
 \usepackage{hyperref}
-
+\hypersetup{
+    colorlinks = true,
+    linkcolor = {black},
+    urlcolor = [rgb]{0 0 .6},
+    menucolor = {black},
+    citecolor = [rgb]{0 .4 0}
+}
 \usepackage{tikz}
-
 \usepackage{listings}
-
-
-% Trennvorschl"age (in {} einfuegen, wenn nicht automatisch getrennt wird:
-% z.B. Authen-ti-ka-tions-sys-tem)
-%\hyphenation{}
-
-%\hyphenation{min-des-tens}
-%\hyphenation{Kol-li-sions-er-ken-nung}
-
-
-%-------------------------- Formatsachen --------------------------%
-
-% Bild-, Tabellenunterschriften veraendern:
-% Nummer fett, kleinerer Text fuer Bildunterschrift
-%\usepackage[bf,small]{caption}
-
-
-%\usepackage{mathpazo}  % -- Palatino als Zeichensatz -- einfach diese
-					   % Zeile auskommentieren, falls nicht installiert
-%\usepackage{mathptmx}  % -- Times als Zeichensatz
-
-% Zum Unterscheiden von Entwurfs- und endgueltiger Fassung
-%\usepackage{draftcopy}
-%\draftcopySetGrey{0.90}   %   90% = sehr helles Grau
-%\draftcopyName{ENTWURF}{155}   % statt ``DRAFT''
-%\draftcopySetScale{1}
-
-%--------------- Zeilen- und Absatzabstaende ----------------------%
-%\setlength{\parindent}{0em}
-%\setlength{\parskip}{\medskipamount}    % Abstand zwischen Abs"atzen
+\usepackage[toc, page]{appendix}
 
 
 \newcommand{\obj}{\operatorname{OBJ}}
+\newcommand{\pos}{\operatorname{pos}}
+\newcommand{\rot}{\operatorname{rot}}
+\newcommand{\gridsize}{s_{\mathit{grid}}}
+\newcommand{\tometer}{\mathit{meter}}
+\newcommand{\calAABB}{\mathcal{AABB}}
+\newcommand{\AABB}{\mathit{AABB}}
+\newcommand{\qb}{\operatorname{QB}}
 
 
 \begin{document}
@@ -87,6 +71,9 @@
 \subsection{Problemdefinition}
 \input{problem_definition.tex}
 
+\subsection{Einflüsse des Mediums Videospiel}
+\input{physical_realism.tex}
+
 
 \section{Suchraumverkleinerung/Kollisionspaarermittlung}
 \input{l1.tex}
@@ -98,6 +85,11 @@
 
 \newpage
 \printbibliography
+
+\newpage
+\appendix
+\input{spec_main.tex}
+
 
 \end{document}
 

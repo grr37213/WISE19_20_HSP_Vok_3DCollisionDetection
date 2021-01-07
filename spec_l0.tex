@@ -1,5 +1,3 @@
-Die Erstellung einer 3D-Simulation umfasst die Kreation eines beschränkten Universums. Diese grandiose aber treffende Erkenntnis hilft, die grundlegenden Konzepte der Simulation zu identifizieren. Im folgenden sollen solche, aber auch technologische Konzepte für die Simulation spezifiziert werden.\\
-Da mathematische Notation per se nicht standardisiert ist, wird sich dabei an definierte mathematische Konzepte der mathematischen Z-Spezifikationssprache angelehnt. Bei Unklarheit bezüglich der mathematischen Syntax in diesem Dokument kann die Quelle \cite{Z} zu Rate gezogen werden. 
 
 \subsection{Datentypen}
 Durch physikalische und technologische Begrenzungen schränkt eine Rechenmaschine mathematischen Zahlenräume ein:
@@ -62,7 +60,8 @@ Theoretisch kann die Rate auch negative Werte annehmen. Die Simulationszeit wür
 \subsection{Tick \& Frame}
 Die Simulation behandelt das Verstreichen von Zeit in Zeitschritten, während dem der interne Zustand der Simulation, bzw.~der simulierten Objekte, zu einem zeitlich neuen Zustand aktualisiert wird.
 Dieser Zeitschritt, bzw.~Verarbeitungsschritt, wird als Tick bezeichnet \cite{tick}.
-Es ist besonders anzumerken, das der Begriff des Ticks sich ausschließlich auf das Voranschreiten der Simulation auch bei kompletter Abwesenheit einer graphischen Renderingpipeline bezieht. Die Äquivalente Bezeichnung im Kontext der Grafik wird als Frame bezeichnet, in welchem eine Szene (ein Grafischer Zustand der Simulation, bzw. ein Bild der Ausgabe) gerendert wird. Von beiden Größen können Raten $r_{tick}, r_{frame} \in \mathbb{R}$ angegeben werden (üblicherweise in Tick/Frame pro Realzeitsekunde). Praktisch kann eine Grafikengine durch Inter- oder Extrapolation dynamisch verschiedene, von der Tickrate unabhängige Frameraten erreichen.\\
+Es ist besonders anzumerken, das der Begriff des Ticks sich ausschließlich auf das Voranschreiten der Simulation auch bei kompletter Abwesenheit einer graphischen Renderingpipeline bezieht. Im grafischen Kontext wird dafür der Begriff Frame (dt. Bild) verwendet, da der äquivalente Prozess der Grafik einmal pro Rendern und Anzeigen eines Bildes geschieht.\\
+Von beiden Größen können Raten $r_{tick}, r_{frame} \in \mathbb{R}$ angegeben werden (üblicherweise in Tick/Frame pro Realzeitsekunde). Praktisch kann eine Grafikengine durch Inter- oder Extrapolation dynamisch verschiedene, von der Tickrate unabhängige Frameraten erreichen.\\
 Wir definieren einen Tick anhand seiner realen, ersten Auftrittszeit
 \begin{align}
 \delta_t: t \in T_r
@@ -128,8 +127,8 @@ Diese Darstellung hat folgende weitere Vorteile
 \item Schnelle Indizierung der durch $\mathcal{I}$ indizierten Raumanteile für raumaufteilende Algorithmen
 \end{itemize}
 
-Absolute Positionen im Raum werden demnach mit Vektoren $\mathcal{S}^3$ dargestellt. Für Berechnungen von Interaktionen zwischen Objekten werden Positionen zunächst zueinander relativiert und nach $\mathcal{F}^3$, um so hardwaregestütz Berechnungen durchzuführen. 
-Man geht dabei davon aus, das relative Strecken zwischen Objekten kurz genug sind, sodass die Genauigkeitsänderung in $\mathcal{F}$ vernachlässigbar ist.\\
+Absolute Positionen im Raum werden demnach mit Vektoren $\mathcal{S}^3$ dargestellt. Für Berechnungen von Interaktionen zwischen Objekten werden Positionen zunächst zueinander relativiert und nach $\mathcal{F}^3$ umgewandelt, um so hardwaregestütz Berechnungen durchzuführen. 
+Man geht dabei davon aus, dass relative Strecken zwischen Objekten kurz genug sind, sodass die Genauigkeitsänderung in $\mathcal{F}$ vernachlässigbar ist.\\
 Effektiv ist dabei die Eigenschaft $\mathcal{F}\subset\mathcal{S}$ nicht exakt gefordert, auch wenn sie in der in diesem Projekt verwendeten Implementierung prinzipiell gilt.
 
 Im Rahmen der Simulation bestehen diverse kartesische Koordinatensysteme, bzw. Räume. Entitäten werden je nach Anwendungsfall zweckmäßig zwischen diesen Transformiert, um bestimmte Features abzubilden.
@@ -159,19 +158,19 @@ Verschiedenartige Beispiele:
 Die Abstraktion der Entität dient demnach als Schnittstelle für die Simulation, um Zeit (während eines Ticks) auf atomare Bestandteile der Simulation anzuwenden, und als Implementierungsplattform für die verschiedenen Anwendungsanforderungen der Simulation, bzw.~dem Verhalten des Simulationsinhalts.\\
 
 \subsection{Objektform}
-\label{object_form}
+\label{sec:object_form}
 Die Form eines Objektes ist in einem hier rigiden, d.h. unveränderlichen Modell beschrieben, welche die Form relativ zum Ursprung $O$ ihres eigenen Objektraums angibt.
 Für Modelle werden mathematisch oft kompakte Punktemengen verwendet. Wir denotieren diese kompakten Modelle zugehörig zum Objekt $o \in \obj$.
 \begin{align}
 K_o \subseteq \mathcal{F}^3
 \end{align}
 
-Durch die kompakte Mengendarstellung führen Rechenoperationen mit Objekten auf maschinell relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt. 
+Durch die kompakte Mengendarstellung führen Rechenoperationen mit Objekten auf maschinell relativ rechenaufwändige Mengenoperationen zurück. In der Computergraphik werden deshalb Objekte durch sogenannte Polygon-Meshes dargestellt, eine Datenrepräsentation für Polyeder. 
 Für das Objekt $o$ beschreibt eine Polygon-Mesh 
 \begin{align}
 M_o := (V_o, I_o); V \subseteq \mathcal{F}^3, I \subseteq [0, |V|-1]_\mathbb{N}^3 
 \end{align}
-ein Polytop durch seine Eckpunkte $V_o$(Ecken, eng. \textit{vertices}), die durch 3-Gruppierungen ihrer Indices $I_o$ zu Dreiecksflächen verbunden sind.\\
+einen Polyeder durch seine Eckpunkte $V_o$(Ecken, eng. \textit{vertices}), die durch 3-Gruppierungen ihrer Indices $I_o$ zu Dreiecksflächen verbunden sind.\\
 Aus der Definition der Polygon-Mesh gehen implizit weitere Definitionen hervor:
 
 \begin{enumerate}
@@ -287,7 +286,86 @@ und für relative Transformationen
 verwendet, sodass z.B. die transformierte Menge der Eckpunkte von $o$ zu Tickzeitpunkt $t$ als $V_{o,t}$ beschrieben werden kann.
 
 \subsection{Hitbox}
-\input{hitbox.tex}
-\subsection{Hüllkörper}
-\input{bounding_box.tex}
+\label{sec:hitbox}
+Eine sogenannte Hitbox ist eine Approximation für ein Modell in einer Simulation \cite{hitbox}.
+\begin{align}
+H_o \approx K_o
+\end{align}
+ Sie abstrahieren das konkrete Modell dabei für einige oder gar alle physikalischen Berechnungskontexte, insbesondere der Kollisionserkennung. Prinzipiell können exakte Modelle $K_o$, bzw.~$G_o$ ebenfalls Hitboxen darstellen, der eigentliche Sinn der Verwendung einer Hitbox liegt jedoch in der Vereinfachung der zu kollidierenden Form.\\
+Der Term Hitbox suggeriert die Verwendung einer Box/eines Quaders zur Approximation. Das ist wahrscheinlich historisch bedingt. Der Term Hitbox ist allerdings auch für andere Formen etabliert.\\
+Wir definieren an dieser Stelle die Diskrepanz zweier Punktemengen $A$ und $B$.
+\begin{align}
+	\mathcal{D}(A, B) = | A \cup B \backslash (A \cap B) |
+\end{align} 
+Ein (menschlicher) Zuschauer der Simulation erfährt nur die Darstellung der Simulation in grafischer Form. Diese grafische Form mag jedoch zum tatsächlichen physikalischen Modell eines Objektes abweichen.
+Hierfür gibt es diverse Gründe:
+\begin{itemize}
+\item grafische Optimierung
+\item Vereinfachung von Modellen (grafischer oder physikalischer Art)
+\item kreative Freiheit
+\end{itemize}
+Für die physikalische Berechnung wird nur das physikalische Modell eines Objekts erfahren. Eine Diskrepanz zwischen Grafik und Physik mag zu einem Bruch im physikalischen Realismus aus der Perspektive eines Zuschauers führen.
+Hitboxes sind meist approximative, idealisierte geometrische Formen, welche die physikalische Berechnung optimieren. Sie abstrahieren dabei ein physikalisches Modell in bestimmten Kontexten, oder sind sogar das physikalische Modell. 
+Die Diskrepanz einer Hitbox $H_o$ zu seinem physikalischen Modell kann wie folgt denotiert werden:
+\begin{align}
+\mathcal{D}(H_o) = \mathcal{D}(H_o, K_o)
+\end{align}
 
+
+
+Mehrere Hitboxen können zu einem Objekt angegeben sein $H_{o, [i]}$. Dafür können mehrere Gründe angegeben werden:
+\begin{enumerate}
+\item Um komplexere Hitboxen durch Komposition darzustellen 
+\begin{align}
+H_{o, [ges]} = \bigcup_{\forall i}H_{o, [i]}
+\end{align}
+\item Um durch verschachtelte Hitboxen so ein Objekt räumlich sukzessiv zu approximieren.
+Typischerweise soll dann eine Ordnung nach der Diskrepanz gelten.
+\begin{align}
+H_{o, [i]} < H_{o, [j]} \Leftrightarrow \mathcal{D}(H_{o, [i]}) < \mathcal{D}(H_{o, [j]})
+\end{align}
+Die Hitbox mit der geringsten Diskrepanz, die Hitbox $H_{o, [min]}=min\{H_{o, [i]}\}$, wenn modellgenau $H_{o, [min]} = K_o$, wird dann als finale Hitbox bezeichnet.
+\end{enumerate}
+
+
+\subsection{Hüllkörper}
+\label{sec:bounding_volume}
+
+Ein Hüllkörper, oder Bounding-Volume, $B_o$ zu einem Objekt $o$ ist eine kompakte Menge.
+\begin{align}
+B_o \supseteq K_o
+\end{align}
+$B_o$ kann als Hitbox fungieren.\\
+Eine Bounding-Box ist ein spezielles Bounding-Volume in Form eines Quaders.\\
+
+\label{sec:aabb}
+\label{sec:AABB}
+Eine in diesem Projekt extensiv verwendete, tiefere Spezialform der Bounding-Box ist die Axis-Aligned-Bounding-Box (AABB). Alle Kanten dieser Bounding-Box sind achsenparallel zu den Koordinatenachsen $\{(1,0,0), (0,1,0), (0,0,1)\}$ des Weltraums (vgl.~\ref{sec:space}).\\
+Hier relevante Eigenschaften dieser sind:
+\begin{itemize}
+\item kleine Datenrepresentation:
+\begin{align}
+\AABB_o \in \mathcal{S}^{3^2};\\
+\AABB_o = (b_{min}, b_{max}) = ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max}))
+\end{align}
+		 Es werden nur absolute Minimal- und Maximalpositionen der AABB festgehalten.
+		 Diese Positionen werden im Worldspace $\mathcal{S}^{3^2}$ angegeben, da AABBs hier die primäre vereinfachende Abstraktion sein sollen, die in der Simulation für Objekte verwendet wird. Die Angabe im Worldspace macht AABBs für Berechnungen im absoluten, zum Beispiel räumliche Partitionierung für Teile-und-Herrsche Algorithmen, direkt zugänglich.
+		 Die theoretische, kompakte Punktemenge 
+		 \begin{align}
+		 \calAABB: \mathcal{S}^{3^2} \mapsto \mathcal{P}(\mathcal{F}^3);\\
+		 \calAABB ((x_{min}, y_{min}, z_{min}), (x_{max}, y_{max}, z_{max})) = \\
+		 \{\tometer((x_{min} + x * (x_{max} - x_{min}), y_{min} + y * (y_{max} - y_{min}),\\
+		  z_{min} + z * (z_{max} - z_{min}))| x, y, z \in [0,1] \} 
+		 \end{align}
+		 ist dann ein Bounding-Volume $\calAABB(\AABB_o) \supseteq K_o$
+	\item Ermittlung einer minimalen AABB für ein Objekt durch Suche der Minima und Maxima der Ausdehnung eines Objektes in jeder Koordinatenachse:
+	 $x_{min} = x : (x, y, z) \in V_o , \forall (x', y', z') \in V_o: x \leq x'; y \& z, min \& max $ analog.
+	 Die Findung dieser Werte ist in $ \mathcal{O}(|V_o|) $.
+		Bei rotierenden Objekten ist auch eine minimale AABB zu diesem Objekt einer Bewegung ausgesetzt, standardmäßig durch Neuermittlung der AABB($\mathcal{O}(|V_o|)$ pro Tick). Optimierungen für verschiedene Arten von Bewegung sind oft möglich (Positionsänderung, Skalierung, etc.), aber manchmal schwierig bis unmöglich (z.B. bei Rotation).\\
+		Aus diesem Grund macht es auch Sinn, nicht-minimale AABBs zu wählen, um den wiederholten Berechnungsaufwand zu vermeiden.
+	\item Schnelle Kollisionsüberprüfung zwischen AABBs durch Vergleiche der Extrema $\mathcal{O}(1)$
+\end{itemize}
+
+AABBs, bzw. Bounding-Volumes generell, werden nicht ausschließlich für statische Objekte $K_{o,t}$ zu einem Zeitpunkt erstellt und verwendet. Es macht in bestimmten Kontexten zum Beispiel auch Sinn das komplette durchlaufene Volumen eines Objektes $\{K_{o,t'} | t' \in \Upsilon_{\delta_i}\}$ während eines Ticks durch ein Bounding-Volume zu abstrahieren. Dies ermöglicht korrekte Kollisionsfilterung unabhängig von der Geschwindigkeit und wurde deshalb für dieses Projekt standardmäßig verwendet.
+
+Im Falle des Spiels Minecraft werden AABBs als finale Hitboxen verwendet (vgl. Abbildungen \ref{fig:mwhitbox}, \ref{fig:mphitbox}), welche jedoch zumindest grafisch dem Kriterium $K_o \subseteq B_o$ zuwiderlaufen. Diese Designentscheidung selbst soll an dieser Stelle nicht eingeschätzt werden.

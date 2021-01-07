@@ -1,30 +1,21 @@
 \label{sec:usages}
-Kollisionsberechnung kann in Simulationen und im speziellen in Videospielen zu Realisierung vieler Features verwendet werden und wird daher in vielen verschiedenen Kontexten benötigt. 
-
-Hinsichtlich der Menge von generell möglichen Anwendungen für Simulation sollen im Folgenden exemplarisch Anwendungsmöglichkeiten der Kollisionsermittlung aufgelistet werden, welche im Projekt von Relevanz sein können. Die Liste grenzt dabei auch den betrachteten Raum an Kontexten im Projekt auf ein überschaubares Maß ein. 
+Im generellen sind die möglichen Anwendungsfälle für Kollisionserkennung in Videospielen sehr divers. Exemplarisch können einige für dieses Projekt in Betracht gezogene aufgelistet werden:
 
 \begin{enumerate}
-	\item logische Kollision als räumliche Anwesenheitsermittlung von Objekten\\
-	Daraufhin können Eigenschaften der Objekte ermittelt werden, welche Auslöser für Ereignisse sein können oder Interaktionen unter Objekten können ausgelöst werden. Spezifischere Konzepte sind zum Beispiel: 
+	\item logische Kollision als räumliche Anwesenheitsermittlung von Objekten, Auslöser für Ereignisse oder Interaktionen. Spezifischere Konzepte sind zum Beispiel: 
 		\begin{enumerate}
 			\item Raycasting\\
-	Zur Ermittlung vom Objekt in Blickrichtung/Fokusobjekt oder Objekt am Cursor/Fadenkreuz wird ein Strahl in dieser Richtung mit Objekten kollidiert.\\
-	Beispiel: Spieler möchte Tür öffnen, schaut Tür an, drückt Taste, Strahl ermittelt Tür in Blickrichtung und interpretiert Tastendruck als Tür-Öffnen-Befehl.
+	Kollision mit einem Strahl (auch Raytracing) \cite[ch.6 , p.131]{fourcrossfour}.
 			\item Areale\\
-	Objekte befinden sich in einem bestimmten Areal.
-	Beispiel: In Stealth-Spielen werden zur Ermittlung, ob ein  Spieler sich im Sichtbereich eines Gegners befinden oft sogenannte View-Cones eingesetzt. Wie der Name suggeriert, werden entsprechende Berechnungen zur Sichtbarkeit des Spielers gegenüber dem Gegner ausgerechnet, sollte der Spieler mit der View-Cone des Gegners kollidieren
+	Kollision mit einem meist ideal geformten Areal.
 		\end{enumerate}
-
 	\item Physikalische Kollision
 		\begin{enumerate}
 			\item Clipping\\
-	Verhinderung, dass zwei Objekte in der Simulation den selben Raum einnehmen und miteinander verschmelzen, da dies bei typischen soliden Objekten nicht der Realität entspricht.
-			\item Projektiltrefferermittlung
+	Verhinderung des typischerweise verbotenen Schnittzustand zweier Objekte. Insbesondere im Kontext mit dem Boden als Plattform zur Fortbewegung.
+			\item Trefferermittlung bei Projektilen
 			\item Rigide Kollision\\
 		Kollision von unzerstörbaren, unveränderlichen Objekten mit korrektem physikalischem Verhalten hinsichtlich Impuls.
 			\item Zerstörung/Zerteilung von Objekten durch Kollision
 		\end{enumerate}
 \end{enumerate}
-
-Es gibt viele weitere Anwendungen, welche durch die Verwendung von Kollisionsermittlung realisiert werden können, welche an dieser Stelle nicht weiter einbezogen werden sollen.
-
