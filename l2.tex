@@ -1,5 +1,5 @@
 \label{sec:l2}
-Die paarweise Kollisionserkennung bezieht sich auf die Kollision von genau zwei 3D-Modellen in ihrer exaktesten Darstellung. Die Genauigkeit der Kollision bei steigender Modellkomplexität ist hier im Fokus.
+Die paarweise Kollisionserkennung bezieht sich auf die Kollision von genau zwei 3D-Modellen in ihrer exaktesten Darstellung. Die Genauigkeit der Kollisionserkennung bei steigender Modellkomplexität ist hier im Fokus.
 
 \subsection{Input}
 Aus den in Abschnitt \ref{sec:l1} beschriebenen Verfahren wird eine Menge von Objektpaaren erhalten, für die eine Kollisionsvermutung während eines Ticks gilt $C_{guess}\subseteq OBJ^2$. Es ist gefordert, dass die Menge der tatsächlichen Kollisionen in der Menge der vermuteten, vorgefilterten Kollisionspaare vollständig enthalten ist $C_{definitive}\subseteq C_{guess}$.\\
@@ -25,7 +25,7 @@ Diese ist konstant während eines Ticks und wird zu Ende eines solchen, oder bev
 Die Objektstatus der Objekte werden zu einem der Objekte im eingegeben Paar relativiert.  Die Positionen, welche das Objekt zu anderen Zeiten $t$ des Simulationsschrittes einnimmt, werden durch Transformationen der Objektform ermittelt. Für weiter Details können die Anhänge \ref{sec:space} und \ref{sec:object_sim} herangezogen werden.\\
 
 \subsection{Output}
-Es ist eine Aufgabe des modellgenauen Kollisionsschritt, sämtliche False-Positives aus dem Schritt der Kollisionspaarvorfilterung zu vollenden.
+Es ist eine Aufgabe des modellgenauen Kollisionsschritt, sämtliche restlichen False-Positives aus dem Schritt der Kollisionspaarvorfilterung zu eliminieren.
 Eine zweite Aufgabe ist die Ermittlung von Informationen über den Hergang von Kollisionen.
 Im Abschnitt~\ref{sec:usages} werden einige für dieses Projekt interessante Verwendungszwecke der Kollisionsermittlung aufgelistet, welche unterschiedliche Anforderungen hinsichtlich benötigter Information über den Kollisionsvorgang haben, um realisiert werden zu können:
 \begin{enumerate}
@@ -41,13 +41,13 @@ Im Abschnitt~\ref{sec:usages} werden einige für dieses Projekt interessante Ver
 		\end{enumerate}
 		ein Eindringen eines Objektes in ein anderes stattfindet, d.h. ein Zustandsübergang von Nicht-Schnitt zu Schnitt stattfindet.
 \end{enumerate}
-Für physikalische Verwendungszwecke insbesondere bei der rigiden Objektkollision erscheint Intrusion besonders interessant. Der aktive Zustand des Schnitts zweier kollisionsfähiger Entitäten/Objekte soll prinzipiell nicht erlaubt sein und muss daher aktiv durch eine Kollisionsreaktion zum Zeitpunkt der Erstkollision verhindert werden.\\
+Für physikalische Verwendungszwecke, insbesondere bei der rigiden Objektkollision, erscheint Intrusion besonders interessant. Der aktive Zustand des Schnitts zweier kollisionsfähiger Entitäten/Objekte soll prinzipiell nicht erlaubt sein und muss daher aktiv durch eine Kollisionsreaktion zum Zeitpunkt der Erstkollision verhindert werden.\\
 Die derzeitig geforderte Reaktion von Objekten auf Kollision ist der Stillstand ($v = \omega = 0$) zum kollidierenden Zeitpunkt. Die Umsetzung der Auflösung von Kollisionen und Mehrfachkollisionen ist explizit aus diesem Projekt ausgeschlossen. Selbst jedoch bei der rudimentären theoretischen Betrachtung von Mehrfachkollisionen während eines Ticks und Optionen zu deren Auflösung, bzw.~physikalischer Reaktion von Objekten, scheinen vorwiegend Erstkollisionen interessant zu sein.\\
 Aus Algorithmen für Erstkollisionen kann adaptiv zu einem späteren Zeitpunkt eine Mehrfachkollisionsroutine durch sukzessive Aufrufe realisiert werden. Ob dieses Vorgehen von Vorteil ist soll an dieser Stelle nicht entschieden werden.
 
 \subsection{Intrusionsermittlung mithilfe geometrischer Berechnungen am durchlaufenen Volumen bei linearer Bewegung}
 \label{sec:linear_int}
-Bei diesem Verfahren soll das durchlaufenen Volumen von Objekten abgeprüft werden. Die Punkte der Kollision zweier durchlaufener Volumen sollen zur Ermittlung weiterer Informationen zum Ablauf der Kollision verwendet werden.
+Bei diesem Verfahren soll das durchlaufenen Volumen von Objekten abgeprüft werden, während diese eine lineare Bewegung ausführen. Die Punkte der Kollision zweier durchlaufener Volumen sollen zur Ermittlung weiterer Informationen zum Ablauf der Kollision verwendet werden. Wir sehen ähnliche Ansatze zur Kollisionsermittlung bei linearen Bewegungen idealisiert in Quelle \cite[ch.12, p.361]{fourcrossfour} und schätzen den Ansatz daher als vernünftigen, relativ simplen, ersten Versuch ein, Kollisionserkennung in einem beschränkten Rahmen umzusetzen.
 \subsubsection{Verwendungszweck und Limitation}
 Der hier vorgestellte Algorithmus behandelt Objekte so als würden sie während eines Ticks keine zeitliche Änderung der Rotation erfahren.\\
 Dies hat mehrere Gründe:
@@ -60,7 +60,7 @@ Dies hat mehrere Gründe:
 
 \subsubsection{Umsetzung}
 Alle im Objekt $o$ enthaltenen Punkte $p \in K_o$ beschreiben lineare, zueinander parallele Flugbahnen während der Simulationszeitsequenz eines Ticks $\Upsilon_{\delta_i}$:
-$$l_p = \{p + (t - t_0) \cdot v(o, t_0) | t \in \Upsilon_{\delta_i} $$
+$$l_p = \{ p + (t - t_0) \cdot v(o, t_0) | t \in \Upsilon_{\delta_i} \}$$
 In ihrer Gesamtheit beschreiben diese das durchlaufene Volumen des Objekts:
 $$\{l_p|p\in K_o\} = \{K_{o, t}| t \in \Upsilon_{\delta_i}\}$$
 
@@ -195,18 +195,18 @@ Für den Algorithmus sind Konvexität und semantische Äquivalenz zu kompakten P
 
 Im generellen sind für die Eingabe-Polygon-Meshes keine Konvexität gefordert und eine entsprechende kompakte Repräsentation nicht gegeben.\\
 Nicht-konvexe Objekte können in konvexe Partitionen aufgeteilt werden. Jede Partition zählt dann als eigenes Objekt gegenüber dem Algorithmus. Das erhöht die erwartete Komplexität der gesamten Kollisionsroutine mit GJK um den Grad der Partitionierung ($\mathcal{O}(|P_{o_0}|\cdot |P_{o_1}|)$).\\
-Du deren Abschwächung scheint insbesondere eine minimale Partitionierung von Interesse.\\
+Zu der Abschwächung der Komplexitätssteigerung scheint insbesondere eine minimale Partitionierung von Interesse.\\
 Zusätzlich zu eigenen Überlegungen bestätigen die Quellen \cite{ARTIGAS20111968} und \cite{grelier2019minimum} die NP-Vollständigkeit, bzw. NP-Härte zusammengehöriger Probleme der minimalen konvexen Partitionierung.\\
 Eine nicht minimale Partitionierung wäre zunächst auch ausreichend und auch lange Berechnungszeiten zur Partitionierung würden für rigide Objekte nur einmaligen Aufwand zum Programmstart bedeuten und wären daher nicht kritisch.\\
 Bei Versuchen, Algorithmen für dieses Problem zu erstellen, wird jedoch eine weiter klare Hürde erkenntlich: Allein durch die Polygon-Mesh, sind Innen und Außenseite des Objektes prinzipiell nicht definiert.\\
-Für grafische Zwecke kann dieser Bezug oft durch das sog. \textit{Winding} \cite[ch.5.6, p.121, ch.7.3]{fourcrossfour} eines Dreiecks angegeben werden. Dabei wird die Reihenfolge der Angabe der Ecken eines Dreiecks konventionell festgelegt, wodurch die Richtung der Flächennormale eines Dreiecks kontrolliert werden kann, die dann Außen oder Innenseite spezifiziert.\\
+Für grafische Zwecke kann dieser Bezug oft durch das sog. \textit{Winding} \cite[ch.5.6, p.121, ch.7.3]{fourcrossfour}\cite{gjk-casey} eines Dreiecks angegeben werden. Dabei wird die Reihenfolge der Angabe der Ecken eines Dreiecks konventionell festgelegt, wodurch die Richtung der Flächennormale eines Dreiecks kontrolliert werden kann, die dann Außen oder Innenseite spezifiziert.\\
 Für die in dieser Projektarbeit verwendeten Testzwecke erscheint der Aufwand der Automatisierung der konvexen Partitionierung für dieses Projekt letztendlich doch zu hoch und thematisch zu fremd. Eine Konvention für ein \textit{Winding} wurde allerdings im Projekt eingeführt, nicht zuletzt, da diese die Implementierung des GJK vereinfacht.
 \ \\
 Die konvexe Partitionierung des Objektes wird letztendlich manuell und explizit bei Modellen durch Mengen beteiligter Eckpunkte einer Partition angegeben.\\
 Ein Körper $K$ ist konvex, wenn gilt $\forall p_0, p_1 \in K, \forall x \in [0,1] : p0 + x \cdot  (p_1 - p0) \in K_o $ \cite[p.121]{morris2015finite}. Bei Entfaltung der Mesh-Repräsentation $M_o$ sind nicht alle diese Punkte enthalten. Da eine Polygon-Mesh jedoch die Eckpunkte angibt, können sämtliche Punkte zwischen Eckpunkten und sukzessive Kanten, Flächen und das restliche Volumen durch die Konvexitätseigenschaft impliziert werden. Die zusätzlich mit der Objektrepräsentation mitgelieferte konvexe Partitionierung erweitert also die verfügbare Information und schafft in dieser Hinsicht Äquivalenz zwischen Polygon-Meshes und kompakten Mengen und die Unterscheidung von Innen und Außen am Modell. Der Algorithmus kann demnach außschließlich unter Einbeziehung von Eckpunkten $V_o$ und der Partitionierung verfahren.
 
 \subsubsection{Diskrete Minkowski-Differenz}
-Eine Diskretisierung/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $V_o$ ist nach Abschnitt \ref{sec:gjk_equiv} möglich, was vorteilhafte Iterationslängen durch die Eingabe zur Folge hat ($V_o \ll G_o \ll K_o$).\\
+Eine Diskretisierung/Beschränkung auf die Information der Eckpunkte der Polygon-Mesh $V_o$ ist nach Abschnitt \ref{sec:gjk_equiv} möglich, was vorteilhafte Iterationslängen durch die Eingabe zur Folge hat ($|V_o| \ll |G_o| \ll |K_o|$).\\
 In der Ausnutzung der Eigenschaften der Minkowski-Differenz muss nun allerdings der Umstand der Diskretion respektiert werden.
 
 \begin{enumerate}

@@ -1,7 +1,7 @@
 \label{sec:l1}
 Unter der Annahme der Schwierigkeit von modellgenauen Kollisionen von Objektpaaren, ist eine Vorfilterung der möglichen kollidierenden Objektpaare sinnvoll, bei der viele Objektpaare ohne die aufwändige Berechnung von modellgenauen Kollisionen ausgeschlossen werden können.\\
-Zu diesem Zweck werden zu jedem Objekt $o_i \in \obj$ Hüllkörper \cite[ch. 8.1, p. 211]{fourcrossfour} $B_{o_i}$ angegeben, die die Objekte durch die Eigenschaft der vollständigen Enthaltung des Objektmodells $B_o \supseteq K_o$ abstrahieren, da gilt $K_{o_0} \cap K_{o_1} \Rightarrow B_{o_0} \cap B_{o_1}$, was bedeutet, dass die Menge aller Paare mit exakter Kollision ist in jedem Fall in der Menge aller Paare enthalten ist. $ \{ (o_0, o_1) | B_{o0} \cap B_{o1} \} \supseteq \{ (o_0, o_1) | K_{o0} \cap K_{o1} \} $\\
-Hüllkörper werden so gewählt, dass eine Kollisionserkennung zwischen ihnen möglichst einfach wird. Hier werden als Hüllkörper sogenannte Axis-Alligned-Bounding-Boxes(AABB) verwendet, unter denen eine Kollision sehr einfach in $\mathcal{O}(1)$ errechnet werden kann. Das Konzept der AABB wird in \ref{sec:AABB} detaillierter beschrieben.\\
+Zu diesem Zweck werden zu jedem Objekt $o_i \in \obj$ Hüllkörper \cite[ch. 8.1, p. 211]{fourcrossfour} $B_{o_i}$ angegeben, die die Objekte durch die Eigenschaft der vollständigen Enthaltung des Objektmodells $B_o \supseteq K_o$ abstrahieren, da gilt $K_{o_0} \cap K_{o_1} \Rightarrow B_{o_0} \cap B_{o_1}$, was bedeutet, dass die Menge aller Paare mit exakter Kollision in jedem Fall in der Menge der Paare der abstrakteren Kollision durch Hüllkörper enthalten ist $ \{ (o_0, o_1) | B_{o0} \cap B_{o1} \} \supseteq \{ (o_0, o_1) | K_{o0} \cap K_{o1} \} $.\\
+Hüllkörper werden so gewählt, dass eine Kollisionserkennung zwischen ihnen möglichst einfach wird. Hier werden als Hüllkörper sogenannte Axis-Aligned-Bounding-Boxes(AABB) verwendet, unter denen eine Kollision sehr einfach in $\mathcal{O}(1)$ errechnet werden kann. Das Konzept der AABB wird in \ref{sec:AABB} detaillierter beschrieben.\\
 Für bestimmte Zwecke, meist logische Kollisionen (vgl. Abschnitt \ref{sec:usages}), ist diese abstrakte Kollision sogar schon ausreichend, um eine Reaktion einzuleiten.\\
 
 Verschiedene Anwendungsfälle der Kollision sind im Kontext der Simulation Interaktionen zwischen simulierten Entitäten.
@@ -29,12 +29,12 @@ Im Folgenden werden 2 Algorithmen, die im Rahmen des Projekts implementiert werd
 \subsection{Box-Sort}
 \label{sec:boxsort}
 Bei Box-Sort \cite{houthuys1987box} wird eine binäre Baumstruktur aufgebaut, in der anschließend nach einem Raumbereich gesucht werden kann.
-Zur Darstellung dieser Raumbereiche werden AABBs verwendet, in deren Datenrepräsentation direkt untere und obere Extrempunkte $(b_min, b_max)$ eines Raumbereichs liefert und einen solchen dadurch eingegrenzt (vgl. Abschnitt \ref{sec:aabb}).\\
+Zur Darstellung dieser Raumbereiche werden AABBs verwendet, in deren Datenrepräsentation direkt untere und obere Extrempunkte $(b_{min}, b_{max})$ eines Raumbereichs liefert und einen solchen dadurch eingegrenzt (vgl. Abschnitt \ref{sec:aabb}).\\
 Die AABB des aktuell gesuchten Raumbereichs wird als Query-Box (QB) bezeichnet.
 Es sollen alle damit überlappenden AABBs, welche von interagierenden Entitäten stammen, gefunden werden.
 Auf Grund der Mehrdimensionalität und dem Einsortieren von Bereichen statt Punkten müssen Anpassungen der Baum-Datenstruktur vorgenommen werden.\\
 %%GRR anpassungen von der Baumstruktur in der Quelle oder eines klassischen Binärbaums?
-Ein Knoten referenziert genau eine einsortierte AABB. Als Sortierschlüssel wird dort das untere Extremum $b_min$ der einsortierten AABB in einer einzigen bestimmten Raumdimension verwendet.\\
+Ein Knoten referenziert genau eine einsortierte AABB. Als Sortierschlüssel wird dort das untere Extremum $b_{min}$ der einsortierten AABB in einer einzigen bestimmten Raumdimension verwendet.\\
 Ist die Query-Box in dieser Dimension kleiner als der Schlüssel, kann die Baumhälfte, die höhere Werte beinhaltet, ausgeschlossen werden und muss nicht mehr durchsucht werden. \\
 Die Sortierdimension ist hier für jeden Knoten individuell wählbar.\\
 Um die untere Baumhälfte ausschließen zu können, muss jedoch eine weitere Information vorliegen: Die maximale Ausdehnung der AABBs im unteren Teilbaum nach oben (in der vorher festgelegten Sortierdimension). Der Knoten kann diese jedoch nicht festlegen, da die Sortierung nur anhand der unteren Extrema erfolgt. Deshalb muss jeder Knoten, der darunter liegt, berücksichtigt werden und der Maximalwert aller Nachkommen/Kinder ermittelt werden. Dieser wird beim Baumaufbau im Knoten vermerkt.\\
